@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron')
 
 
 const path = require('path')
-
+var mainWindow = undefined;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
@@ -26,7 +26,7 @@ function createMainWindow() {
 
 app.whenReady().then(() => {
   createMainWindow(mainWindow)
-  setWindow(mainWindow);
+  // setWindow(mainWindow);
   app.on('activate', function () {
 
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
