@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 
-
+var { setWindow,  } = require('./ipc_main.js')
 const path = require('path')
 var mainWindow = undefined;
 function createMainWindow() {
@@ -25,7 +25,7 @@ function createMainWindow() {
 
 app.whenReady().then(() => {
   createMainWindow(mainWindow)
-  // setWindow(mainWindow);
+  setWindow(mainWindow);
   app.on('activate', function () {
 
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow()

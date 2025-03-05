@@ -1,3 +1,8 @@
+/**
+*****************************
+* ndac_home_Page界面主样式
+*****************************
+*/
 .box {
   border: 5px solid #ececf0;
   /* 设置边框颜色为蓝色 */
@@ -14,6 +19,7 @@
   /* 使子元素左右排列并居中 */
   /* 添加阴影效果 */
 }
+
 .inner-box {
   /* 设置高度 */
   background: transparent;
@@ -32,6 +38,7 @@
   /* 设置宽度 */
   height: 380px;
 }
+
 .right-box {
   border: 4px solid #ececf0;
   /* 设置边框颜色 */
@@ -42,6 +49,11 @@
   height: 375px;
 }
 
+/**
+*****************************
+* ndac_home_Page界面底部样式
+*****************************
+*/
 footer {
   background-color: transparent;
   padding: 20px;
@@ -78,10 +90,37 @@ footer {
   color: #888;
   /* text-shadow: 2px 2px 5px rgb(73, 105, 230); */
 }
+
+/**
+*****************************
+* button样式
+*****************************
+*/
 .button {
-  background-color: transparent; 
-  color: white; font-weight: bolder;
-  border: 2px solid white; 
-  border-radius: 5px; 
+  background-color: transparent;
+  color: white;
+  font-weight: bolder;
+  border: 2px solid white;
+  border-radius: 5px;
   box-shadow: 2px 2px 5px rgb(73, 105, 230);
+}
+
+/**
+*****************************
+* 设置功能样式
+*****************************
+*/
+.setup {
+  width: 350px;
+  height: 400px;
+  border: #fffefe 5px solid;
+  border-right: none;
+  position: fixed;
+  margin-top: 162px;
+  right: 0px;
+  transition: right 0.3s ease-in-out;
+  /* 添加滑动动画 */
+  z-index: 999;
+  right: -355px;
+  /* 初始隐藏在右侧 */
 }
