@@ -1,5 +1,5 @@
 {
-  "name": "MKL_Equipment_Remote_Upgrade",
+  "name": "MKL_NDAC",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "icon": "./image/icon.png",
@@ -29,3 +29,4 @@
     "electron-packager": "^17.1.2"
   }
 }
+

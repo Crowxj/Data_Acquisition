@@ -18,9 +18,8 @@ function createMainWindow() {
       enableRemoteModule: true,
     }
   })
-
   // mainWindow.setMenu(null);
-  mainWindow.loadFile('home_Page.html')
+  mainWindow.loadFile('ndac_home_Page.html')
 
 }
 

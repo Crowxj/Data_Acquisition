@@ -1,3 +1,80 @@
-/* styles.css */
+.box {
+  border: 5px solid #ececf0;
+  /* 设置边框颜色为蓝色 */
+  width: 700px;
+  height: 400px;
+  /* 设置背景透明 */
+  background: transparent;
+  margin: 0 auto;
+  /* 设置边框为圆形 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
+  display: flex;
+  /* 使用 Flexbox 布局 */
+  /* justify-content: space-around; */
+  /* 使子元素左右排列并居中 */
+  /* 添加阴影效果 */
+}
+.inner-box {
+  /* 设置高度 */
+  background: transparent;
+  /* 设置背景颜色 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
+  /* 添加阴影效果 */
+}
 
-/* Add styles here to customize the appearance of your app */
+.left-box {
+  /* 可以在这里添加特定于左边框的样式 */
+  border: 2px solid #ececf0;
+  /* 设置边框颜色 */
+  margin-left: 15px;
+  margin-top: 8px;
+  width: 170px;
+  /* 设置宽度 */
+  height: 380px;
+}
+.right-box {
+  border: 4px solid #ececf0;
+  /* 设置边框颜色 */
+  margin-left: 5px;
+  margin-top: 9px;
+  width: 70px;
+  /* 设置宽度 */
+  height: 375px;
+}
+
+footer {
+  background-color: transparent;
+  padding: 20px;
+  text-align: center;
+}
+
+/* 导航链接样式 */
+.footer-nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 50px;
+}
+
+.footer-nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+
+}
+
+.footer-nav ul li a {
+  text-decoration: none;
+  color: #888;
+  text-shadow: 2px 2px 5px rgb(73, 105, 230);
+}
+
+/* 版权信息样式 */
+.footer-info {
+  /* margin: 10px 0; */
+  margin-left: 50px;
+}
+
+.footer-info p {
+  font-size: 12px;
+  color: #888;
+  /* text-shadow: 2px 2px 5px rgb(73, 105, 230); */
+}
