@@ -1,0 +1,31 @@
+{
+  "name": "MKL_Equipment_Remote_Upgrade",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "icon": "./image/icon.png",
+  "main": "main.js",
+  "scripts": {
+    "start": "chcp 65001 && electron ."
+  },
+  "build": {
+    "asar": false,
+    "asarUnpack": [
+      "**/*.pdf",
+      "**/*.zip"
+    ]
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^34.0.2",
+    "electron-packager": "^17.1.2"
+  }
+}

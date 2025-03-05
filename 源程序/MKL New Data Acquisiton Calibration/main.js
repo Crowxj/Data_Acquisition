@@ -1,0 +1,41 @@
+const { app, BrowserWindow } = require('electron')
+
+
+const path = require('path')
+
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1500,
+    height: 800,
+    frame:true,
+    resizable: true,
+    // maximizable: true,
+    // fullscreen: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true, //允许远程模块使用
+      // contextIsolation: false,
+      enableRemoteModule: true,
+    }
+  })
+
+  // mainWindow.setMenu(null);
+  mainWindow.loadFile('home_Page.html')
+
+}
+
+app.whenReady().then(() => {
+  createMainWindow(mainWindow)
+  setWindow(mainWindow);
+  app.on('activate', function () {
+
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+  })
+})
+
+
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
+
+
