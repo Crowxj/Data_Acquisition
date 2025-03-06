@@ -9,19 +9,68 @@
 </head>
 
 <body style="background-image: url('./image/ndac_home_Page.png'); background-size: cover;background-repeat: no-repeat;">
-  <!-- 设置界面 -->
-   <div  id="ndac_setup_home_Page" class="setup" >
-    <button id="ndac_setup_home_Page_exit"
-      style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
-        src="./image/ndac_setup_home_Page_exit.png" style="width: 30px;height: 30px;margin-left: 5px;margin-top: 5px;"></button>
-   </div>
-
+  <!-- 系统设置界面 -->
   <div>
-    <div  style="margin-top: 0px; margin-bottom: 10px; margin-left: 0px; margin-right: 0px; text-align: right; ">
+    <fieldset id="ndac_setup_home_Page">
+      <legend id="">系统设置</legend>
+      <div>
+        <button id="ndac_setup_home_Page_exit"
+          style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
+            src="./image/ndac_setup_home_Page_exit.png"
+            style="width: 30px;height: 30px;margin-left: -15px;margin-top: -100px;"></button>
+      </div>
+      <!-- 换行 -->
+      <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
+        <hr style="border: 1px solid white;">
+      </div>
+      <div style="margin-top: 15px;margin-left: -10px;">
+        <label>DSP IP&nbsp;&nbsp;:</label>
+        <input id="" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;"></input>
+      </div>
+      <!-- 换行 -->
+      <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
+        <hr style="border: 1px solid white; border-style: dashed;">
+      </div>
+      <!-- CANFD -->
+      <div style="margin-top: 15px;margin-left: -10px;">
+        <label>CANFD&nbsp;:</label>
+        <select id="" style="width: 145px;height:30px;margin-left: 5px;opacity: 0.7;">
+          <option value="61015">15</option>
+          <option value="61016" selected>16</option>
+        </select>
+      </div>
+      <!-- 对应端口 -->
+      <div style="margin-top: 15px;margin-left: -10px;">
+        <label>对应端口:</label>
+        <input id="" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;"></input>
+      </div>
+      <!-- 换行 -->
+      <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
+        <hr style="border: 1px solid white; border-style: dashed;">
+      </div>
+      <!-- 回传时间 -->
+      <div style="margin-top: 15px;margin-left: -10px;">
+        <label>回传时间:</label>
+        <input id="" style="width: 100px;height:25px;margin-left: 3px;opacity:0.7;"></input>
+        <label style="font-size: 20px;font-style:italic ;">ms</label>
+      </div>
+      <!-- 换行 -->
+      <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
+        <hr style="border: 1px solid white;">
+      </div>
+      <div style="margin-top: 20px;">
+        <button id="home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
+        <button id="home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">设置</button>
+      </div>
+    </fieldset>
+  </div>
+  <!-- 正文 -->
+  <div>
+    <div style="margin-top: 0px; margin-bottom: 10px; margin-left: 0px; margin-right: 0px; text-align: right; ">
       <!-- 窗口控制按钮 -->
       <button id="ndac_home_Page_setup"
-      style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
-        src="./image/ndac_win_setup.png" style="width: 30px;height: 30px;"></button>
+        style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
+          src="./image/ndac_win_setup.png" style="width: 30px;height: 30px;"></button>
       <button id="ndac_home_Page_min"
         style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
           src="./image/ndac_win_min.png" style="width: 30px;height: 30px;"></button>
@@ -68,15 +117,15 @@
       </div>
       <!-- 窗口内容_右边 -->
       <div
-        style="margin-left: 50px;color: white;text-shadow: 2px 2px 4px rgba(0, 0, 0,200); font-weight: bold; font-size: 25px;">
+        style="margin-left: 40px;color: white;text-shadow: 2px 2px 4px rgba(0, 0, 0,200); font-weight: bold; font-size: 25px;">
         <!-- 设备号 -->
-        <div style="margin-top: 15px;margin-left: 30px;">
+        <div style="margin-top: 60px;margin-left: 30px;">
           <label>设备号&nbsp;&nbsp;:</label>
           <input type="number" id="" value="1" min="1" max="16"
             style="width: 215px;height:25px;margin-left: 10px;opacity:1;" disabled></input>
         </div>
         <!-- 数采ip -->
-        <div style="margin-top: 15px;margin-left: 25px;">
+        <div style="margin-top: 20px;margin-left: 25px;">
           <label>DPS&nbsp;IP&nbsp;:</label>
           <select id="ip-dropdown" style="width: 221px;height:30px;margin-left: 14px;opacity: 0.7;">
             <option value="192.168.1.1">192.168.1.1</option>
@@ -85,13 +134,13 @@
           </select>
         </div>
         <!-- 板卡号 -->
-        <div style="margin-top: 15px;margin-left: 30px;">
+        <!-- <div style="margin-top: 15px;margin-left: 30px;">
           <label>板卡号&nbsp;&nbsp;:</label>
           <input type="number" id="" value="1" min="1" max="99"
             style="width: 215px;height:25px;margin-left: 10px;opacity:0.7;"></input>
-        </div>
+        </div> -->
         <!-- CANFD -->
-        <div style="margin-top: 15px;margin-left: 25px;">
+        <div style="margin-top: 20px;margin-left: 25px;">
           <label>CANFD:</label>
           <select id="" style="width: 220px;height:30px;margin-left: 15px;opacity: 0.7;">
             <option value="Dev01">15</option>
@@ -99,19 +148,18 @@
           </select>
         </div>
         <!-- 校准模式 -->
-        <div style="margin-top: 15px;margin-left: 30px;">
+        <div style="margin-top: 20px;margin-left: 30px;">
           <label>模&nbsp;&nbsp;&nbsp;式&nbsp;&nbsp;:</label>
           <select id="" style="width: 220px;height:30px;margin-left: 14px;opacity: 0.7;">
             <option value="Dev01" selected>四段校准</option>
             <option value="Dev02">二次校准</option>
           </select>
         </div>
-        <div style="margin-top: 35px;margin-left: 30px;">
+        <div style="margin-top: 45px;margin-left: 30px;">
           <hr style="border: 1px solid white;">
         </div>
         <div style="margin-top:25px;margin-left: 30px;">
-          <button id="home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
-          <button id="home_Page_next" class="button" style="width: 100px;height: 26px;margin-left: 50px;">下一步</button>
+          <button id="home_Page_next" class="button" style="width: 100px;height: 26px;margin-left: 220px;">下一步</button>
         </div>
       </div>
     </div>

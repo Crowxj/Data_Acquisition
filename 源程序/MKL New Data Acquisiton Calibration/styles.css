@@ -110,17 +110,31 @@ footer {
 * 设置功能样式
 *****************************
 */
-.setup {
-  width: 350px;
-  height: 400px;
+fieldset {
+  width: 340px;
+  height: 390px;
   border: #fffefe 5px solid;
   border-right: none;
   position: fixed;
-  margin-top: 162px;
-  right: 0px;
+  margin-top: 149px;
+  /* right: 0px; */
   transition: right 0.3s ease-in-out;
   /* 添加滑动动画 */
   z-index: 999;
-  right: -355px;
-  /* 初始隐藏在右侧 */
+  right: -410px;
+  color: #faf8f8;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);
+  font-weight: bold;
+  font-size: 25px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
+
+}
+
+legend {
+  color: white;
+  padding: 0px 10px;
+  font-weight: bold;
+  transform: skewX(-20deg);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);
+  margin-left: 200px;
 }

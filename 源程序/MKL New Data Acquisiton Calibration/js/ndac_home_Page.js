@@ -38,7 +38,7 @@ const ndac_home_Page_setup = document.getElementById('ndac_home_Page_setup')
 ndac_home_Page_setup.addEventListener('click', () => {
     const ndac_setup_home_Page = document.getElementById('ndac_setup_home_Page')
     ndac_setup_home_Page.style.transition = 'none';
-    ndac_setup_home_Page.style.right = '-355px';
+    ndac_setup_home_Page.style.right = '-410px';
     void ndac_setup_home_Page.offsetWidth;
     ndac_setup_home_Page.style.transition = 'right 0.3s ease-in-out';
     ndac_setup_home_Page.style.right = '0';
@@ -53,5 +53,5 @@ const ndac_setup_home_Page_exit = document.getElementById('ndac_setup_home_Page_
 ndac_setup_home_Page_exit.addEventListener('click', () => {
     const ndac_setup_home_Page = document.getElementById('ndac_setup_home_Page')
     ndac_setup_home_Page.style.transition = 'right 0.3s ease-in-out';
-    ndac_setup_home_Page.style.right = '-355px';
+    ndac_setup_home_Page.style.right = '-410px';
 })
