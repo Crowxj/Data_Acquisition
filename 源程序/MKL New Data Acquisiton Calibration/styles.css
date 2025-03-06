@@ -111,7 +111,7 @@ footer {
 *****************************
 */
 fieldset {
-  width: 340px;
+  width: 320px;
   height: 390px;
   border: #fffefe 5px solid;
   border-right: none;
@@ -139,62 +139,105 @@ legend {
   margin-left: 200px;
 }
 
-   /* 开关按钮的容器 */
-   .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+/* 开关按钮的容器 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
 }
 
 /* 隐藏默认的复选框 */
 .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 /* 滑块的样式 */
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 24px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
 }
 
 /* 滑块的圆形按钮 */
 .slider:before {
-    position: absolute;
-    content: "";
-    height:16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
 }
 
 /* 当复选框被选中时，改变滑块的背景色 */
-input:checked + .slider {
-    background-color: #2196F3;
+input:checked+.slider {
+  background-color: #2196F3;
 }
 
 /* 当复选框被选中时，移动滑块 */
-input:checked + .slider:before {
-    transform: translateX(26px);
+input:checked+.slider:before {
+  transform: translateX(26px);
 }
 
 /* 圆角样式 */
 .slider.round {
-    border-radius: 24px;
+  border-radius: 24px;
 }
 
 .slider.round:before {
-    border-radius: 50%;
+  border-radius: 50%;
+}
+
+/**
+*****************************
+* 弹出对话框样式
+*****************************
+*/
+.ndac_dialog {
+  display: none;
+  /* 默认隐藏对话框 */
+  position: fixed;
+  border: #fbfafa 3px solid;
+  left: 40%;
+  width: 320px;
+  height: 140px;
+  z-index: 5000;
+  /* 保证对话框在最上层 */
+  justify-content: center;
+  align-items: center;
+  /* 设置边框为圆形 */
+  /* border-radius: 5%; */
+  /* 添加阴影效果 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
+  background-image: url('./image/nadc_dialog.png');
+  background-size: cover;
+}
+
+.ndac_dialog_div {
+  display: flex;
+  align-items: center;
+  margin-top: 45px;
+  margin-left: 20px;
+}
+
+.ndac_dialog_img {
+  width: 50px;
+  margin-right: 10px;
+}
+
+.ndac_dialog_label {
+  font-size: 20px;
+  font-weight: bolder;
+  color: rgb(255, 254, 254);
 }

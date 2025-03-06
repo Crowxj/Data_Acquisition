@@ -9,7 +9,17 @@
 </head>
 
 <body style="background-image: url('./image/ndac_home_Page.png'); background-size: cover;background-repeat: no-repeat;">
-  <!-- 系统设置界面 -->
+
+  <!-- 对话框 -->
+  <div class="ndac_dialog" id="ndac_dialog">
+    <div class="ndac_dialog_div">
+      <!-- 显示提示图片 -->
+      <img src="./image/nadc_dialog_notice.png" class="ndac_dialog_img">
+      <!-- 显示设置成功标签，与图片对齐 -->
+      <label class=" ndac_dialog_label" id="ndac_dialog_label">提示信息</label>
+    </div>
+  </div>
+  <!-- 系统设置 -->
   <div>
     <fieldset id="ndac_setup_home_Page">
       <legend id="">系统设置</legend>
@@ -23,12 +33,12 @@
       <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
         <hr style="border: 1px solid white;">
       </div>
-      <div style="margin-top: 15px;margin-left: -10px;display: flex;align-items: center;">
+      <div style="margin-top: 15px;margin-left: -4px;display: flex;align-items: center;">
         <label>DSP IP&nbsp;&nbsp;:</label>
-        <input id="" style="width: 160px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;"></input>
+        <input id="ndac_dspip_set" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;" disabled></input>
         <!-- 开关 -->
-        <label class="switch" style="margin-left: 15px;">
-          <input type="checkbox" id="myCheckbox">
+        <label class="switch" style="margin-left: 10px;">
+          <input type="checkbox" id="ndac_dspip_switch">
           <span class="slider round"></span>
         </label>
       </div>
@@ -37,35 +47,36 @@
         <hr style="border: 1px solid white; border-style: dashed;">
       </div>
       <!-- CANFD -->
-      <div style="margin-top: 15px;margin-left: -10px; display: flex;align-items: center;">
+      <div style="margin-top: 15px;margin-left: -4px; display: flex;align-items: center;">
         <label>CANFD&nbsp;:</label>
-        <select id="" style="width: 167px;height:30px;margin-left: 10px;opacity: 0.7;">
-          <option value="61015">15</option>
-          <option value="61016" selected>16</option>
+        <select id="ndac_canfd_num_set" style="width: 147px;height:30px;margin-left: 10px;opacity: 0.7;" disabled>
+          <option value="15" >15</option>
+          <option  value="16" selected>16</option>
         </select>
         <!-- 开关 -->
-        <label class="switch" style="margin-left: 15px;">
-          <input type="checkbox" id="myCheckbox">
+        <label class="switch" style="margin-left: 10px;">
+          <input type="checkbox" id="ndac_canfdport_switch">
           <span class="slider round"></span>
         </label>
       </div>
       <!-- 对应端口 -->
-      <div style="margin-top: 15px;margin-left: -10px;">
+      <div style="margin-top: 15px;margin-left: -4px;">
         <label>对应端口:</label>
-        <input id="" style="width: 160px;height:25px;margin-left: 1px;opacity:0.7;"></input>
+        <input id="ndac_canfd_port_set" value="61016" style="width: 140px;height:25px;margin-left: 1px;opacity:0.7;" disabled></input>
       </div>
       <!-- 换行 -->
       <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
         <hr style="border: 1px solid white; border-style: dashed;">
       </div>
       <!-- 回传时间 -->
-      <div style="margin-top: 15px;margin-left: -10px; display: flex;align-items: center;">
+      <div style="margin-top: 15px;margin-left: -4px; display: flex;align-items: center;">
         <label>回传时间:</label>
-        <input id="" style="width: 123px;height:25px;margin-left: 10px;opacity:0.7;"></input>
+        <input id="ndac_passback_time" value="100" style="width: 100px;height:25px;margin-left: 10px;opacity:0.7;"
+          disabled></input>
         <label style="font-size: 20px;font-style:italic ;margin-left: 5px;">ms</label>
         <!-- 开关 -->
         <label class="switch" style="margin-left: 15px;">
-          <input type="checkbox" id="myCheckbox">
+          <input type="checkbox" id="ndac_passback_switch">
           <span class="slider round"></span>
         </label>
       </div>
@@ -74,8 +85,8 @@
         <hr style="border: 1px solid white;">
       </div>
       <div style="margin-top: 20px;">
-        <button id="home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
-        <button id="home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">设置</button>
+        <button id="ndac_home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
+        <button id="ndac_home_Page_save" class="button" style="width: 100px;height: 26px;margin-left: 40px;">设置</button>
       </div>
     </fieldset>
   </div>
@@ -94,6 +105,7 @@
         <img src="./image/ndac_win_close.png" style="width: 30px;height: 30px;">
       </button>
     </div>
+
     <!-- 窗口标题 -->
     <div style="text-align: center; margin-top: 0px;">
       <h1
@@ -136,45 +148,40 @@
         <!-- 设备号 -->
         <div style="margin-top: 60px;margin-left: 30px;">
           <label>设备号&nbsp;&nbsp;:</label>
-          <input type="number" id="" value="1" min="1" max="16"
-            style="width: 215px;height:25px;margin-left: 10px;opacity:1;" disabled></input>
+          <input type="number" id="ndac_device_num" value="1" min="1" max="16"
+            style="width: 215px;height:25px;margin-left: 10px;opacity:0.7;" disabled></input>
         </div>
         <!-- 数采ip -->
         <div style="margin-top: 20px;margin-left: 25px;">
           <label>DPS&nbsp;IP&nbsp;:</label>
-          <select id="ip-dropdown" style="width: 221px;height:30px;margin-left: 14px;opacity: 0.7;">
+          <select id="ndac_dspip_num" style="width: 221px;height:30px;margin-left: 14px;opacity: 0.7;">
             <option value="192.168.1.1">192.168.1.1</option>
             <option value="192.168.1.2">192.168.1.2</option>
             <option value="other">Other...</option>
           </select>
         </div>
-        <!-- 板卡号 -->
-        <!-- <div style="margin-top: 15px;margin-left: 30px;">
-          <label>板卡号&nbsp;&nbsp;:</label>
-          <input type="number" id="" value="1" min="1" max="99"
-            style="width: 215px;height:25px;margin-left: 10px;opacity:0.7;"></input>
-        </div> -->
         <!-- CANFD -->
         <div style="margin-top: 20px;margin-left: 25px;">
           <label>CANFD:</label>
-          <select id="" style="width: 220px;height:30px;margin-left: 15px;opacity: 0.7;">
-            <option value="Dev01">15</option>
-            <option value="Dev01" selected>16</option>
+          <select id="ndac_canfd_num" style="width: 220px;height:30px;margin-left: 15px;opacity: 0.7;" disabled >
+            <option value="15"  >15</option>
+            <option value="16" selected>16</option>
           </select>
         </div>
         <!-- 校准模式 -->
         <div style="margin-top: 20px;margin-left: 30px;">
           <label>模&nbsp;&nbsp;&nbsp;式&nbsp;&nbsp;:</label>
-          <select id="" style="width: 220px;height:30px;margin-left: 14px;opacity: 0.7;">
-            <option value="Dev01" selected>四段校准</option>
-            <option value="Dev02">二次校准</option>
+          <select id="ndac_mode" style="width: 220px;height:30px;margin-left: 14px;opacity: 0.7;">
+            <option value="mdacMode1" selected>四段校准</option>
+            <option value="mdacMode2">二次校准</option>
           </select>
         </div>
         <div style="margin-top: 45px;margin-left: 30px;">
           <hr style="border: 1px solid white;">
         </div>
         <div style="margin-top:25px;margin-left: 30px;">
-          <button id="home_Page_next" class="button" style="width: 100px;height: 26px;margin-left: 220px;">下一步</button>
+          <button id="ndac_home_Page_next" class="button"
+            style="width: 100px;height: 26px;margin-left: 220px;">下一步</button>
         </div>
       </div>
     </div>
