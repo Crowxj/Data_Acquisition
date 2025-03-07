@@ -197,13 +197,21 @@ ndac_home_Page_save.addEventListener('click', () => {
     //弹出设置成功对话框
     ndac_dialog.style.display = 'block';
     ndac_dialog_label.innerText = '设置成功，退出系统设置'
+    SETUPSIGN = true;//退出
     setTimeout(() => {
+        if (SETUPSIGN == true) {
+            const ndac_dspip_num = document.getElementById('ndac_dspip_num');//dps ip能选
+            ndac_dspip_num.disabled = false;
+            const ndac_mode = document.getElementById('ndac_mode');//模式能选
+            ndac_mode.disabled = false;
+        }
         ndac_dialog.style.display = 'none';
         SETUPSIGN = true;//退出系统设置
         const ndac_setup_home_Page = document.getElementById('ndac_setup_home_Page')
         ndac_setup_home_Page.style.transition = 'right 0.3s ease-in-out';
         ndac_setup_home_Page.style.right = '-410px';
     }, 1000); // 调整为1秒
+
     //保存CANFD端口到canfd_port数组中
     canfd_port[ndac_canfd_num_set.value] = ndac_canfd_port_set.value;
     // portValue = getPortByCANFD(ndac_canfd_num.value);
@@ -223,7 +231,7 @@ ndac_home_Page_next.addEventListener('click', () => {
     const ndac_dialog = document.getElementById('ndac_dialog')
     const ndac_dialog_label = document.getElementById('ndac_dialog_label')
     ndac_dialog.style.display = 'none';
-    const ndac_canfd_num = document.getElementById('ndac_canfd_num');//CANFD号
+    const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');//CANFD号
     const ndac_mode = document.getElementById('ndac_mode');//模式
     if (SETUPSIGN == false) {
         ndac_dialog.style.display = 'block';
@@ -231,15 +239,15 @@ ndac_home_Page_next.addEventListener('click', () => {
         setTimeout(() => {
             ndac_dialog.style.display = 'none';
         }, 1000); // 调整为1秒
-    } else if (ndac_canfd_num.value < 0) {
+    } else if (ndac_canfd_port_set.value < 0) {
         ndac_dialog.style.display = 'block';
-        ndac_dialog_label.innerText = 'CANFD对应端口不能为负数'
+        ndac_dialog_label.innerText = 'CANFD对应端口不能为负'
         setTimeout(() => {
             ndac_dialog.style.display = 'none';
         }, 1000); // 调整为1秒
-    } else if (ndac_canfd_num.value == 0) {
+    } else if (ndac_canfd_port_set.value == 0) {
         ndac_dialog.style.display = 'block';
-        ndac_dialog_label.innerText = 'CANFD对应端口为0'
+        ndac_dialog_label.innerText = 'CANFD对应端口不能为0'
         setTimeout(() => {
             ndac_dialog.style.display = 'none';
         }, 1000); // 调整为1秒

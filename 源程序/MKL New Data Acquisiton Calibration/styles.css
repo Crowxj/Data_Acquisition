@@ -241,3 +241,117 @@ input:checked+.slider:before {
   font-weight: bolder;
   color: rgb(255, 254, 254);
 }
+/**
+*****************************
+* ndac_aboutus_Page界面主样式
+* ndac_guide_Page界面主样式
+*****************************
+*/
+.link-body {
+  background-image: url('./image/nadc_home_Page_link.png');
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 40px 20px 20px;
+  /* 增加顶部padding给控制按钮留空间 */
+  position: relative;
+}
+
+/* 内容框样式 */
+.content-box {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px;
+  /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); */
+  min-height: 590px;
+}
+
+/* 控制按钮位置微调 */
+.window-controls {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 100;
+}
+
+/* 内容框标题样式 */
+.content-title {
+  font-size: 30px;
+  color: #022348;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #00a8ff;
+  padding-bottom: 10px;
+
+}
+
+/* 示例内容样式 */
+.status-item {
+  padding: 10px;
+  /* margin: 10px 0; */
+  background-color: rgba(2, 35, 72, 0.1);
+  border-radius: 5px;
+}
+
+/* 左侧导航栏样式 */
+/* 左侧导航栏样式 */
+.sidebar {
+background-color: rgba(255, 255, 255, 0.3);
+border-radius: 10px;
+width: 200px;
+height: 460px;
+/* background-color: rgba(40, 40, 40, 0.8); */
+padding: 20px 0;
+/* box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); */
+margin-right: 20px; /* 添加右边距 */
+}
+
+.sidebar2 {
+background-color: rgba(255, 255, 255, 0.3);
+border-radius: 10px;
+width: 1075px;
+height: 480px;
+/* background-color: rgba(40, 40, 40, 0.8); */
+padding: 10px 10px;
+margin-left: 50px;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  padding: 15px 25px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  transform: skewX(-20deg);
+  text-shadow: 0 0 20px rgba(0, 0, 0, 200);
+}
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-left: 30px;
+}
+.nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background-color: #00a8ff;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.nav-item:hover::before {
+  opacity: 1;
+}
