@@ -35,7 +35,7 @@
       </div>
       <div style="margin-top: 15px;margin-left: -4px;display: flex;align-items: center;">
         <label>DSP IP&nbsp;&nbsp;:</label>
-        <input id="ndac_dspip_set" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;" disabled></input>
+        <input id="ndac_dspip_set" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;" placeholder="Temporary IP address" disabled></input>
         <!-- 开关 -->
         <label class="switch" style="margin-left: 10px;">
           <input type="checkbox" id="ndac_dspip_switch">
@@ -61,8 +61,8 @@
       </div>
       <!-- 对应端口 -->
       <div style="margin-top: 15px;margin-left: -4px;">
-        <label>对应端口:</label>
-        <input id="ndac_canfd_port_set" value="61016" style="width: 140px;height:25px;margin-left: 1px;opacity:0.7;" disabled></input>
+        <label>端&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;口&nbsp;:</label>
+        <input id="ndac_canfd_port_set" value="61016" style="width: 140px;height:25px;margin-left: 6px;opacity:0.7;" disabled></input>
       </div>
       <!-- 换行 -->
       <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
@@ -71,7 +71,7 @@
       <!-- 回传时间 -->
       <div style="margin-top: 15px;margin-left: -4px; display: flex;align-items: center;">
         <label>回传时间:</label>
-        <input id="ndac_passback_time" value="100" style="width: 100px;height:25px;margin-left: 10px;opacity:0.7;"
+        <input id="ndac_passback_time" value="500" style="width: 100px;height:25px;margin-left: 10px;opacity:0.7;"
           disabled></input>
         <label style="font-size: 20px;font-style:italic ;margin-left: 5px;">ms</label>
         <!-- 开关 -->
@@ -154,10 +154,9 @@
         <!-- 数采ip -->
         <div style="margin-top: 20px;margin-left: 25px;">
           <label>DPS&nbsp;IP&nbsp;:</label>
-          <select id="ndac_dspip_num" style="width: 221px;height:30px;margin-left: 14px;opacity: 0.7;">
-            <option value="192.168.1.1">192.168.1.1</option>
+          <select id="ndac_dspip_num" size="1" style="width: 221px;height:30px;margin-left: 14px;opacity: 0.7;">
+            <option value="192.168.1.1" selected>192.168.1.1</option>
             <option value="192.168.1.2">192.168.1.2</option>
-            <option value="other">Other...</option>
           </select>
         </div>
         <!-- CANFD -->
