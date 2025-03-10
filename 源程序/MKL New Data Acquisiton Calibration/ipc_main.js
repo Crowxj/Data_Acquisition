@@ -52,7 +52,7 @@ ipcMain.on('Buttoned', async (event, id) => {
             break;
 
     }
-    console.log(`ipc =Buttoned ${id},${Operation_tips}`);
+    console.log(`ipc = Buttoned ${id},${Operation_tips}`);
 });
 
 ipcMain.on('toMain2', async (event, id, d1) => {
@@ -63,6 +63,7 @@ ipcMain.on('toMain2', async (event, id, d1) => {
             break;
     }
     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
+
 });
 
 
@@ -70,32 +71,31 @@ ipcMain.on('toMain2', async (event, id, d1) => {
 // ipcMain.on('toMain3', async (event, id, d1, d2) => {
 //     switch (id) {
 //         case 1:
-//             operate = "设置透传的ip和端口及传输方式";
-//             read_Connect_Settings_File(id, d1, d2);
+//             Operation_tips = `进入${d1}界面`;
+//             mainWindow.loadFile("./html/" + d1);
+//             // console.log(d2)
+//             // showValue(1,`123`)
 //             break;
 //     }
-
-// });
-
-// ipcMain.on('Buttoned', (_event, btn) => {
-
+//     console.log(`ipc = toMain3 ${id},${Operation_tips}`);
 // });
 
 
-// function showStatus(value) {
-//     if (mainWindow != null) {
-//         mainWindow.webContents.send('status_update', value);
-//     }
-// }
+
+function showStatus(value) {
+    if (mainWindow != null) {
+        mainWindow.webContents.send('status_update', value);
+    }
+}
 
 
 
 
-// function showValue(id, value) {
-//     if (mainWindow != null) {
-//         mainWindow.webContents.send('multi_data', id, value);
-//     }
-// }
+function showValue(id, value) {
+    if (mainWindow != null) {
+        mainWindow.webContents.send('multi_data', id, value);
+    }
+}
 
 // function showValue2(id, value1, value2) {
 //     if (mainWindow != null) {

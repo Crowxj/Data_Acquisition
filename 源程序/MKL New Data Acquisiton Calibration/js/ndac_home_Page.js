@@ -9,6 +9,11 @@ var canfd_port = {};
 var ndac_canfd_num = null;
 document.addEventListener('DOMContentLoaded', () => {
     SETUPSIGN = true;//退出标识
+
+    // 恢复设置
+    restoreUserSelection();
+
+
     const ndac_dspip_set = document.getElementById('ndac_dspip_set');//初始设置dps ip等于默认选择ip
     const ndac_dspip_num = document.getElementById('ndac_dspip_num');
     ndac_dspip_set.value = ndac_dspip_num.value;
@@ -20,15 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 为两个选择框添加事件监听器
     ndac_canfd_num_set.addEventListener('change', syncCANFDValues);
     canfd_port[ndac_canfd_num_set.value] = ndac_canfd_port_set.value;//系统保存CANFD和端口的值
+    saveCANFDPortToSessionStorage();
     // 定义一个函数来同步两个选择框的值
     function syncCANFDValues(event) {
         const selectedValue = event.target.value;
         if (event.target === ndac_canfd_num_set) {
             ndac_canfd_num.value = selectedValue;
+            canfd_port[selectedValue] = ndac_canfd_port_set.value; // 更新canfd_port对象
+            saveCANFDPortToSessionStorage(); // 保存到sessionStorage
         }
     }
-    //恢复设置
-    // restoreUserSelection();
 })
 
 
@@ -124,6 +130,8 @@ ndac_setup_home_Page_exit.addEventListener('click', () => {//点击系统退出
     setTimeout(() => {
         ndac_dialog.style.display = 'none';
     }, 1000); // 调整为1秒
+
+    saveUserSelection();
 })
 /**
 * 模块名:ndac_dspip_switch
@@ -217,6 +225,7 @@ const ndac_dspip_num = document.getElementById('ndac_dspip_num');
 ndac_dspip_num.addEventListener('change', () => {
     const ndac_dspip_set = document.getElementById('ndac_dspip_set');
     ndac_dspip_set.value = ndac_dspip_num.value;
+    saveUserSelection();
 })
 
 /**
@@ -282,8 +291,8 @@ ndac_home_Page_save.addEventListener('click', () => {
         }, 1000); // 调整为1秒
         return -1;
     } else {//符合条件写入到canfd
-        canfd_port[ndac_canfd_num_set.value] = ndac_canfd_port_set.value;
-    }
+
+    };
     //回传时间
     const ndac_passback_time = document.getElementById('ndac_passback_time');//选择可以编辑时间
     if (ndac_passback_time.value < 100) {
@@ -340,6 +349,9 @@ ndac_home_Page_save.addEventListener('click', () => {
         ndac_setup_home_Page.style.transition = 'right 0.3s ease-in-out';
         ndac_setup_home_Page.style.right = '-410px';
     }, 1000); // 调整为1秒
+
+    // 保存用户设置
+    saveUserSelection();
 })
 
 /**
@@ -402,7 +414,6 @@ ndac_home_Page_next.addEventListener('click', () => {
         }, 1000); // 调整为1秒
         return -1;
     } else {
-        saveUserSelection();//保存用户设置信息
         switch (ndac_mode.value) {
             case 'ndacMode1':
                 ndac_dialog.style.display = 'block';
@@ -411,6 +422,7 @@ ndac_home_Page_next.addEventListener('click', () => {
                 setTimeout(() => {
                     ndac_dialog.style.display = 'none';
                     window.TheIPC.toMain2(1, ndacMode1html);//跳转界面
+           
                 }, 1000);
                 break;
             case 'ndacMode2':
@@ -426,41 +438,49 @@ ndac_home_Page_next.addEventListener('click', () => {
 })
 
 
-/**
-* 模块名:saveUserSelection
-* 代码描述:保存用户配置信息
-* 作者:Crow
-* 创建时间:2025/03/10 08:35:47
-*/
+// /**
+// * 模块名:saveUserSelection
+// * 代码描述:保存用户配置信息
+// * 作者:Crow
+// * 创建时间:2025/03/10 08:35:47
+// */
+
+
+
+
 
 function saveUserSelection() {
+    // 保存所有IP选项
+    const ipOptions = Array.from(ndac_dspip_num.options).map(opt => opt.value);
+    sessionStorage.setItem('ipOptions', JSON.stringify(ipOptions));
 
-    const ndac_dspip_set = document.getElementById('ndac_dspip_set');//DSP IP设置
-    const ndac_dspip_switch = document.getElementById('ndac_dspip_switch');//DSP IP开关
-    const ndac_canfd_num_set = document.getElementById('ndac_canfd_num_set');//CANFD设置
-    const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');//CANFD PORT 设置
-    const ndac_canfdport_switch = document.getElementById('ndac_canfdport_switch');//CANFD PORT开关
-    const ndac_passback_time = document.getElementById('ndac_passback_time');//回传时间设置
-    const ndac_passback_switch = document.getElementById('ndac_passback_switch');//回传时间开关
-    const ndac_device_num = document.getElementById('ndac_device_num');//设备号
-    const ndac_dspip_num = document.getElementById('ndac_dspip_num');//DSP IP
-    const ndac_canfd_num = document.getElementById('ndac_canfd_num');//CANFD号
-    const ndac_mode = document.getElementById('ndac_mode');//模式
+    // 保存其他配置项
+    const elementsToSave = {
+        ndac_dspip_set: document.getElementById('ndac_dspip_set').value,//保存ip设置的值
+        ndac_dspip_switch: document.getElementById('ndac_dspip_switch').checked,//ip设置的开关
+        ndac_canfd_num_set: document.getElementById('ndac_canfd_num_set').value,//canfd设置的值
+        ndac_canfd_port_set: document.getElementById('ndac_canfd_port_set').value,//端口的值
+        ndac_canfdport_switch: document.getElementById('ndac_canfdport_switch').checked,//canfd的开关
+        ndac_passback_time: document.getElementById('ndac_passback_time').value,//时间的的值
+        ndac_passback_switch: document.getElementById('ndac_passback_switch').checked,//时间的开关
+        ndac_device_num: document.getElementById('ndac_device_num').value,//设备号的值
+        ndac_dspip_num: document.getElementById('ndac_dspip_num').value,//dspip值
+        ndac_canfd_num: document.getElementById('ndac_canfd_num').value,//canfd号
+        ndac_mode: document.getElementById('ndac_mode').value,//模式
+    };
 
-    localStorage.setItem('ndac_dspip_set', ndac_dspip_set.value);//保存 DSP IPS设置
-    localStorage.setItem('ndac_dspip_switch', ndac_dspip_switch.value);//保存DSP IP开关
-    localStorage.setItem('ndac_canfd_num_set', ndac_canfd_num_set.value);//保存CANFD设置
-    localStorage.setItem('ndac_canfd_port_set', ndac_canfd_port_set.value);//保存ORT设置
-    localStorage.setItem('ndac_canfdport_switch', ndac_canfdport_switch.value);//保存CANFD PORT开关
-    localStorage.setItem('ndac_passback_time', ndac_passback_time.value);//保存回传时间设置
-    localStorage.setItem('ndac_passback_switch', ndac_passback_switch.value);//保存回传时间开关
-    localStorage.setItem('ndac_device_num', ndac_device_num.value);//保存设备号
-    localStorage.setItem('ndac_dspip_num', ndac_dspip_num.value);//保存DSP IP
-    localStorage.setItem('ndac_canfd_num', ndac_canfd_num.value);//保存CANFD号
-    localStorage.setItem('ndac_mode', ndac_mode.value);//保存模式
-    localStorage.setItem('canfd_port', canfd_port);//保存对应CANFD PORT值
+    Object.keys(elementsToSave).forEach(key => {
+        sessionStorage.setItem(key, elementsToSave[key]);
+    });
 
 }
+
+// 定义一个函数来保存canfd_port到sessionStorage
+function saveCANFDPortToSessionStorage() {
+    sessionStorage.setItem('canfd_port', JSON.stringify(canfd_port));
+}
+
+
 
 /**
 * 模块名:restoreUserSelection
@@ -468,30 +488,68 @@ function saveUserSelection() {
 * 作者:Crow
 * 创建时间:2025/03/10 09:14:27
 */
-
 function restoreUserSelection() {
-    const ndac_dspip_set = document.getElementById('ndac_dspip_set');//DSP IP设置
-    const ndac_dspip_switch = document.getElementById('ndac_dspip_switch');//DSP IP开关
-    const ndac_canfd_num_set = document.getElementById('ndac_canfd_num_set');//CANFD设置
-    const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');//CANFD PORT 设置
-    const ndac_canfdport_switch = document.getElementById('ndac_canfdport_switch');//CANFD PORT开关
-    const ndac_passback_time = document.getElementById('ndac_passback_time');//回传时间设置
-    const ndac_passback_switch = document.getElementById('ndac_passback_switch');//回传时间开关
-    const ndac_device_num = document.getElementById('ndac_device_num');//设备号
-    const ndac_dspip_num = document.getElementById('ndac_dspip_num');//DSP IP
-    const ndac_canfd_num = document.getElementById('ndac_canfd_num');//CANFD号
-    const ndac_mode = document.getElementById('ndac_mode');//模式
+    const elementsToRestore = [
+        'ndac_dspip_set', //dsp ip 设置
+        'ndac_dspip_switch', //dsp ip 开关
+        'ndac_canfd_num_set',//canfd 设置
+        'ndac_canfd_port_set', //端口设置
+        'ndac_canfdport_switch', //端口开关
+        'ndac_passback_time',//回传时间
+        'ndac_passback_switch', //回传时间开关
+        'ndac_device_num',//设备号
+        'ndac_dspip_num',//ip设置
+        'ndac_canfd_num',//canfd号
+        'ndac_mode'//模式
+    ];
 
-    ndac_dspip_set.value = localStorage.getItem('ndac_dspip_set');
-    ndac_dspip_switch.value = localStorage.getItem('ndac_dspip_switch');
-    ndac_canfd_num_set.value = localStorage.getItem('ndac_canfd_num_set');
-    ndac_canfd_port_set.value = localStorage.getItem('ndac_canfd_port_set');
-    ndac_canfdport_switch.value = localStorage.getItem('ndac_canfdport_switch');
-    ndac_passback_time.value = localStorage.getItem('ndac_passback_time');
-    ndac_passback_switch.value = localStorage.getItem('ndac_passback_switch');
-    ndac_device_num.value = localStorage.getItem('ndac_device_num');
-    ndac_dspip_num.value = localStorage.getItem('ndac_dspip_num');
-    ndac_canfd_num.value = localStorage.getItem('ndac_canfd_num');
-    ndac_mode.value = localStorage.getItem('ndac_mode');
-    canfd_port = localStorage.getItem('canfd_port');
+    // 恢复基础值
+    elementsToRestore.forEach(id => {
+        // 根据ID获取页面中的元素
+        const element = document.getElementById(id);
+        // 从sessionStorage中获取与元素ID对应的存储值
+        const storedValue = sessionStorage.getItem(id);
+        // 如果找到了对应的元素且sessionStorage中有存储值
+        if (element && storedValue !== null) {
+            // 检查元素类型是否为复选框
+            if (element.type === 'checkbox') {
+                // 对于复选框，根据存储值设置其选中状态
+                element.checked = storedValue === 'true';
+            } else {
+                // 对于其他类型的元素，直接设置其值为存储值
+                element.value = storedValue;
+            }
+        }
+    });
+
+    // 恢复IP选项
+    const ndac_dspip_num = document.getElementById('ndac_dspip_num');
+    const storedIPOptions = JSON.parse(sessionStorage.getItem('ipOptions') || '[]');
+    if (storedIPOptions.length > 0) {
+        ndac_dspip_num.innerHTML = ''; // 清空现有选项
+        storedIPOptions.forEach(ip => {
+            ndac_dspip_num.add(new Option(ip, ip));
+        });
+        ndac_dspip_num.value = sessionStorage.getItem('ndac_dspip_num');
+    }
+
+    // 同步IP输入框
+    const ndac_dspip_set = document.getElementById('ndac_dspip_set');
+    ndac_dspip_set.value = ndac_dspip_num.value;
+
+    // 更新UI状态
+    updateUIState();
+}
+/**
+* 辅助函数:更新UI状态（根据开关状态禁用/启用元素）
+*/
+function updateUIState() {
+    const dspipSwitch = document.getElementById('ndac_dspip_switch');
+    const canfdSwitch = document.getElementById('ndac_canfdport_switch');
+    const passbackSwitch = document.getElementById('ndac_passback_switch');
+    // 更新输入框禁用状态
+    document.getElementById('ndac_dspip_set').disabled = !dspipSwitch.checked;
+    document.getElementById('ndac_canfd_num_set').disabled = !canfdSwitch.checked;
+    document.getElementById('ndac_canfd_port_set').disabled = !canfdSwitch.checked;
+    document.getElementById('ndac_passback_time').disabled = !passbackSwitch.checked;
 }
