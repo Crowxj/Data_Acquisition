@@ -50,46 +50,20 @@ ipcMain.on('Buttoned', async (event, id) => {
             Operation_tips = "返回上一页";
             backWindow();
             break;
-        
+
     }
     console.log(`ipc =Buttoned ${id},${Operation_tips}`);
 });
 
-// ipcMain.on('toMain2', async (event, id, d1) => {
-//     switch (id) {
-//         case 1:
-//             Operation_tips = `进入${d1}界面`;
-//             mainWindow.loadFile("./html/" + d1);
-//             break;
-//         case 2:
-//             Operation_tips = "显示设备信息";
-//             show_loc_devinfo(id, d1);
-//             break;
-//         case 3:
-//             Operation_tips = "显示配置文件通道信息";
-//             readConfig_File(id, d1);
-//             break;
-//         case 4:
-//             Operation_tips = "设置烧录通道";
-//             needBurning_channel(id, d1)
-//             break;
-//         case 5:
-//             Operation_tips = "获取烧录通道对应的端口";
-//             get_PortAndChannel(id, d1);
-//             break;
-//         case 6:
-//             Operation_tips = "获取烧录.hex文件内容";
-//             read_hex_file(id, d1)
-//             break;
-//         case 200:
-//             Operation_tips = "设置E系列设备波特率";
-//             dev02_baudrate_operation(id,d1)
-//             break;
-
-//     }
-//     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
-
-// });
+ipcMain.on('toMain2', async (event, id, d1) => {
+    switch (id) {
+        case 1:
+            Operation_tips = `进入${d1}界面`;
+            mainWindow.loadFile("./html/" + d1);
+            break;
+    }
+    console.log(`ipc =toMain2 ${id},${Operation_tips}`);
+});
 
 
 

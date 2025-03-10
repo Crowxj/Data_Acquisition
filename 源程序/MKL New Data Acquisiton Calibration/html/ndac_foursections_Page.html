@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../styles.css" rel="stylesheet">
+    <title>MKL NDA四段定标</title>
+</head>
+
+<body style="background-image: url('../image/nadc_mode_Page.png');background-size: cover;margin: 0; padding: 0;">
+    <div>
+        <!-- 窗口按钮 -->
+        <div style="text-align: right;">
+            <button id="nadc_mode_Page_return"
+                style="display: inline;padding: 3px;background-color: transparent;border: none;">
+                <img src="../image/ndac_win_return.png" style="width: 30px;height: 30px;">
+            </button>
+            <button id="nadc_mode_Page_min"
+                style="display: inline;padding: 3px;background-color: transparent;border: none;">
+                <img src="../image/ndac_win_min.png" style="width: 30px;height: 30px;">
+            </button>
+            <button id="nadc_mode_Page_close"
+                style="display: inline;padding: 3px;background-color: transparent;border: none;">
+                <img src="../image/ndac_win_close.png" style="width: 30px;height: 30px;">
+            </button>
+        </div>
+        <!-- 四段定标盒子 -->
+        <div style="margin-top: 0px;margin-left: 30px; display: flex;">
+            <fieldset
+                style="width: 1435px;height:500px;display: inline-block;vertical-align: top; padding: 10px;background-color: rgba(255, 255, 255, 0.1);border-radius: 5px;border: rgb(255, 252, 252) solid 4px;box-shadow: 0 0 20px rgba(0, 0, 0, 200);">
+
+                <legend id="system_dev01"
+                    style="color: white;padding: 5px 10px; font-weight: bold;transform: skewX(-20deg);text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);">
+                    <label style="font-size: 30px;">参数信息：</label>
+                    <label style="font-size: 20px;">......</label>
+                </legend>
+            </fieldset>
+        </div>
+        <!-- 数据显示区域 -->
+        <div id="device_dev01_display"
+            style="overflow: auto;margin-left: 50px;margin-top:15px;width: 1000px;max-height: 350px;">
+            <table id="dev01_display_data" style="width: 950px; height: 30px; 
+        box-shadow: 0 0 0 rgba(0, 0, 0, 200); background-color: transparent;">
+            </table>
+        </div>
+
+
+
+
+    </div>
+
+    <script src="../js/nadc_foursections_Page.js"></script>
+</body>
+
+</html>

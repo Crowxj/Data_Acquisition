@@ -11,11 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     SETUPSIGN = true;//退出标识
     const ndac_dspip_set = document.getElementById('ndac_dspip_set');//初始设置dps ip等于默认选择ip
     const ndac_dspip_num = document.getElementById('ndac_dspip_num');
-    ndac_dspip_set.value = ndac_dspip_num.value
+    ndac_dspip_set.value = ndac_dspip_num.value;
     // 获取两个 CANFD 选择框元素
     const ndac_canfd_num_set = document.getElementById('ndac_canfd_num_set');
     const ndac_canfd_num = document.getElementById('ndac_canfd_num');
     const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');
+
+    // 为两个选择框添加事件监听器
+    ndac_canfd_num_set.addEventListener('change', syncCANFDValues);
+    canfd_port[ndac_canfd_num_set.value] = ndac_canfd_port_set.value;//系统保存CANFD和端口的值
     // 定义一个函数来同步两个选择框的值
     function syncCANFDValues(event) {
         const selectedValue = event.target.value;
@@ -23,20 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ndac_canfd_num.value = selectedValue;
         }
     }
-    // 为两个选择框添加事件监听器
-    ndac_canfd_num_set.addEventListener('change', syncCANFDValues);
-    canfd_port[ndac_canfd_num_set.value] = ndac_canfd_port_set.value;//系统保存CANFD和端口的值
+    //恢复设置
+    // restoreUserSelection();
 })
 
-/**
- * 根据CAN-FD值获取对应的端口号
- * 此函数用于根据给定的CAN-FD值查找并返回相应的端口号
- * @param {string} canfdValue - CAN-FD值，作为查找端口的键
- * @returns {string} - 返回对应的端口号如果找不到对应的端口，则返回undefined
- */
-function getPortByCANFD(canfdValue) {
-    return canfd_port[canfdValue];
-}
+
 /**
 * 模块名:ndac_home_Page_close
 * 代码描述:窗口关闭
@@ -102,6 +97,10 @@ ndac_setup_home_Page_exit.addEventListener('click', () => {//点击系统退出
     ndac_setup_home_Page.style.right = '-410px';
     const ndac_dialog = document.getElementById('ndac_dialog')
     const ndac_dialog_label = document.getElementById('ndac_dialog_label')
+    const ndac_dspip_set = document.getElementById('ndac_dspip_set');//初始设置dps ip等于默认选择ip
+    const ndac_dspip_num = document.getElementById('ndac_dspip_num');
+    localStorage.setItem('ndac_dspip_num', ndac_dspip_num.value);//保存 DSP IPS设置
+    ndac_dspip_set.value = localStorage.getItem('ndac_dspip_num');
     SETUPSIGN = true;//已退出
     if (SETUPSIGN == true) {
         ndac_dspip_switch.checked = false;
@@ -402,23 +401,97 @@ ndac_home_Page_next.addEventListener('click', () => {
             ndac_dialog.style.display = 'none';
         }, 1000); // 调整为1秒
         return -1;
-    } else if (ndac_mode.value == 'mdacMode2') {
-        ndac_dialog.style.display = 'block';
-        ndac_dialog_label.innerText = '此模式功能暂不支持'
-        setTimeout(() => {
-            ndac_dialog.style.display = 'none';
-        }, 1000); // 调整为1秒
-        return -1;
     } else {
-        ndac_dialog.style.display = 'block';
-        ndac_dialog_label.innerText = '设置完成，执行下一步'
-        // 跳到新的界面，关闭显示
-        setTimeout(() => {
-            ndac_dialog.style.display = 'none';
-            // let html = "device_channel_set.html"
-            //     window.TheIPC.toMain2(1, html);//跳转界面
-            //     //对象转换为 JSON 字符串
-            //     localStorage.setItem('set_dev_info', JSON.stringify(dev_info));
-        }, 1000); // 调整为1秒
+        saveUserSelection();//保存用户设置信息
+        switch (ndac_mode.value) {
+            case 'ndacMode1':
+                ndac_dialog.style.display = 'block';
+                ndac_dialog_label.innerText = '设置完成，进入四段定标'
+                let ndacMode1html = "ndac_foursections_Page.html"
+                setTimeout(() => {
+                    ndac_dialog.style.display = 'none';
+                    window.TheIPC.toMain2(1, ndacMode1html);//跳转界面
+                }, 1000);
+                break;
+            case 'ndacMode2':
+                ndac_dialog.style.display = 'block';
+                ndac_dialog_label.innerText = '此模式功能暂不支持'
+                let ndacMode2html = ""
+                setTimeout(() => {
+                    // window.TheIPC.toMain2(1, ndacMode2html);//跳转界面
+                    ndac_dialog.style.display = 'none';
+                }, 1000);
+        }
     }
 })
+
+
+/**
+* 模块名:saveUserSelection
+* 代码描述:保存用户配置信息
+* 作者:Crow
+* 创建时间:2025/03/10 08:35:47
+*/
+
+function saveUserSelection() {
+
+    const ndac_dspip_set = document.getElementById('ndac_dspip_set');//DSP IP设置
+    const ndac_dspip_switch = document.getElementById('ndac_dspip_switch');//DSP IP开关
+    const ndac_canfd_num_set = document.getElementById('ndac_canfd_num_set');//CANFD设置
+    const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');//CANFD PORT 设置
+    const ndac_canfdport_switch = document.getElementById('ndac_canfdport_switch');//CANFD PORT开关
+    const ndac_passback_time = document.getElementById('ndac_passback_time');//回传时间设置
+    const ndac_passback_switch = document.getElementById('ndac_passback_switch');//回传时间开关
+    const ndac_device_num = document.getElementById('ndac_device_num');//设备号
+    const ndac_dspip_num = document.getElementById('ndac_dspip_num');//DSP IP
+    const ndac_canfd_num = document.getElementById('ndac_canfd_num');//CANFD号
+    const ndac_mode = document.getElementById('ndac_mode');//模式
+
+    localStorage.setItem('ndac_dspip_set', ndac_dspip_set.value);//保存 DSP IPS设置
+    localStorage.setItem('ndac_dspip_switch', ndac_dspip_switch.value);//保存DSP IP开关
+    localStorage.setItem('ndac_canfd_num_set', ndac_canfd_num_set.value);//保存CANFD设置
+    localStorage.setItem('ndac_canfd_port_set', ndac_canfd_port_set.value);//保存ORT设置
+    localStorage.setItem('ndac_canfdport_switch', ndac_canfdport_switch.value);//保存CANFD PORT开关
+    localStorage.setItem('ndac_passback_time', ndac_passback_time.value);//保存回传时间设置
+    localStorage.setItem('ndac_passback_switch', ndac_passback_switch.value);//保存回传时间开关
+    localStorage.setItem('ndac_device_num', ndac_device_num.value);//保存设备号
+    localStorage.setItem('ndac_dspip_num', ndac_dspip_num.value);//保存DSP IP
+    localStorage.setItem('ndac_canfd_num', ndac_canfd_num.value);//保存CANFD号
+    localStorage.setItem('ndac_mode', ndac_mode.value);//保存模式
+    localStorage.setItem('canfd_port', canfd_port);//保存对应CANFD PORT值
+
+}
+
+/**
+* 模块名:restoreUserSelection
+* 代码描述:恢复设置选择状态
+* 作者:Crow
+* 创建时间:2025/03/10 09:14:27
+*/
+
+function restoreUserSelection() {
+    const ndac_dspip_set = document.getElementById('ndac_dspip_set');//DSP IP设置
+    const ndac_dspip_switch = document.getElementById('ndac_dspip_switch');//DSP IP开关
+    const ndac_canfd_num_set = document.getElementById('ndac_canfd_num_set');//CANFD设置
+    const ndac_canfd_port_set = document.getElementById('ndac_canfd_port_set');//CANFD PORT 设置
+    const ndac_canfdport_switch = document.getElementById('ndac_canfdport_switch');//CANFD PORT开关
+    const ndac_passback_time = document.getElementById('ndac_passback_time');//回传时间设置
+    const ndac_passback_switch = document.getElementById('ndac_passback_switch');//回传时间开关
+    const ndac_device_num = document.getElementById('ndac_device_num');//设备号
+    const ndac_dspip_num = document.getElementById('ndac_dspip_num');//DSP IP
+    const ndac_canfd_num = document.getElementById('ndac_canfd_num');//CANFD号
+    const ndac_mode = document.getElementById('ndac_mode');//模式
+
+    ndac_dspip_set.value = localStorage.getItem('ndac_dspip_set');
+    ndac_dspip_switch.value = localStorage.getItem('ndac_dspip_switch');
+    ndac_canfd_num_set.value = localStorage.getItem('ndac_canfd_num_set');
+    ndac_canfd_port_set.value = localStorage.getItem('ndac_canfd_port_set');
+    ndac_canfdport_switch.value = localStorage.getItem('ndac_canfdport_switch');
+    ndac_passback_time.value = localStorage.getItem('ndac_passback_time');
+    ndac_passback_switch.value = localStorage.getItem('ndac_passback_switch');
+    ndac_device_num.value = localStorage.getItem('ndac_device_num');
+    ndac_dspip_num.value = localStorage.getItem('ndac_dspip_num');
+    ndac_canfd_num.value = localStorage.getItem('ndac_canfd_num');
+    ndac_mode.value = localStorage.getItem('ndac_mode');
+    canfd_port = localStorage.getItem('canfd_port');
+}

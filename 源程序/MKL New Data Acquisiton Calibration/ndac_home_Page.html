@@ -20,9 +20,13 @@
     </div>
   </div>
   <!-- 系统设置 -->
+
   <div>
-    <fieldset id="ndac_setup_home_Page">
-      <legend id="">系统设置</legend>
+    <fieldset id="ndac_setup_home_Page"
+      style="width: 320px;height: 390px;border: #fffefe 5px solid;border-right: none;position: fixed;margin-top: 149px;transition: right 0.3s ease-in-out;z-index: 999;right: -410px;color: #faf8f8;text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);font-weight: bold;font-size: 25px;box-shadow: 0 0 20px rgba(0, 0, 0, 200);">
+      <legend
+        style="color: white;padding: 0px 10px;font-weight: bold; transform: skewX(-20deg);text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);margin-left: 200px;">
+        系统设置</legend>
       <div>
         <button id="ndac_setup_home_Page_exit"
           style="display: inline;padding: 3px;background-color: transparent;border: none; "><img
@@ -35,7 +39,8 @@
       </div>
       <div style="margin-top: 15px;margin-left: -4px;display: flex;align-items: center;">
         <label>DSP IP&nbsp;&nbsp;:</label>
-        <input id="ndac_dspip_set" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;" placeholder="Temporary IP address" disabled></input>
+        <input id="ndac_dspip_set" style="width: 140px;height:25px;margin-left: 3px;opacity:0.7;margin-left: 10px;"
+          placeholder="Temporary IP address" disabled></input>
         <!-- 开关 -->
         <label class="switch" style="margin-left: 10px;">
           <input type="checkbox" id="ndac_dspip_switch">
@@ -50,8 +55,8 @@
       <div style="margin-top: 15px;margin-left: -4px; display: flex;align-items: center;">
         <label>CANFD&nbsp;:</label>
         <select id="ndac_canfd_num_set" style="width: 147px;height:30px;margin-left: 10px;opacity: 0.7;" disabled>
-          <option value="15" >15</option>
-          <option  value="16" selected>16</option>
+          <option value="15">15</option>
+          <option value="16" selected>16</option>
         </select>
         <!-- 开关 -->
         <label class="switch" style="margin-left: 10px;">
@@ -62,7 +67,8 @@
       <!-- 对应端口 -->
       <div style="margin-top: 15px;margin-left: -4px;">
         <label>端&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;口&nbsp;:</label>
-        <input id="ndac_canfd_port_set" value="61016" style="width: 140px;height:25px;margin-left: 6px;opacity:0.7;" disabled></input>
+        <input id="ndac_canfd_port_set" value="61016" style="width: 140px;height:25px;margin-left: 6px;opacity:0.7;"
+          disabled></input>
       </div>
       <!-- 换行 -->
       <div style="margin-top: 10px;margin-bottom: 10px; margin-left: -10px;margin-right: -10px;">
@@ -85,7 +91,8 @@
         <hr style="border: 1px solid white;">
       </div>
       <div style="margin-top: 20px;">
-        <button id="ndac_home_Page_reset" class="button" style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
+        <button id="ndac_home_Page_reset" class="button"
+          style="width: 100px;height: 26px;margin-left: 40px;">重置</button>
         <button id="ndac_home_Page_save" class="button" style="width: 100px;height: 26px;margin-left: 40px;">设置</button>
       </div>
     </fieldset>
@@ -162,8 +169,8 @@
         <!-- CANFD -->
         <div style="margin-top: 20px;margin-left: 25px;">
           <label>CANFD:</label>
-          <select id="ndac_canfd_num" style="width: 220px;height:30px;margin-left: 15px;opacity: 0.7;" disabled >
-            <option value="15"  >15</option>
+          <select id="ndac_canfd_num" style="width: 220px;height:30px;margin-left: 15px;opacity: 0.7;" disabled>
+            <option value="15">15</option>
             <option value="16" selected>16</option>
           </select>
         </div>
@@ -171,8 +178,8 @@
         <div style="margin-top: 20px;margin-left: 30px;">
           <label>模&nbsp;&nbsp;&nbsp;式&nbsp;&nbsp;:</label>
           <select id="ndac_mode" style="width: 220px;height:30px;margin-left: 14px;opacity: 0.7;">
-            <option value="mdacMode1" selected>四段校准</option>
-            <option value="mdacMode2">二次校准</option>
+            <option value="ndacMode1" selected>四段校准</option>
+            <option value="ndacMode2">二次校准</option>
           </select>
         </div>
         <div style="margin-top: 45px;margin-left: 30px;">
