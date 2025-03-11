@@ -414,6 +414,7 @@ ndac_home_Page_next.addEventListener('click', () => {
         }, 1000); // 调整为1秒
         return -1;
     } else {
+        saveUserSelection()
         switch (ndac_mode.value) {
             case 'ndacMode1':
                 ndac_dialog.style.display = 'block';
@@ -438,17 +439,12 @@ ndac_home_Page_next.addEventListener('click', () => {
 })
 
 
-// /**
-// * 模块名:saveUserSelection
-// * 代码描述:保存用户配置信息
-// * 作者:Crow
-// * 创建时间:2025/03/10 08:35:47
-// */
-
-
-
-
-
+/**
+* 模块名:saveUserSelection
+* 代码描述:保存用户配置信息
+* 作者:Crow
+* 创建时间:2025/03/10 08:35:47
+*/
 function saveUserSelection() {
     // 保存所有IP选项
     const ipOptions = Array.from(ndac_dspip_num.options).map(opt => opt.value);

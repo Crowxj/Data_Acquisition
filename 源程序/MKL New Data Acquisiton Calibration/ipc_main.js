@@ -1,12 +1,14 @@
-const { ipcMain } = require('electron');
+const { ipcMain, } = require('electron');
 
 module.exports = {
-    setWindow,
+    setWindow, showStatus
 }
+const { ndac_mode1_display_TD}=require('./js/manage/ndac_jump_interface.js')
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
 }
+
 var Operation_tips;//操作提示
 
 //关闭窗口方法
@@ -61,6 +63,10 @@ ipcMain.on('toMain2', async (event, id, d1) => {
             Operation_tips = `进入${d1}界面`;
             mainWindow.loadFile("./html/" + d1);
             break;
+        case 100:
+            Operation_tips = `显示校准系统配置值`;
+            ndac_mode1_display_TD(id, d1);
+            break;
     }
     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
 
@@ -81,8 +87,8 @@ ipcMain.on('toMain2', async (event, id, d1) => {
 // });
 
 
-
 function showStatus(value) {
+    console.log(`showStatus: ${value}`);
     if (mainWindow != null) {
         mainWindow.webContents.send('status_update', value);
     }
@@ -90,12 +96,20 @@ function showStatus(value) {
 
 
 
+// function showStatus(value) {
+//     if (mainWindow != null) {
+//         mainWindow.webContents.send('status_update', value);
+//     }
+// }
 
-function showValue(id, value) {
-    if (mainWindow != null) {
-        mainWindow.webContents.send('multi_data', id, value);
-    }
-}
+
+
+
+// function showValue(id, value) {
+//     if (mainWindow != null) {
+//         mainWindow.webContents.send('multi_data', id, value);
+//     }
+// }
 
 // function showValue2(id, value1, value2) {
 //     if (mainWindow != null) {

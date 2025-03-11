@@ -212,6 +212,7 @@ input:checked+.slider:before {
   font-weight: bolder;
   color: rgb(255, 254, 254);
 }
+
 /**
 *****************************
 * ndac_aboutus_Page界面主样式
@@ -273,24 +274,25 @@ input:checked+.slider:before {
 /* 左侧导航栏样式 */
 /* 左侧导航栏样式 */
 .sidebar {
-background-color: rgba(255, 255, 255, 0.3);
-border-radius: 10px;
-width: 200px;
-height: 460px;
-/* background-color: rgba(40, 40, 40, 0.8); */
-padding: 20px 0;
-/* box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); */
-margin-right: 20px; /* 添加右边距 */
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  width: 200px;
+  height: 460px;
+  /* background-color: rgba(40, 40, 40, 0.8); */
+  padding: 20px 0;
+  /* box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); */
+  margin-right: 20px;
+  /* 添加右边距 */
 }
 
 .sidebar2 {
-background-color: rgba(255, 255, 255, 0.3);
-border-radius: 10px;
-width: 1075px;
-height: 480px;
-/* background-color: rgba(40, 40, 40, 0.8); */
-padding: 10px 10px;
-margin-left: 50px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  width: 1075px;
+  height: 480px;
+  /* background-color: rgba(40, 40, 40, 0.8); */
+  padding: 10px 10px;
+  margin-left: 50px;
 }
 
 .nav-list {
@@ -308,10 +310,12 @@ margin-left: 50px;
   transform: skewX(-20deg);
   text-shadow: 0 0 20px rgba(0, 0, 0, 200);
 }
+
 .nav-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
   padding-left: 30px;
 }
+
 .nav-item::before {
   content: "";
   position: absolute;
@@ -323,6 +327,137 @@ margin-left: 50px;
   opacity: 0;
   transition: opacity 0.3s;
 }
+
 .nav-item:hover::before {
   opacity: 1;
+}
+
+/**
+*****************************
+* 四段定标样式
+*****************************
+*/
+/* 工具栏 */
+.toolbar {
+  /* border: white 2px solid; */
+  /* 设置工具栏背景色 */
+  padding: 10px;
+  /* 添加内边距以增加元素之间的空间 */
+  display: flex;
+  /* 使用flex布局以适应不同宽度的元素 */
+  gap: 10px;
+  /* 设置元素之间的间隔 */
+  align-items: center;
+  /* 垂直居中对齐工具栏中的元素 */
+  height: 60px;
+  /* 设置工具栏高度 */
+}
+.toolbar-item {
+  position: relative;
+  /* 设置元素的定位方式为相对定位，使其可以根据自身正常文档流位置进行偏移 */
+  display: flex;
+  /* 使用flex布局以便于对子元素进行灵活的布局和对齐 */
+  flex-direction: column;
+  /* 设置flex容器的子元素排列方向为垂直方向，即从上到下排列 */
+  align-items: center;
+  /* 将子元素沿横轴中心对齐，确保内容在容器内居中显示 */
+}
+.up-down-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);
+}
+
+.separator {
+  width: 2px;
+  /* 分割线宽度 */
+  height: 60px;
+  /* 分割线高度，比工具栏稍小 */
+  background-color: #999;
+  /* 分割线颜色 */
+  margin: 0 5px;
+  /* 分割线与其他元素的间距 */
+}
+
+
+.show-label-one{
+  font-size: 18px;
+}
+
+.show-label-two{
+  font-size: 17px;
+}
+
+
+.collapse-panel {
+  width: 99.9%;
+  border: 1px solid #0e0e0e;
+  margin-bottom: 10px;
+}
+
+.collapse-header {
+  padding: 10px;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapse-content {
+  padding: 10px;
+  display: none;
+}
+
+.collapse-content.open {
+  display: block;
+}
+
+.arrow {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.checkbox {
+  margin-right: 10px;
+}
+
+.buttons {
+  margin-bottom: 20px;
+}
+
+.buttons button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* 两列 */
+  grid-template-rows: auto auto;
+  /* 两行 */
+  gap: 10px;
+  /* 列与行之间的间距 */
+}
+
+.content-section {
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
 }

@@ -1,15 +1,15 @@
 const { app, BrowserWindow } = require('electron')
 
-var { setWindow,  } = require('./ipc_main.js')
+var { setWindow, showStatus } = require('./ipc_main.js')
 const path = require('path')
 var mainWindow = undefined;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 800,
-    frame:true,
-    resizable: true,
-    // maximizable: true,
+    frame: false,
+    resizable: false,
+    maximizable: true,
     // fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -18,7 +18,7 @@ function createMainWindow() {
       enableRemoteModule: true,
     }
   })
-  // mainWindow.setMenu(null);
+  mainWindow.setMenu(null);
   mainWindow.loadFile('ndac_home_Page.html')
 
 }
