@@ -7,7 +7,7 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 800,
-    frame: false,
+    frame: true,
     resizable: false,
     maximizable: true,
     // fullscreen: true,
@@ -18,7 +18,7 @@ function createMainWindow() {
       enableRemoteModule: true,
     }
   })
-  mainWindow.setMenu(null);
+  // mainWindow.setMenu(null);
   mainWindow.loadFile('ndac_home_Page.html')
 
 }

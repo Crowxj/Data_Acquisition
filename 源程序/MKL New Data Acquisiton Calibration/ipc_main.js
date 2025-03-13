@@ -4,6 +4,7 @@ module.exports = {
     setWindow, showStatus
 }
 const { ndac_mode1_display_TD}=require('./js/manage/ndac_jump_interface.js')
+const {query_transmission_mode}=require('./command/ndac_mode1_command.js')
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -51,6 +52,10 @@ ipcMain.on('Buttoned', async (event, id) => {
         case 5://返回上一页
             Operation_tips = "返回上一页";
             backWindow();
+            break;
+        case 100://mode1查询透传命令
+            Operation_tips = "mode1查询透传命令";
+            query_transmission_mode();
             break;
 
     }

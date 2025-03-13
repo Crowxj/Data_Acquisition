@@ -11,6 +11,7 @@ var ndac_mode1_canfd_num;//canfd号
 var ndac_mode1_canfd_port;//CANFD_端口
 var ndac_mode1_port;//端口
 var ndac_mode1_mode;//模式
+var ndac_mode1_passbacktime;//回传时间
 var NDACMODE1D;//模式显示值
 var NDACDISPLAYD = {};//显示值
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (ndac_mode1_mode == "ndacMode2") {
         NDACMODE1D = "二次校准";
     }
+    ndac_mode1_passbacktime = sessionStorage.getItem('ndac_passback_time');
     const ndac_mode1_Parameter1 = document.getElementById('ndac_mode1_Parameter1');//显示参数信息1
     ndac_mode1_Parameter1.innerHTML = `
     <span style="color: white;">设备号:</span> <span style="color: #39FF14;">${ndac_mode1_device_num}</span> 
@@ -32,34 +34,38 @@ document.addEventListener('DOMContentLoaded', () => {
     <span style="color: white;">CANFD:</span> <span style="color: #39FF14;">${ndac_mode1_canfd_num}</span> 
     <span style="color: white;">端口:</span> <span style="color: #39FF14;">${ndac_mode1_port}</span> 
     <span style="color: white;">模式:</span> <span style="color: #39FF14;">${NDACMODE1D}</span>
+    <span style="color: white;">接收报文时间:</span> <span style="color: #39FF14;">${ndac_mode1_passbacktime}ms</span>
 `;
     NDACDISPLAYD = {//显示值
         ndac_mode1_device_num: ndac_mode1_device_num,//设备号
         ndac_mode1_dspip_num: ndac_mode1_dspip_num,//DSP IP
         ndac_mode1_canfd_num: ndac_mode1_canfd_num,//CANFD号
         ndac_mode1_port: ndac_mode1_port,//端口号
-        ndac_mode1_mode: NDACMODE1D//模式
+        ndac_mode1_mode: NDACMODE1D,//模式
+        ndac_mode1_passbacktime: ndac_mode1_passbacktime,//回传时间
+       
     }
     window.TheIPC.toMain2(100, JSON.stringify(NDACDISPLAYD));//传到界面显示
-    console.log("设备号:", ndac_mode1_device_num, " DSP IP:", ndac_mode1_dspip_num, " CANFD:", ndac_mode1_canfd_num, " 端口:", ndac_mode1_port, " 模式:", NDACMODE1D)
-    //1.获取所有的 collapse-panel 元素
-    const collapsePanels = document.querySelectorAll('.collapse-panel');
-    // 遍历每个 collapse-panel 元素
-    collapsePanels.forEach(panel => {
-        // 2.获取 collapse-header 和 collapse-content 元素
-        const header = panel.querySelector('.collapse-header');
-        const content = panel.querySelector('.collapse-content');
-        //3.默认展开 collapse-content
-        content.style.display = 'none';
-        //4.添加点击事件监听器，用于切换展开和折叠状态
-        header.addEventListener('click', () => {
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-            } else {
-                content.style.display = 'block';
-            }
-        });
-    });
+    console.log("设备号:", ndac_mode1_device_num, " DSP IP:", ndac_mode1_dspip_num, " CANFD:", ndac_mode1_canfd_num, " 端口:", ndac_mode1_port, " 模式:", NDACMODE1D, " 接收报文时间:",ndac_mode1_passbacktime,"ms")
+    // //1.获取所有的 collapse-panel 元素
+    // const collapsePanels = document.querySelectorAll('.collapse-panel');
+    // // 遍历每个 collapse-panel 元素
+    // collapsePanels.forEach(panel => {
+    //     // 2.获取 collapse-header 和 collapse-content 元素
+    //     const header = panel.querySelector('.collapse-header');
+    //     const content = panel.querySelector('.collapse-content');
+    //     //3.默认展开 collapse-content
+    //     content.style.display = 'none';
+    //     //4.添加点击事件监听器，用于切换展开和折叠状态
+    //     header.addEventListener('click', () => {
+    //         if (content.style.display === 'block') {
+    //             content.style.display = 'none';
+    //         } else {
+    //             content.style.display = 'block';
+    //         }
+    //     });
+    // });
+    window.TheIPC.ButtonPressed(100);
 })
 /**
 * 模块名:
