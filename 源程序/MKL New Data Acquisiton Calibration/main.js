@@ -8,7 +8,7 @@ function createMainWindow() {
     width: 1500,
     height: 800,
     frame: true,
-    resizable: false,
+    resizable: true,
     maximizable: true,
     // fullscreen: true,
     webPreferences: {

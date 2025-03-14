@@ -3,8 +3,8 @@ const { ipcMain, } = require('electron');
 module.exports = {
     setWindow, showStatus
 }
-const { ndac_mode1_display_TD}=require('./js/manage/ndac_jump_interface.js')
-const {query_transmission_mode}=require('./command/ndac_mode1_command.js')
+const { ndac_mode1_display_TD } = require('./js/manage/ndac_jump_interface.js')
+const { mode1_parameter, query_tran_baudrate } = require('./mode/mode1/mode1_client.js');
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -54,8 +54,11 @@ ipcMain.on('Buttoned', async (event, id) => {
             backWindow();
             break;
         case 100://mode1查询透传命令
-            Operation_tips = "mode1查询透传命令";
-            query_transmission_mode();
+            Operation_tips = "mode1下设备参数";
+            mode1_parameter();
+            break;
+        case 101://查询透传模式和波特率
+            query_tran_baudrate();
             break;
 
     }

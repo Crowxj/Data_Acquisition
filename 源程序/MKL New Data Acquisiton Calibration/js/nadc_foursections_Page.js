@@ -43,10 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ndac_mode1_port: ndac_mode1_port,//端口号
         ndac_mode1_mode: NDACMODE1D,//模式
         ndac_mode1_passbacktime: ndac_mode1_passbacktime,//回传时间
-       
     }
     window.TheIPC.toMain2(100, JSON.stringify(NDACDISPLAYD));//传到界面显示
     console.log("设备号:", ndac_mode1_device_num, " DSP IP:", ndac_mode1_dspip_num, " CANFD:", ndac_mode1_canfd_num, " 端口:", ndac_mode1_port, " 模式:", NDACMODE1D, " 接收报文时间:",ndac_mode1_passbacktime,"ms")
+    window.TheIPC.ButtonPressed(100);//传值到主进程
+    window.TheIPC.ButtonPressed(101);//查询透传及波特率
     // //1.获取所有的 collapse-panel 元素
     // const collapsePanels = document.querySelectorAll('.collapse-panel');
     // // 遍历每个 collapse-panel 元素
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //         }
     //     });
     // });
-    window.TheIPC.ButtonPressed(100);
+
 })
 /**
 * 模块名:

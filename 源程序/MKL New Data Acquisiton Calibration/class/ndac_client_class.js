@@ -3,6 +3,7 @@
  */
 const dgram = require('dgram');
 const Command = require('./ndac_command_class');//引用命令的类
+const Module = require('module');
 
 /**
 * 模块名:Client
@@ -45,45 +46,41 @@ class UDPClient extends Client {
         this.sendPort = sendPort; // 发送命令的端口
         this.listenPort = listenPort; // 监听回复的端口
         this.udpclient = dgram.createSocket('udp4');
+
+
+        //绑定监听到的端口
+        this.udpclient.bind(this.listenPort, () => {
+            console.log(`>>> Running udpClient ${this.host}:${this.sendPort}-${this.listenPort}`);
+        });
+
     }
+    //发送命令
+    sendCommand(command) {
+        const buffer = Buffer.from(command);
+        this.udpclient.send(buffer, 0, buffer.length, this.sendPort, this.host, (err) => {
+            if (err) {
+                console.error('Error sending command:', err);
+                this.close();
+            } else {
+                console.log(`Command sent to ${this.host}:${this.sendPort}`);
+            }
+        });
+    }
+    // 监听服务器响应
+    onMessage(callback) {
+        this.udpclient.on('message', (msg, rinfo) => {
+            callback(msg, rinfo);
+        });
+    }
+    // 关闭客户端
+    close() {
+        this.udpclient.close();
+    }
+
 }
 
+module.exports = UDPClient
 
-// class UDPClient {
-//     constructor(host, port) {
-//         this.host = host; // 目标主机
-//         this.port = port; // 目标端口
-//         this.client = UDPClient.getClient();
-//     }
-//     static getClient() {
-//         if (!UDPClient.instance) {
-//             UDPClient.instance = dgram.createSocket('udp4');
-//         }
-//         return UDPClient.instance;
-//     }
-//     // 发送命令
-//     sendCommand(command) {
-//         const buffer = Buffer.from(command);
-//         this.client.send(buffer, 0, buffer.length, this.port, this.host, (err) => {
-//             if (err) {
-//                 console.error('Error sending command:', err);
-//                 this.client.close();
-//             } else {
-//                 console.log(`Command sent to ${this.host}:${this.port}:${command}`);
-//             }
-//         });
-//     }
-//     // 监听服务器响应
-//     onResponse(callback) {
-//         this.client.on('message', (msg, rinfo) => {
-//             const response = Command.deserialize(msg.toString()); //
-//             callback(response, rinfo);
-//         });
-//     }
-//     // 关闭客户端
-//     close() {
-//         this.client.close();
-//     }
-// }
 
-module.exports = UDPClient;
+
+

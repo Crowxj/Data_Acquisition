@@ -36,13 +36,22 @@
         <!-- 功能栏 -->
         <div style="font-family: Arial, sans-serif;background-color: rgba(255, 255, 255, 0.3);">
             <div class="toolbar">
-                <!-- 透传模式 -->
+                <!-- 恢复状态 -->
                 <div class="toolbar-item">
                     <div class="switch">
-                        <input type="checkbox" id="ndac_transmission_switch">
+                        <input type="checkbox" id="ndac_reply_status">
                         <span class="slider round"></span>
                     </div>
-                    <div class="label" style="margin-top: 10px;font-size: 15px;">透传模式</div>
+                    <div class="label" style="margin-top: 10px;font-size: 15px;">恢复状态</div>
+                </div>
+                <div class="separator"></div> <!-- 分割线 -->
+                <!-- 发送透传命令 -->
+                <div class="toolbar-item">
+                    <button id="nadc_mode1_transmission" style="padding: 1px; background-color: transparent; border: none;"
+                        title="开启透传模式">
+                        <img src="../image/ndac_transmission_mode.png" style="width: 30px; height: 30px;">
+                    </button>
+                    <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">开启透传</div>
                 </div>
                 <div class="separator"></div> <!-- 分割线 -->
                 <!-- 设置波特率 -->
