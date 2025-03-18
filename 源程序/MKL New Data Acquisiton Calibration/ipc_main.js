@@ -1,10 +1,10 @@
 const { ipcMain, } = require('electron');
 
 module.exports = {
-    setWindow, showStatus
+    setWindow, showStatus, showValue
 }
 const { ndac_mode1_display_TD } = require('./js/manage/ndac_jump_interface.js')
-const { mode1_parameter, query_tran_baudrate } = require('./mode/mode1/mode1_client.js');
+const { mode1_parameter, query_mode1_tran, restore_mode1_tran } = require('./mode/mode1/mode1_client.js');
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -54,11 +54,16 @@ ipcMain.on('Buttoned', async (event, id) => {
             backWindow();
             break;
         case 100://mode1查询透传命令
-            Operation_tips = "mode1下设备参数";
+            Operation_tips = "mode1设备参数";
             mode1_parameter();
             break;
         case 101://查询透传模式和波特率
-            query_tran_baudrate();
+            Operation_tips = "查询透传模式及波特率";
+            query_mode1_tran();
+            break;
+        case 102://获取查询的透传模式和波特率参数
+            Operation_tips = "恢复透传模式及波特率";
+            restore_mode1_tran();
             break;
 
     }
@@ -75,6 +80,10 @@ ipcMain.on('toMain2', async (event, id, d1) => {
             Operation_tips = `显示校准系统配置值`;
             ndac_mode1_display_TD(id, d1);
             break;
+        // case 101://恢复透传模式和波特率
+        //     Operation_tips = "恢复透传及波特率";
+        //     restore_mode1_tran(id, d1);
+        //     break;
     }
     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
 
@@ -103,21 +112,11 @@ function showStatus(value) {
 }
 
 
-
-// function showStatus(value) {
-//     if (mainWindow != null) {
-//         mainWindow.webContents.send('status_update', value);
-//     }
-// }
-
-
-
-
-// function showValue(id, value) {
-//     if (mainWindow != null) {
-//         mainWindow.webContents.send('multi_data', id, value);
-//     }
-// }
+function showValue(id, value) {
+    if (mainWindow != null) {
+        mainWindow.webContents.send('multi_data', id, value);
+    }
+}
 
 // function showValue2(id, value1, value2) {
 //     if (mainWindow != null) {

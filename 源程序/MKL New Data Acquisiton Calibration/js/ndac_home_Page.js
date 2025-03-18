@@ -481,19 +481,7 @@ function saveUserSelection() {
         
         canfd_port:JSON.stringify(canfd_port),
     };
-    // ndac_dspip_set 192.168.1.1
-    // ndac_home_Page.js:173 ndac_dspip_switch false
-    // ndac_home_Page.js:173 ndac_canfd_num_set 16
-    // ndac_home_Page.js:173 ndac_canfd_port_set 61016
-    // ndac_home_Page.js:173 ndac_canfdport_switch false
-    // ndac_home_Page.js:173 ndac_passback_time 500
-    // ndac_home_Page.js:173 ndac_passback_switch false
-    // ndac_home_Page.js:173 ndac_device_num 1
-    // ndac_home_Page.js:173 ndac_dspip_num 192.168.1.1
-    // ndac_home_Page.js:173 ndac_canfd_num 16
-    // ndac_home_Page.js:173 ndac_mode ndacMode1
     Object.keys(elementsToSave).forEach(key => {
-        console.log(key, elementsToSave[key]);
         sessionStorage.setItem(key, elementsToSave[key]);
     });
 

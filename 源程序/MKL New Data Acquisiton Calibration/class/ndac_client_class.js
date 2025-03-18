@@ -4,6 +4,7 @@
 const dgram = require('dgram');
 const Command = require('./ndac_command_class');//引用命令的类
 const Module = require('module');
+const {array_to_hex}=require('../js/numeric/ndac_numeric')
 
 /**
 * 模块名:Client
@@ -62,7 +63,7 @@ class UDPClient extends Client {
                 console.error('Error sending command:', err);
                 this.close();
             } else {
-                console.log(`Command sent to ${this.host}:${this.sendPort}`);
+                console.log(`TX Command to ${this.host}:${this.sendPort}:${array_to_hex(command)}`);// 
             }
         });
     }
@@ -72,6 +73,7 @@ class UDPClient extends Client {
             callback(msg, rinfo);
         });
     }
+
     // 关闭客户端
     close() {
         this.udpclient.close();

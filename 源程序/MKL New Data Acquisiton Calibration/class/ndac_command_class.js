@@ -1,24 +1,133 @@
 // 定义命令类
 
-class Command{
-    constructor(name,args) {
-        this.name = name; // 命令名称
-        if (Buffer.isBuffer(args)) {
-            this.args = JSON.parse(args.toString()); // 将 Buffer 解析为对象
-        } else {
-            this.args = args; // 命令参数
+class CommandFactory {
+    constructor(code, args = {}) {
+        this.code = code; // 命令码
+        this.args = args; // 命令参数（可以是 Buffer 或其他类型）
+        console.log(`Create Command Code: ${this.code}`);
+        if (!Array.isArray(this.args)) {
+            throw new Error('Set command parameters to not be arrays.');
         }
-        console.log(this.name,this.args);
+        return this;
     }
-    // 将命令序列化为字符串
-    serialize() {
-        return JSON.stringify(this.args);
-    }
-    // 从字符串反序列化为命令对象
-    static deserialize(data) {
-        console.log(JSON.parse(data));
-        return JSON.parse(data);
-    }
-}
 
-module.exports = Command;
+
+    // 动态生成命令
+    generate() {
+        switch (this.code) {
+            case 'NDAC001':
+                return this.generateTran();
+            case 'NDAC002':
+                return this.generateQueryBaudRate();
+            case 'NDAC003'://修改波特率
+                return this.generateUpdateBaudRate();
+            // case 'NDAC004'://发送波特率
+            //     return this.generateRestoreBaudRate();
+            default:
+                throw new Error(`Unknown command: ${this.code}`);
+        }
+    }
+
+    // 生成查询/发送透传及状态命令
+    generateTran() {
+        const [param1, param2, param3] = this.args;
+        const sendBuf = new Uint8Array(10);
+        sendBuf[0] = 0x7b; // 起始标志
+        sendBuf[2] = 0x09; // 命令类型
+        sendBuf[3] = 0x11; // 子命令类型
+        sendBuf[4] = 0x01; // 端口号
+        sendBuf[5] = param1; // 固定值 01查询 02修改 
+        sendBuf[6] = param2; // CAN FD 编号  16
+        sendBuf[7] = param3; // 开启透传 07透传
+        sendBuf[9] = 0x7d; // 结束标志
+        return sendBuf;
+    }
+
+    // 生成查询波特率命令
+    generateQueryBaudRate() {
+        // const [param1, param2] = this.args;
+        const param1 = this.args;
+        const sendBuf = new Uint8Array(72);
+        sendBuf[0] = 0x7b; // 起始标志
+        sendBuf[2] = 0x48;
+        sendBuf[3] = 0x7c;
+        sendBuf[4] = 0x01;
+        sendBuf[5] = 0x01;
+        sendBuf[6] = 0x3c;
+        sendBuf[7] = 0x3e;
+        sendBuf[8] = param1;
+        sendBuf[71] = 0x7d;
+        return sendBuf;
+    }
+
+
+    //生成修改波特率命令
+    generateUpdateBaudRate() {
+       const [param1, param2, param3, param4] = this.args;
+        const sendBuf = new Uint8Array(24);
+        sendBuf[0] = 0x7b; // 起始标志
+        sendBuf[2] = 0x18; // 命令类型
+        sendBuf[3] = 0x84; // 子命令类型
+        sendBuf[4] = 0x01; // 端口号
+        sendBuf[5] = 0x02; // 固定值
+        sendBuf[6] = param1; // CAN FD 编号
+        sendBuf[8] = param2 & 0xFF;
+        sendBuf[9] = (param2 >> 8) & 0xFF;
+        //存放CANFD控制域波特率
+        sendBuf[10] = param3 & 0xFF;// 最低字节
+        sendBuf[11] = (param3 >> 8) & 0xFF; // 次低字节
+        sendBuf[12] = (param3 >> 16) & 0xFF;// 次高字节
+        sendBuf[13] = (param3 >> 24) & 0xFF;// 最高字节
+        //存放CANFD数据域波特率
+        sendBuf[14] = param4 & 0xFF;// 最低字节
+        sendBuf[15] = (param4 >> 8) & 0xFF; // 次低字节
+        sendBuf[16] = (param4 >> 16) & 0xFF;// 次高字节
+        sendBuf[17] = (param4 >> 24) & 0xFF;// 最高字节
+        sendBuf[18] = 0x00;
+        sendBuf[23] = 0x7d;
+        return sendBuf;
+    }
+
+    // //生成恢复透传命令
+    // generateRestoreTran() {
+    //     const [param1, param2] = this.args;
+    //     const sendBuf = new Uint8Array(10);
+    //     sendBuf[0] = 0x7b; // 起始标志
+    //     sendBuf[2] = 0x09; // 命令类型
+    //     sendBuf[3] = 0x11; // 子命令类型
+    //     sendBuf[4] = 0x01; // 端口号
+    //     sendBuf[5] = 0x02; // 固定值
+    //     sendBuf[6] = param1; // CAN FD 编号
+    //     sendBuf[7] = param2; // 开启透传
+    //     sendBuf[9] = 0x7d; // 结束标志
+    //     return sendBuf;
+    // }
+
+    // //生成恢复波特率命令
+    // generateRestoreBaudRate() {
+    //     const [param1, param2, param3, param4] = this.args;
+    //     const sendBuf = new Uint8Array(24);
+    //     sendBuf[0] = 0x7b; // 起始标志
+    //     sendBuf[2] = 0x18; // 命令类型
+    //     sendBuf[3] = 0x84; // 子命令类型
+    //     sendBuf[4] = 0x01; // 端口号
+    //     sendBuf[5] = 0x02; // 固定值
+    //     sendBuf[6] = param1; // CAN FD 编号
+    //     sendBuf[8] = param2 & 0xFF;
+    //     sendBuf[9] = (param2 >> 8) & 0xFF;
+    //     //存放CANFD控制域波特率
+    //     sendBuf[10] = param3 & 0xFF;// 最低字节
+    //     sendBuf[11] = (param3 >> 8) & 0xFF; // 次低字节
+    //     sendBuf[12] = (param3 >> 16) & 0xFF;// 次高字节
+    //     sendBuf[13] = (param3 >> 24) & 0xFF;// 最高字节
+    //     //存放CANFD数据域波特率
+    //     sendBuf[14] = param4 & 0xFF;// 最低字节
+    //     sendBuf[15] = (param4 >> 8) & 0xFF; // 次低字节
+    //     sendBuf[16] = (param4 >> 16) & 0xFF;// 次高字节
+    //     sendBuf[17] = (param4 >> 24) & 0xFF;// 最高字节
+    //     sendBuf[18] = 0x00;
+    //     sendBuf[23] = 0x7d;
+    //     return sendBuf;
+    // }
+}
+module.exports = CommandFactory;

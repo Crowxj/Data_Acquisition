@@ -9,6 +9,15 @@
 
 <body style="background-image: url('../image/nadc_mode_Page.png');background-size: cover;margin: 0; padding: 0;">
     <div>
+        <!-- 对话框 -->
+        <div class="ndac_dialog" id="ndac_mode1_dialog">
+            <div class="ndac_dialog_div">
+                <!-- 显示提示图片 -->
+                <img src="./image/nadc_dialog_notice.png" class="ndac_dialog_img">
+                <!-- 显示设置成功标签，与图片对齐 -->
+                <label class=" ndac_dialog_label" id="ndac_mode1_dialog_label">提示信息</label>
+            </div>
+        </div>
         <!-- 窗口按钮 -->
         <div
             style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-right: 10px;">
@@ -38,23 +47,32 @@
             <div class="toolbar">
                 <!-- 恢复状态 -->
                 <div class="toolbar-item">
-                    <div class="switch">
-                        <input type="checkbox" id="ndac_reply_status">
+                    <label class="switch" style="margin-left: 15px;  ">
+                        <input type="checkbox" id="mode1_query_state" disabled>
                         <span class="slider round"></span>
-                    </div>
-                    <div class="label" style="margin-top: 10px;font-size: 15px;">恢复状态</div>
+                    </label>
+                    <div class="label" style="margin-top: 10px;font-size: 15px;">查询状态</div>
                 </div>
                 <div class="separator"></div> <!-- 分割线 -->
-                <!-- 发送透传命令 -->
+                <!-- 发送恢复命令 -->
                 <div class="toolbar-item">
-                    <button id="nadc_mode1_transmission" style="padding: 1px; background-color: transparent; border: none;"
-                        title="开启透传模式">
+                    <button id="nadc_mode1_restore" style="padding: 1px; background-color: transparent; border: none;" disabled
+                        title="恢复查询前状态">
+                        <img src="../image/ndac_restore_state.png" style="width: 30px; height: 30px;">
+                    </button>
+                    <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">恢复状态</div>
+                </div>
+                <div class="separator"></div> <!-- 分割线 -->
+               
+                <!-- <div class="toolbar-item">
+                    <button id="nadc_mode1_transmission"
+                        style="padding: 1px; background-color: transparent; border: none;" title="开启透传模式">
                         <img src="../image/ndac_transmission_mode.png" style="width: 30px; height: 30px;">
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">开启透传</div>
                 </div>
-                <div class="separator"></div> <!-- 分割线 -->
-                <!-- 设置波特率 -->
+                <div class="separator"></div> 
+         
                 <div class="toolbar-item">
                     <button id="nadc_mode1_baud_rate" style="padding: 1px; background-color: transparent; border: none;"
                         title="设置波特率">
@@ -62,7 +80,7 @@
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">设置波特率</div>
                 </div>
-                <div class="separator"></div> <!-- 分割线 -->
+                <div class="separator"></div>  -->
                 <!-- 板卡 -->
                 <div class="toolbar-item">
                     <div class="up-down-buttons">
@@ -3877,15 +3895,11 @@
 
         <!-- 数据显示区域 -->
         <div id="ndac_mode1_display"
-            style="overflow: auto;margin-left: 10px;margin-top:10px;width: 1000px;max-height: 350px;">
+            style="overflow: auto;margin-left: 10px;margin-top:10px;width: 1465px;max-height: 80px;">
             <table id="ndac_mode1_displaydata" style="width: 950px; height: 30px; 
           box-shadow: 0 0 0 rgba(0, 0, 0, 200); background-color: transparent;">
             </table>
         </div>
-
-
-
-
 
 
 
