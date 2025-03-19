@@ -12,3 +12,5 @@
 NDACODE = "NDAC003"
 #修改波特率命令
 
+NDACODE = "NDAC004"
+#查询板卡信息命令

@@ -4,7 +4,7 @@ module.exports = {
     setWindow, showStatus, showValue
 }
 const { ndac_mode1_display_TD } = require('./js/manage/ndac_jump_interface.js')
-const { mode1_parameter, query_mode1_tran, restore_mode1_tran } = require('./mode/mode1/mode1_client.js');
+const { mode1_parameter, query_mode1_tran, restore_mode1_tran,query_board_version } = require('./mode/mode1/mode1_client.js');
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -77,13 +77,13 @@ ipcMain.on('toMain2', async (event, id, d1) => {
             mainWindow.loadFile("./html/" + d1);
             break;
         case 100:
-            Operation_tips = `显示校准系统配置值`;
+            Operation_tips = `#100显示校准系统配置值`;
             ndac_mode1_display_TD(id, d1);
             break;
-        // case 101://恢复透传模式和波特率
-        //     Operation_tips = "恢复透传及波特率";
-        //     restore_mode1_tran(id, d1);
-        //     break;
+        case 101://查看板卡版本号
+            Operation_tips = "#101查看板卡版本号";
+            query_board_version(id, d1);
+            break;
     }
     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
 

@@ -13,7 +13,7 @@
         <div class="ndac_dialog" id="ndac_mode1_dialog">
             <div class="ndac_dialog_div">
                 <!-- 显示提示图片 -->
-                <img src="./image/nadc_dialog_notice.png" class="ndac_dialog_img">
+                <img src="./../image/nadc_dialog_notice.png" class="ndac_dialog_img">
                 <!-- 显示设置成功标签，与图片对齐 -->
                 <label class=" ndac_dialog_label" id="ndac_mode1_dialog_label">提示信息</label>
             </div>
@@ -25,18 +25,18 @@
                 style="text-align: left;margin-left: 10px;color: white;padding: 5px 10px; font-weight: bold;transform: skewX(-20deg);text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);">
                 <label style="font-size: 25px; ">参数信息：</label>
                 <label id="ndac_mode1_Parameter1" style="font-size: 20px;">......</label>
-                <label id="ndac_mode1_Parameter2" style="font-size: 20px;"></label>
+                <label id="ndac_mode1_Parameter2" style="font-size: 20px;">......</label>
             </span>
             <span style="text-align: right;">
-                <button id="nadc_mode1_Page_return"
+                <button id="nadc_mode1_Page_return" disabled
                     style="display: inline; padding: 3px; background-color: transparent; border: none;">
                     <img src="../image/ndac_win_return.png" style="width: 30px; height: 30px;">
                 </button>
-                <button id="nadc_mode1_Page_min"
+                <button id="nadc_mode1_Page_min" 
                     style="display: inline; padding: 3px; background-color: transparent; border: none;">
                     <img src="../image/ndac_win_min.png" style="width: 30px; height: 30px;">
                 </button>
-                <button id="nadc_mode1_Page_close"
+                <button id="nadc_mode1_Page_close" disabled
                     style="display: inline; padding: 3px; background-color: transparent; border: none;">
                     <img src="../image/ndac_win_close.png" style="width: 30px; height: 30px;">
                 </button>
@@ -84,7 +84,7 @@
                 <!-- 板卡 -->
                 <div class="toolbar-item">
                     <div class="up-down-buttons">
-                        <select id="ndac_mode1_board_num" style="width: 120px;height: 25px; opacity:0.7">
+                        <select id="ndac_mode1_board_num" style="width: 120px;height: 25px; opacity:0.7" disabled>
                             <option value="1" selected>板卡1</option>
                             <option value="2">板卡2</option>
                             <option value="3">板卡3</option>
@@ -103,7 +103,7 @@
                             <option value="16">板卡16</option>
                         </select>
                         <select id="ndac_mode1_cali_part"
-                            style="width: 120px;height: 25px; opacity:0.7;margin-top: 10px;">
+                            style="width: 120px;height: 25px; opacity:0.7;margin-top: 10px;" disabled>
                             <option value="1" selected>定标1段</option>
                             <option value="2">定标2段</option>
                             <option value="3">定标3段</option>
@@ -116,18 +116,18 @@
                     <div class="up-down-buttons">
                         <div>
                             <button id="nadc_mode1_version"
-                                style="padding: 1px; background-color: transparent; border: none;" title="查询板卡版本">
+                                style="padding: 1px; background-color: transparent; border: none;" title="查询板卡版本" disabled>
                                 <img src="../image/ndac_version.png" style="width: 25px; height: 25px;">
                             </button>
                         </div>
                         <div>
                             <button id="nadc_mode1_testValue1"
-                                style="padding: 1px; background-color: transparent; border: none;" title="获取测试值1">
+                                style="padding: 1px; background-color: transparent; border: none;" title="获取测试值1" disabled>
                                 <img src="../image/ndac_test_value1.png" style="width: 25px; height: 25px;">
                             </button>
                             <button id="nadc_mode1_testValue2"
                                 style="padding: 1px; background-color: transparent; border: none; margin-left: 10px;"
-                                title="获取测试值2">
+                                title="获取测试值2" disabled>
                                 <img src="../image/ndac_test_value2.png" style="width: 25px; height: 25px;">
                             </button>
                         </div>
@@ -144,17 +144,17 @@
                 </div>
                 <div class="toolbar-item">
                     <div class="up-down-buttons">
-                        <input type="checkbox" id="ndac_select_all" style="width: 15px;height: 15px;margin-top: 8px;">
+                        <input type="checkbox" id="ndac_select_all" style="width: 15px;height: 15px;margin-top: 8px;" disabled>
                         <input type="checkbox" id="ndac_select_part"
-                            style="width: 15px;height: 15px; margin-top: 12px;">
+                            style="width: 15px;height: 15px; margin-top: 12px;" disabled>
                     </div>
                 </div>
                 <div class="separator"></div> <!-- 分割线 -->
                 <!-- 设置分界点 -->
                 <div class="toolbar-item">
                     <button id="nadc_mode1_demarc" style="padding: 1px; background-color: transparent; border: none;"
-                        title="设置分界点">
-                        <img src="../image/ndac_demarc.png" style="width: 30px; height: 30px;">
+                        title="设置分界点" disabled>
+                        <img src="../image/ndac_demarc.png" style="width: 30px; height: 30px;" >
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">设置分界点</div>
                 </div>
@@ -163,7 +163,7 @@
                 <div class="toolbar-item">
                     <button id="nadc_mode1_application"
                         style="padding: 1px; background-color: transparent; border: none;margin-left: 10px;"
-                        title="一键应用">
+                        title="一键应用" disabled>
                         <img src="../image/ndac_application.png" style="width: 30px; height: 30px;">
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">一键应用</div>
@@ -173,7 +173,7 @@
                 <div class="toolbar-item">
                     <button id="nadc_mode1_count"
                         style="padding: 1px; background-color: transparent; border: none;margin-left: 10px;"
-                        title="计算K/B值">
+                        title="计算K/B值" disabled>
                         <img src="../image/ndac_count.png" style="width: 30px; height: 30px;">
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">计算K/B值</div>
@@ -183,7 +183,7 @@
                 <div class="toolbar-item">
                     <button id="nadc_mode1_initialize"
                         style="padding: 1px; background-color: transparent; border: none;margin-left: 10px;"
-                        title="初始化K/B值">
+                        title="初始化K/B值" disabled>
                         <img src="../image/nadc_initialize.png" style="width: 30px; height: 30px;">
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">初始化K/B值</div>
@@ -193,7 +193,7 @@
                 <div class="toolbar-item">
                     <button id="nadc_mode1_batch_send"
                         style="padding: 1px; background-color: transparent; border: none;margin-left: 10px;"
-                        title="批量发送K/B值">
+                        title="批量发送K/B值" disabled>
                         <img src="../image/nadc_batch_send.png" style="width: 30px; height: 30px;">
                     </button>
                     <div class="label" style="display: inline-block; margin-left: 5px;font-size: 15px;">批量发送K/B值</div>
@@ -203,14 +203,14 @@
         </div>
         <!-- 四段定标盒子 -->
         <div style="margin-top: 10px;margin-left: 10px;margin-right: 10px; display: flex;">
-            <fieldset
+            <fieldset id="fieldset_mode1" disabled
                 style="width: 1500px;height:513px;display: inline-block;vertical-align: top; padding: 10px;background-color: rgba(255, 255, 255, 0.3);border-radius: 5px;border: rgb(255, 252, 252) solid 4px;box-shadow: 0 0 20px rgba(0, 0, 0, 200);">
                 <!-- 通道区域 -->
-                <div style="height: 513px; overflow-y: auto;">
+                <div style="height: 513px; overflow-y: auto;"  id="ndac_mode1_channel_area">
                     <!-- 通道1区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
-                            style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="collapse-header"  onclick="toggleCollapse(this)"
+                            style="display: flex; align-items: center; justify-content: space-between;" >
                             <div>
                                 <input id="ndac_mode1_channel1" type="checkbox" class="checkbox">
                                 <span class="show-label-one">通道 1</span>
@@ -420,7 +420,7 @@
                     </div>
                     <!-- 通道2区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel2" type="checkbox" class="checkbox">
@@ -649,7 +649,7 @@
                     </div>
                     <!-- 通道3区域-->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel3" type="checkbox" class="checkbox">
@@ -878,7 +878,7 @@
                     </div>
                     <!-- 通道4区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel4" type="checkbox" class="checkbox">
@@ -1107,7 +1107,7 @@
                     </div>
                     <!-- 通道5区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel5" type="checkbox" class="checkbox">
@@ -1336,7 +1336,7 @@
                     </div>
                     <!-- 通道6区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel6" type="checkbox" class="checkbox">
@@ -1565,7 +1565,7 @@
                     </div>
                     <!-- 通道7区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel7" type="checkbox" class="checkbox">
@@ -1794,7 +1794,7 @@
                     </div>
                     <!-- 通道8区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel8" type="checkbox" class="checkbox">
@@ -2023,7 +2023,7 @@
                     </div>
                     <!-- 通道9区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel9" type="checkbox" class="checkbox">
@@ -2252,7 +2252,7 @@
                     </div>
                     <!-- 通道10区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel10" type="checkbox" class="checkbox">
@@ -2486,7 +2486,7 @@
                     </div>
                     <!-- 11通道区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel11" type="checkbox" class="checkbox">
@@ -2720,7 +2720,7 @@
                     </div>
                     <!-- 12通道区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel12" type="checkbox" class="checkbox">
@@ -2954,7 +2954,7 @@
                     </div>
                     <!-- 13通道区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel13" type="checkbox" class="checkbox">
@@ -3188,7 +3188,7 @@
                     </div>
                     <!-- 14通道 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel14" type="checkbox" class="checkbox">
@@ -3422,7 +3422,7 @@
                     </div>
                     <!-- 15通道区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel15" type="checkbox" class="checkbox">
@@ -3656,7 +3656,7 @@
                     </div>
                     <!-- 16通道区域 -->
                     <div class="collapse-panel">
-                        <div class="collapse-header"
+                        <div class="collapse-header" onclick="toggleCollapse(this)"
                             style="display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <input id="ndac_mode1_channel16" type="checkbox" class="checkbox">

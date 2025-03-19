@@ -1,5 +1,9 @@
 // 定义命令类
 
+const { showStatus } = require("../ipc_main");
+
+const { getTimestamp } = require("../js/time/ndac_time_Info");
+
 class CommandFactory {
     constructor(code, args = {}) {
         this.code = code; // 命令码
@@ -19,10 +23,10 @@ class CommandFactory {
                 return this.generateTran();
             case 'NDAC002':
                 return this.generateQueryBaudRate();
-            case 'NDAC003'://修改波特率
+            case 'NDAC003':
                 return this.generateUpdateBaudRate();
-            // case 'NDAC004'://发送波特率
-            //     return this.generateRestoreBaudRate();
+            case 'NDAC004'://查询板卡版本
+                return this.generateQueryBoardVersion();
             default:
                 throw new Error(`Unknown command: ${this.code}`);
         }
@@ -63,7 +67,7 @@ class CommandFactory {
 
     //生成修改波特率命令
     generateUpdateBaudRate() {
-       const [param1, param2, param3, param4] = this.args;
+        const [param1, param2, param3, param4] = this.args;
         const sendBuf = new Uint8Array(24);
         sendBuf[0] = 0x7b; // 起始标志
         sendBuf[2] = 0x18; // 命令类型
@@ -88,46 +92,22 @@ class CommandFactory {
         return sendBuf;
     }
 
-    // //生成恢复透传命令
-    // generateRestoreTran() {
-    //     const [param1, param2] = this.args;
-    //     const sendBuf = new Uint8Array(10);
-    //     sendBuf[0] = 0x7b; // 起始标志
-    //     sendBuf[2] = 0x09; // 命令类型
-    //     sendBuf[3] = 0x11; // 子命令类型
-    //     sendBuf[4] = 0x01; // 端口号
-    //     sendBuf[5] = 0x02; // 固定值
-    //     sendBuf[6] = param1; // CAN FD 编号
-    //     sendBuf[7] = param2; // 开启透传
-    //     sendBuf[9] = 0x7d; // 结束标志
-    //     return sendBuf;
-    // }
+    //生成恢复透传命令
+    generateQueryBoardVersion() {
+        const param1 =Number( this.args);
+        console.log('param1', param1);
+        const Fid = param1 + 0x100;
+        const sendBuf = new Uint8Array(69);
+        console.log('Fid', Fid);
+        sendBuf[0] = 0x38; // 起始标志
+        sendBuf[1] = 0x00; // 命令类型
+        sendBuf[3] = (Fid >> 8) & 0xFF; // 子命令类型
+        sendBuf[4] = Fid & 0xFF;
+        sendBuf[5] = 0x7c; // 固定值
+        sendBuf[6] = 0x00; // 固定值
+        return sendBuf;
+    }
 
-    // //生成恢复波特率命令
-    // generateRestoreBaudRate() {
-    //     const [param1, param2, param3, param4] = this.args;
-    //     const sendBuf = new Uint8Array(24);
-    //     sendBuf[0] = 0x7b; // 起始标志
-    //     sendBuf[2] = 0x18; // 命令类型
-    //     sendBuf[3] = 0x84; // 子命令类型
-    //     sendBuf[4] = 0x01; // 端口号
-    //     sendBuf[5] = 0x02; // 固定值
-    //     sendBuf[6] = param1; // CAN FD 编号
-    //     sendBuf[8] = param2 & 0xFF;
-    //     sendBuf[9] = (param2 >> 8) & 0xFF;
-    //     //存放CANFD控制域波特率
-    //     sendBuf[10] = param3 & 0xFF;// 最低字节
-    //     sendBuf[11] = (param3 >> 8) & 0xFF; // 次低字节
-    //     sendBuf[12] = (param3 >> 16) & 0xFF;// 次高字节
-    //     sendBuf[13] = (param3 >> 24) & 0xFF;// 最高字节
-    //     //存放CANFD数据域波特率
-    //     sendBuf[14] = param4 & 0xFF;// 最低字节
-    //     sendBuf[15] = (param4 >> 8) & 0xFF; // 次低字节
-    //     sendBuf[16] = (param4 >> 16) & 0xFF;// 次高字节
-    //     sendBuf[17] = (param4 >> 24) & 0xFF;// 最高字节
-    //     sendBuf[18] = 0x00;
-    //     sendBuf[23] = 0x7d;
-    //     return sendBuf;
-    // }
+
 }
 module.exports = CommandFactory;

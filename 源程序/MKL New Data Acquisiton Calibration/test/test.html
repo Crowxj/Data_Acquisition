@@ -10,10 +10,63 @@
 </head>
 
 <body>
-    <label class="switch" style="margin-left: 15px;">
-        <input type="checkbox" id="ndac_passback_switch">
-        <span class="slider round"></span>
-      </label>
+    <div style="margin-top: 10px;margin-left: 10px;margin-right: 10px; display: flex;">
+        <fieldset id="fieldset_mode1" 
+            style="width: 1500px;height:513px;display: inline-block;vertical-align: top; padding: 10px;background-color: rgba(255, 255, 255, 0.3);border-radius: 5px;border: rgb(255, 252, 252) solid 4px;box-shadow: 0 0 20px rgba(0, 0, 0, 200);">
+            <!-- 通道区域 -->
+            <div style="height: 513px; overflow-y: auto;">
+                <!-- 全选和反选按钮 -->
+                <div>
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll()"> 全选
+                    <input type="checkbox" id="invertSelection" onclick="toggleInvertSelection()"> 反选
+                </div>
+                <!-- 通道1区域 -->
+                <div class="collapse-panel">
+                    <div class="collapse-header"
+                        style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <input id="ndac_mode1_channel1" type="checkbox" class="channel-checkbox">
+                            <span class="show-label-one">通道 1</span>
+                            <span class="show-label-one" style="margin-left: 50px;">数据区域：</span>
+                            <span><label id="ndac_mode1_channel1_data" class="show-label-one">6556356</label></span>
+                            <span><label>V</label></span>
+                        </div>
+                        <div>
+                            <button id="ndac_mode1_channel1_sendkb"
+                                style="background-color: transparent; border: none; margin-left: 10px;"
+                                title="通道1发送K/B值">
+                                <img src="../image/nadc_single_send.png" style="width: 20px; height: 20px;">
+                            </button>
+                            <span class="arrow">▶</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 其他通道区域 -->
+                <!-- 通道2区域 -->
+                <div class="collapse-panel">
+                    <div class="collapse-header"
+                        style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <input id="ndac_mode1_channel2" type="checkbox" class="channel-checkbox">
+                            <span class="show-label-one">通道 2</span>
+                            <span class="show-label-one" style="margin-left: 50px;">数据区域：</span>
+                            <span><label id="ndac_mode1_channel2_data" class="show-label-one">6556356</label></span>
+                            <span><label>V</label></span>
+                        </div>
+                        <div>
+                            <button id="ndac_mode1_channel2_sendkb"
+                                style="background-color: transparent; border: none; margin-left: 10px;"
+                                title="通道2发送K/B值">
+                                <img src="../image/nadc_single_send.png" style="width: 20px; height: 20px;">
+                            </button>
+                            <span class="arrow">▶</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 其他通道区域 -->
+            </div>
+        </fieldset>
+    </div>
     <script src='test.js'></script>
 </body>
 

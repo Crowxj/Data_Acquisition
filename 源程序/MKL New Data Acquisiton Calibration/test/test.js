@@ -1,8 +1,33 @@
-const mode1_reply_state = document.getElementById('mode1_reply_state');
-mode1_reply_state.addEventListener('click', () => {
-    if (mode1_reply_state.checked) {
-        alert("1请先设置回传时间");
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const invertSelection = document.getElementById('invertSelection');
+    const channelCheckboxes = document.querySelectorAll('.channel-checkbox');
+
+    if (selectAll.checked) {
+        invertSelection.checked = false; // 确保反选不被选中
+        channelCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
     } else {
-        alert("2请先设置回传时间");
+        channelCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
     }
-})
+}
+
+function toggleInvertSelection() {
+    const selectAll = document.getElementById('selectAll');
+    const invertSelection = document.getElementById('invertSelection');
+    const channelCheckboxes = document.querySelectorAll('.channel-checkbox');
+
+    if (invertSelection.checked) {
+        selectAll.checked = false; // 确保全选不被选中
+        channelCheckboxes.forEach(checkbox => {
+            checkbox.checked = !checkbox.checked;
+        });
+    } else {
+        channelCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+}

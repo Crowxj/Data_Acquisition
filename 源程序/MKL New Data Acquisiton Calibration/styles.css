@@ -428,7 +428,7 @@ input:checked+.slider:before {
 }
 
 .arrow.open {
-  transform: rotate(90deg);
+  transform: rotate(90deg); /* 旋转90度，使箭头朝下 */
 }
 
 .checkbox {
