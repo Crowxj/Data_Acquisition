@@ -334,6 +334,35 @@ input:checked+.slider:before {
 
 /**
 *****************************
+* 官方网站
+*****************************
+*/
+
+/* 网页信息容器样式 */
+.web-info-container {
+  position: fixed;
+  top: 80px;
+  /* 根据需要调整 */
+  left: 50px;
+  /* 根据需要调整 */
+  width: 93.3%;
+  /* 根据需要调整 */
+  height: 600px;
+  /* 根据需要调整 */
+  border: #00a8ff 3px solid;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* iframe样式 */
+.web-info-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/**
+*****************************
 * 四段定标样式
 *****************************
 */
