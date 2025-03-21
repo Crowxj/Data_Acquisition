@@ -9,8 +9,14 @@
 #NDACODE = "NDAC002"
 #查询波特率命令Code
 
-NDACODE = "NDAC003"
+#NDACODE = "NDAC003"
 #修改波特率命令
 
-NDACODE = "NDAC004"
+#NDACODE = "NDAC004"
 #查询板卡信息命令
+
+#NDACODE = "NDAC005"
+#通道要数命令
+
+#NDACODE = "NDAC006"
+#调试状态命令

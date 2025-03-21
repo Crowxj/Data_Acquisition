@@ -13,11 +13,9 @@ var ndac_mode1_mode;//模式
 var ndac_mode1_passbacktime;//回传时间
 var NDACMODE1D;//模式显示值
 var NDACDISPLAYD = {};//显示值
-// var MODE1RETURN = false;
-// var MODE1CLOSE = false;
+var MODE1TIMER = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // MODE1RETURN = false;
-    // MODE1CLOSE = false;
     ndac_mode1_device_num = sessionStorage.getItem('ndac_device_num');//设备号
     ndac_mode1_dspip_num = sessionStorage.getItem('ndac_dspip_num');//DSP IP
     ndac_mode1_canfd_num = sessionStorage.getItem('ndac_canfd_num');//canfd号
@@ -54,11 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
     const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
     //添加10秒钟检查开关状态，没开启就返回上一页
+    ndac_mode1_dialog.style.display = 'block';
+    ndac_mode1_dialog_label.innerText = 'DPS参数状态初始化\n进行中'
+    setTimeout(() => {
+        ndac_mode1_dialog.style.display = 'none';
+    }, 1500); // 调整为1秒
     const mode1_query_state = document.getElementById('mode1_query_state');//控制开关
-    const timeoutId = setTimeout(() => {
+    MODE1TIMER = setTimeout(() => {
         if (!mode1_query_state.checked) {
             ndac_mode1_dialog.style.display = 'block';
-            ndac_mode1_dialog_label.innerText = 'DPS参数状态\n初始化超时'
+            ndac_mode1_dialog_label.innerText = 'DPS参数状态初始化\n超时退出'
             setTimeout(() => {
                 console.log("开关未在3秒内选中，退出界面");
                 window.TheIPC.ButtonPressed(5); // 关闭窗口
@@ -67,15 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 10000); // 10秒
     mode1_query_state.addEventListener('change', () => {
         if (mode1_query_state.checked) {
-            clearTimeout(timeoutId);
+            clearTimeout(MODE1TIMER);
             console.log("开关被选中，清除定时器");
         }
     });
-    ndac_mode1_dialog.style.display = 'block';
-    ndac_mode1_dialog_label.innerText = 'DPS参数状态\n初始化进行中'
-    setTimeout(() => {
-        ndac_mode1_dialog.style.display = 'none';
-    }, 1500); // 调整为1秒
+
 })
 /**
 * 模块名:
@@ -118,6 +117,7 @@ nadc_mode1_Page_return.addEventListener('click', () => {
         }, 1000)
     } else {
         nadc_mode1_Page_return.disabled = true;
+        clearTimeout(MODE1TIMER);
         window.TheIPC.ButtonPressed(5);
     }
 })
@@ -151,6 +151,7 @@ nadc_mode1_Page_close.addEventListener('click', () => {
         }, 1000)
     } else {
         nadc_mode1_Page_close.disabled = true;
+        clearTimeout(MODE1TIMER);
         window.TheIPC.ButtonPressed(1);
     }
 })
@@ -163,6 +164,34 @@ nadc_mode1_Page_close.addEventListener('click', () => {
 const nadc_mode1_restore = document.getElementById('nadc_mode1_restore');
 nadc_mode1_restore.addEventListener('click', () => {
     window.TheIPC.ButtonPressed(102);
+})
+
+/**
+* 模块名:
+* 代码描述:进入/退出调试
+* 作者:Crow
+* 创建时间:2025/03/20 15:04:55
+*/
+var MODE1DEBUG = true;
+const nadc_mode1_debug = document.getElementById('nadc_mode1_debug');
+nadc_mode1_debug.addEventListener('click', () => {
+    const nadc_mode1_debug_label = document.getElementById('nadc_mode1_debug_label');
+    const nadc_mode1_debug = document.getElementById('nadc_mode1_debug');
+    const nadc_mode1_debug_img = document.getElementById('nadc_mode1_debug_img');
+    const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
+    if (MODE1DEBUG == true) {
+        nadc_mode1_debug_label.innerText = "退出调试";
+        nadc_mode1_debug.title = "退出调试";
+        nadc_mode1_debug_img.src = "../image/ndac_stop_debug.png";
+        window.TheIPC.toMain2(102, Number(ndac_mode1_board_num.value));
+        MODE1DEBUG = false;
+    } else {
+        nadc_mode1_debug_label.innerText = "进入调试";
+        nadc_mode1_debug.title = "进入调试";
+        nadc_mode1_debug_img.src = "../image/ndac_start_debug.png";
+        window.TheIPC.toMain2(103, Number(ndac_mode1_board_num.value));
+        MODE1DEBUG = true;
+    }
 })
 
 /**
@@ -225,19 +254,163 @@ window.TheIPC.onStatus((text) => {
     ndac_mode1_display.scrollTop = ndac_mode1_display.scrollHeight;
 });
 
-var restore_state = null;//恢复状态
+
 window.TheIPC.onMultiData((id, data) => {
     console.log("id:", id, "data:", data);
     switch (id) {
         case 1:
             const ndac_mode1_Parameter2 = document.getElementById('ndac_mode1_Parameter2');
-            const product_type=data;
+            const product_type = data;
             ndac_mode1_Parameter2.innerHTML = `
                       <span style="color: white;">产品类型:</span> <span style="color: #39FF14;">${product_type}</span> `
             break;
         case 100:
-            restore_state = data;
-            mode1_open_restore(restore_state);//开启恢复状态
+            mode1_open_restore(data);//开启恢复状态
+            break;
+        case 101:
+            show_channels_data(data);//显示通道信息
+            break;
+        case 102:
+            const mode1_debug_data = data;
+            console.log("进入调试状态", mode1_debug_data);
+            const mode1_debug_type = mode1_debug_data.debug_type;
+            const mode1_debug_status = mode1_debug_data.debug_status;
+            switch (mode1_debug_type) {
+                case "voltage":
+                    switch (mode1_debug_status) {
+                        case true:
+                            ndac_mode1_channel1_unit.innerText = 'mV';
+                            ndac_mode1_channel2_unit.innerText = 'mV';
+                            ndac_mode1_channel3_unit.innerText = 'mV';
+                            ndac_mode1_channel4_unit.innerText = 'mV';
+                            ndac_mode1_channel5_unit.innerText = 'mV';
+                            ndac_mode1_channel6_unit.innerText = 'mV';
+                            ndac_mode1_channel7_unit.innerText = 'mV';
+                            ndac_mode1_channel8_unit.innerText = 'mV';
+                            ndac_mode1_channel9_unit.innerText = 'mV';
+                            ndac_mode1_channel10_unit.innerText = 'mV';
+                            ndac_mode1_channel11_unit.innerText = 'mV';
+                            ndac_mode1_channel12_unit.innerText = 'mV';
+                            ndac_mode1_channel13_unit.innerText = 'mV';
+                            ndac_mode1_channel14_unit.innerText = 'mV';
+                            ndac_mode1_channel15_unit.innerText = 'mV';
+                            ndac_mode1_channel16_unit.innerText = 'mV';
+                            break;
+                        case false:
+                            ndac_mode1_channel1_unit.innerText = 'mV';
+                            ndac_mode1_channel2_unit.innerText = 'mV';
+                            ndac_mode1_channel3_unit.innerText = 'mV';
+                            ndac_mode1_channel4_unit.innerText = 'mV';
+                            ndac_mode1_channel5_unit.innerText = 'mV';
+                            ndac_mode1_channel6_unit.innerText = 'mV';
+                            ndac_mode1_channel7_unit.innerText = 'mV';
+                            ndac_mode1_channel8_unit.innerText = 'mV';
+                            ndac_mode1_channel9_unit.innerText = 'mV';
+                            ndac_mode1_channel10_unit.innerText = 'mV';
+                            ndac_mode1_channel11_unit.innerText = 'mV';
+                            ndac_mode1_channel12_unit.innerText = 'mV';
+                            ndac_mode1_channel13_unit.innerText = 'mV';
+                            ndac_mode1_channel14_unit.innerText = 'mV';
+                            ndac_mode1_channel15_unit.innerText = 'mV';
+                            ndac_mode1_channel16_unit.innerText = 'mV';
+                            break;
+                    }
+                    break;
+                case "Temp":
+                    switch (mode1_debug_status) {
+                        case true:
+                            ndac_mode1_channel1_unit.innerText = 'mV';
+                            ndac_mode1_channel2_unit.innerText = 'mV';
+                            ndac_mode1_channel3_unit.innerText = 'mV';
+                            ndac_mode1_channel4_unit.innerText = 'mV';
+                            ndac_mode1_channel5_unit.innerText = 'mV';
+                            ndac_mode1_channel6_unit.innerText = 'mV';
+                            ndac_mode1_channel7_unit.innerText = 'mV';
+                            ndac_mode1_channel8_unit.innerText = 'mV';
+                            ndac_mode1_channel9_unit.innerText = 'mV';
+                            ndac_mode1_channel10_unit.innerText = 'mV';
+                            ndac_mode1_channel11_unit.innerText = 'mV';
+                            ndac_mode1_channel12_unit.innerText = 'mV';
+                            ndac_mode1_channel13_unit.innerText = 'mV';
+                            ndac_mode1_channel14_unit.innerText = 'mV';
+                            ndac_mode1_channel15_unit.innerText = 'mV';
+                            ndac_mode1_channel16_unit.innerText = 'mV';
+                            break;
+                        case false:
+                            ndac_mode1_channel1_unit.innerText = 'mΩ';
+                            ndac_mode1_channel2_unit.innerText = 'mΩ';
+                            ndac_mode1_channel3_unit.innerText = 'mΩ';
+                            ndac_mode1_channel4_unit.innerText = 'mΩ';
+                            ndac_mode1_channel5_unit.innerText = 'mΩ';
+                            ndac_mode1_channel6_unit.innerText = 'mΩ';
+                            ndac_mode1_channel7_unit.innerText = 'mΩ';
+                            ndac_mode1_channel8_unit.innerText = 'mΩ';
+                            ndac_mode1_channel9_unit.innerText = 'mΩ';
+                            ndac_mode1_channel10_unit.innerText = 'mΩ';
+                            ndac_mode1_channel11_unit.innerText = 'mΩ';
+                            ndac_mode1_channel12_unit.innerText = 'mΩ';
+                            ndac_mode1_channel13_unit.innerText = 'mΩ';
+                            ndac_mode1_channel14_unit.innerText = 'mΩ';
+                            ndac_mode1_channel15_unit.innerText = 'mΩ';
+                            ndac_mode1_channel16_unit.innerText = 'mΩ';
+                            break;
+                    }
+                    break;
+            }
+            // const ndac_mode1_channel1_unit = document.getElementById('ndac_mode1_channel1_unit');
+            // const ndac_mode1_channel2_unit = document.getElementById('ndac_mode1_channel2_unit');
+            // const ndac_mode1_channel3_unit = document.getElementById('ndac_mode1_channel3_unit');
+            // const ndac_mode1_channel4_unit = document.getElementById('ndac_mode1_channel4_unit');
+            // const ndac_mode1_channel5_unit = document.getElementById('ndac_mode1_channel5_unit');
+            // const ndac_mode1_channel6_unit = document.getElementById('ndac_mode1_channel6_unit');
+            // const ndac_mode1_channel7_unit = document.getElementById('ndac_mode1_channel7_unit');
+            // const ndac_mode1_channel8_unit = document.getElementById('ndac_mode1_channel8_unit');
+            // const ndac_mode1_channel9_unit = document.getElementById('ndac_mode1_channel9_unit');
+            // const ndac_mode1_channel10_unit = document.getElementById('ndac_mode1_channel10_unit');
+            // const ndac_mode1_channel11_unit = document.getElementById('ndac_mode1_channel11_unit');
+            // const ndac_mode1_channel12_unit = document.getElementById('ndac_mode1_channel12_unit');
+            // const ndac_mode1_channel13_unit = document.getElementById('ndac_mode1_channel13_unit');
+            // const ndac_mode1_channel14_unit = document.getElementById('ndac_mode1_channel14_unit');
+            // const ndac_mode1_channel15_unit = document.getElementById('ndac_mode1_channel15_unit');
+            // const ndac_mode1_channel16_unit = document.getElementById('ndac_mode1_channel16_unit');
+            // switch (mode1_debug_unit) {
+            //     case true:
+            //         ndac_mode1_channel1_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel2_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel3_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel4_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel5_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel6_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel7_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel8_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel9_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel10_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel11_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel12_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel13_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel14_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel15_unit.innerText = 'mΩ';
+            //         ndac_mode1_channel16_unit.innerText = 'mΩ';
+            //         break;
+            //     case false:
+            //         ndac_mode1_channel1_unit.innerText = 'mV';
+            //         ndac_mode1_channel2_unit.innerText = 'mV';
+            //         ndac_mode1_channel3_unit.innerText = 'mV';
+            //         ndac_mode1_channel4_unit.innerText = 'mV';
+            //         ndac_mode1_channel5_unit.innerText = 'mV';
+            //         ndac_mode1_channel6_unit.innerText = 'mV';
+            //         ndac_mode1_channel7_unit.innerText = 'mV';
+            //         ndac_mode1_channel8_unit.innerText = 'mV';
+            //         ndac_mode1_channel9_unit.innerText = 'mV';
+            //         ndac_mode1_channel10_unit.innerText = 'mV';
+            //         ndac_mode1_channel11_unit.innerText = 'mV';
+            //         ndac_mode1_channel12_unit.innerText = 'mV';
+            //         ndac_mode1_channel13_unit.innerText = 'mV';
+            //         ndac_mode1_channel14_unit.innerText = 'mV';
+            //         ndac_mode1_channel15_unit.innerText = 'mV';
+            //         ndac_mode1_channel16_unit.innerText = 'mV';
+            //         break;
+            // }
             break;
     }
 });
@@ -281,6 +454,7 @@ function mode1_open_restore(data) {
     const nadc_mode1_version = document.getElementById('nadc_mode1_version');//板卡版本
     const nadc_mode1_testValue1 = document.getElementById('nadc_mode1_testValue1');//获取测试值1恢复
     const nadc_mode1_testValue2 = document.getElementById('nadc_mode1_testValue2');//获取测试值2恢复
+    const nadc_mode1_debug = document.getElementById('nadc_mode1_debug');//获取进入调试恢复
     const ndac_select_all = document.getElementById('ndac_select_all');//全选恢复
     const ndac_select_part = document.getElementById('ndac_select_part');//部分选恢复
     const nadc_mode1_demarc = document.getElementById('nadc_mode1_demarc');//分界点恢复
@@ -290,9 +464,7 @@ function mode1_open_restore(data) {
     const nadc_mode1_batch_send = document.getElementById('nadc_mode1_batch_send');//批量发送KB值恢复
     const fieldset_mode1 = document.getElementById('fieldset_mode1');//fieldset恢复
     const restore_state = data;
-    if (restore_state == true) {
-        // MODE1RETURN = false;//不可以返回
-        // MODE1CLOSE = false;//不可以关闭
+    if (restore_state === true) {
         mode1_query_state.checked = true;
         nadc_mode1_Page_return.disabled = false;//返回恢复
         nadc_mode1_Page_close.disabled = false;//关闭恢复
@@ -302,6 +474,7 @@ function mode1_open_restore(data) {
         nadc_mode1_version.disabled = false;//查询板卡版本恢复
         nadc_mode1_testValue1.disabled = false;//获取测试值1恢复
         nadc_mode1_testValue2.disabled = false;//获取测试值2恢复
+        nadc_mode1_debug.disabled = false;//调试恢复
         ndac_select_all.disabled = false;//全选恢复
         ndac_select_part.disabled = false;//部分选恢复
         nadc_mode1_demarc.disabled = false;//分界点恢复
@@ -311,26 +484,24 @@ function mode1_open_restore(data) {
         nadc_mode1_batch_send.disabled = false;//批量发送K/B值恢复
         fieldset_mode1.disabled = false;//fieldset恢复
         ndac_mode1_dialog.style.display = 'block';
-        ndac_mode1_dialog_label.innerText = 'DPS参数状态\n初始化完成'
+        ndac_mode1_dialog_label.innerText = 'DPS参数状态初始化\n完成'
+        clearTimeout(MODE1TIMER);
         setTimeout(() => {
             ndac_mode1_dialog.style.display = 'none';
         }, 1000)
     } else if (restore_state == false) {
-        // MODE1RETURN = true;
-        // MODE1CLOSE = true;
         const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
         const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
         ndac_mode1_dialog.style.display = 'block';
-        ndac_mode1_dialog_label.innerText = 'DPS参数状态恢复完成'
+        ndac_mode1_dialog_label.innerText = 'DPS参数状态恢复\n完成'
         mode1_query_state.checked = false;
-        // nadc_mode1_Page_return.disabled = true;//返回不可点
-        // nadc_mode1_Page_close.disabled=false;//关闭不可点
         nadc_mode1_restore.disabled = true;//恢复状态不可以点击
         ndac_mode1_board_num.disabled = true;//板卡号不可点
         ndac_mode1_cali_part.disabled = true;//定标段不可点
         nadc_mode1_version.disabled = true;//查询板卡版本不可点
         nadc_mode1_testValue1.disabled = true;//获取测试值1不可点
         nadc_mode1_testValue2.disabled = true;//获取测试值2不可点
+        nadc_mode1_debug.disabled = true;//调试恢复
         ndac_select_all.disabled = true;//全选不可选
         ndac_select_part.disabled = true;//部分选不可选
         nadc_mode1_demarc.disabled = true;//分界点不可选
@@ -347,6 +518,175 @@ function mode1_open_restore(data) {
     }
 }
 
+
+/**
+* 模块名:
+* 代码描述:显示通道信息
+* 作者:Crow
+* 创建时间:2025/03/21 08:37:30
+*/
+function show_channels_data(data) {
+    const mode1_channels_data = data;
+    const mode1_channels_type = mode1_channels_data.channels_type;
+    //通道1的数据
+    const ndac_mode1_channel1_data = document.getElementById('ndac_mode1_channel1_data');
+    ndac_mode1_channel1_data.innerText = mode1_channels_data.channel1_value;
+    ndac_mode1_channel1_data.value = mode1_channels_data.channel1_value;
+    //通道2的数据
+    const ndac_mode1_channel2_data = document.getElementById('ndac_mode1_channel2_data');
+    ndac_mode1_channel2_data.innerText = mode1_channels_data.channel2_value;
+    ndac_mode1_channel2_data.value = mode1_channels_data.channel2_value;
+    //通道3的数据
+    const ndac_mode1_channel3_data = document.getElementById('ndac_mode1_channel3_data');
+    ndac_mode1_channel3_data.innerText = mode1_channels_data.channel3_value;
+    ndac_mode1_channel3_data.value = mode1_channels_data.channel3_value;
+    //通道4的数据
+    const ndac_mode1_channel4_data = document.getElementById('ndac_mode1_channel4_data');
+    ndac_mode1_channel4_data.innerText = mode1_channels_data.channel4_value;
+    ndac_mode1_channel4_data.value = mode1_channels_data.channel4_value;
+    //通道5的数据
+    const ndac_mode1_channel5_data = document.getElementById('ndac_mode1_channel5_data');
+    ndac_mode1_channel5_data.innerText = mode1_channels_data.channel5_value;
+    ndac_mode1_channel5_data.value = mode1_channels_data.channel5_value;
+    //通道6的数据
+    const ndac_mode1_channel6_data = document.getElementById('ndac_mode1_channel6_data');
+    ndac_mode1_channel6_data.innerText = mode1_channels_data.channel6_value;
+    ndac_mode1_channel6_data.value = mode1_channels_data.channel6_value;
+    //通道7的数据
+    const ndac_mode1_channel7_data = document.getElementById('ndac_mode1_channel7_data');
+    ndac_mode1_channel7_data.innerText = mode1_channels_data.channel7_value;
+    ndac_mode1_channel7_data.value = mode1_channels_data.channel7_value;
+    //通道8的数据
+    const ndac_mode1_channel8_data = document.getElementById('ndac_mode1_channel8_data');
+    ndac_mode1_channel8_data.innerText = mode1_channels_data.channel8_value;
+    ndac_mode1_channel8_data.value = mode1_channels_data.channel8_value;
+    //通道9的数据
+    const ndac_mode1_channel9_data = document.getElementById('ndac_mode1_channel9_data');
+    ndac_mode1_channel9_data.innerText = mode1_channels_data.channel9_value;
+    ndac_mode1_channel9_data.value = mode1_channels_data.channel9_value;
+    //通道10的数据
+    const ndac_mode1_channel10_data = document.getElementById('ndac_mode1_channel10_data');
+    ndac_mode1_channel10_data.innerText = mode1_channels_data.channel10_value;
+    ndac_mode1_channel10_data.value = mode1_channels_data.channel10_value;
+    //通道11的数据
+    const ndac_mode1_channel11_data = document.getElementById('ndac_mode1_channel11_data');
+    ndac_mode1_channel11_data.innerText = mode1_channels_data.channel11_value;
+    ndac_mode1_channel11_data.value = mode1_channels_data.channel11_value;
+    //通道12的数据
+    const ndac_mode1_channel12_data = document.getElementById('ndac_mode1_channel12_data');
+    ndac_mode1_channel12_data.innerText = mode1_channels_data.channel12_value;
+    ndac_mode1_channel12_data.value = mode1_channels_data.channel12_value;
+    //通道13的数据
+    const ndac_mode1_channel13_data = document.getElementById('ndac_mode1_channel13_data');
+    ndac_mode1_channel13_data.innerText = mode1_channels_data.channel13_value;
+    ndac_mode1_channel13_data.value = mode1_channels_data.channel13_value;
+    //通道14的数据
+    const ndac_mode1_channel14_data = document.getElementById('ndac_mode1_channel14_data');
+    ndac_mode1_channel14_data.innerText = mode1_channels_data.channel14_value;
+    ndac_mode1_channel14_data.value = mode1_channels_data.channel14_value;
+    //通道15的数据
+    const ndac_mode1_channel15_data = document.getElementById('ndac_mode1_channel15_data');
+    ndac_mode1_channel15_data.innerText = mode1_channels_data.channel15_value;
+    ndac_mode1_channel15_data.value = mode1_channels_data.channel15_value;
+    //通道16的数据
+    const ndac_mode1_channel16_data = document.getElementById('ndac_mode1_channel16_data');
+    ndac_mode1_channel16_data.innerText = mode1_channels_data.channel16_value;
+    ndac_mode1_channel16_data.value = mode1_channels_data.channel16_value;
+    //显示每个通道的单位
+    const ndac_mode1_channel1_unit = document.getElementById('ndac_mode1_channel1_unit');
+    const ndac_mode1_channel2_unit = document.getElementById('ndac_mode1_channel2_unit');
+    const ndac_mode1_channel3_unit = document.getElementById('ndac_mode1_channel3_unit');
+    const ndac_mode1_channel4_unit = document.getElementById('ndac_mode1_channel4_unit');
+    const ndac_mode1_channel5_unit = document.getElementById('ndac_mode1_channel5_unit');
+    const ndac_mode1_channel6_unit = document.getElementById('ndac_mode1_channel6_unit');
+    const ndac_mode1_channel7_unit = document.getElementById('ndac_mode1_channel7_unit');
+    const ndac_mode1_channel8_unit = document.getElementById('ndac_mode1_channel8_unit');
+    const ndac_mode1_channel9_unit = document.getElementById('ndac_mode1_channel9_unit');
+    const ndac_mode1_channel10_unit = document.getElementById('ndac_mode1_channel10_unit');
+    const ndac_mode1_channel11_unit = document.getElementById('ndac_mode1_channel11_unit');
+    const ndac_mode1_channel12_unit = document.getElementById('ndac_mode1_channel12_unit');
+    const ndac_mode1_channel13_unit = document.getElementById('ndac_mode1_channel13_unit');
+    const ndac_mode1_channel14_unit = document.getElementById('ndac_mode1_channel14_unit');
+    const ndac_mode1_channel15_unit = document.getElementById('ndac_mode1_channel15_unit');
+    const ndac_mode1_channel16_unit = document.getElementById('ndac_mode1_channel16_unit');
+    switch (mode1_channels_type) {
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x04:
+        case 0x05:
+        case 0x06:
+        case 0x07:
+        case 0x08:
+            ndac_mode1_channel1_unit.innerText = 'mV';
+            ndac_mode1_channel2_unit.innerText = 'mV';
+            ndac_mode1_channel3_unit.innerText = 'mV';
+            ndac_mode1_channel4_unit.innerText = 'mV';
+            ndac_mode1_channel5_unit.innerText = 'mV';
+            ndac_mode1_channel6_unit.innerText = 'mV';
+            ndac_mode1_channel7_unit.innerText = 'mV';
+            ndac_mode1_channel8_unit.innerText = 'mV';
+            ndac_mode1_channel9_unit.innerText = 'mV';
+            ndac_mode1_channel10_unit.innerText = 'mV';
+            ndac_mode1_channel11_unit.innerText = 'mV';
+            ndac_mode1_channel12_unit.innerText = 'mV';
+            ndac_mode1_channel13_unit.innerText = 'mV';
+            ndac_mode1_channel14_unit.innerText = 'mV';
+            ndac_mode1_channel15_unit.innerText = 'mV';
+            ndac_mode1_channel16_unit.innerText = 'mV';
+            break;
+        case 0x31:
+        case 0x32:
+        case 0x33:
+        case 0x34:
+        case 0x35:
+        case 0x36:
+        case 0x37:
+        case 0x38:
+            ndac_mode1_channel1_unit.innerText = 'mΩ';
+            ndac_mode1_channel2_unit.innerText = 'mΩ';
+            ndac_mode1_channel3_unit.innerText = 'mΩ';
+            ndac_mode1_channel4_unit.innerText = 'mΩ';
+            ndac_mode1_channel5_unit.innerText = 'mΩ';
+            ndac_mode1_channel6_unit.innerText = 'mΩ';
+            ndac_mode1_channel7_unit.innerText = 'mΩ';
+            ndac_mode1_channel8_unit.innerText = 'mΩ';
+            ndac_mode1_channel9_unit.innerText = 'mΩ';
+            ndac_mode1_channel10_unit.innerText = 'mΩ';
+            ndac_mode1_channel11_unit.innerText = 'mΩ';
+            ndac_mode1_channel12_unit.innerText = 'mΩ';
+            ndac_mode1_channel13_unit.innerText = 'mΩ';
+            ndac_mode1_channel14_unit.innerText = 'mΩ';
+            ndac_mode1_channel15_unit.innerText = 'mΩ';
+            ndac_mode1_channel16_unit.innerText = 'mΩ';
+            break;
+        case 0x51:
+        case 0x52:
+        case 0x53:
+        case 0x54:
+        case 0x55:
+        case 0x56:
+        case 0x57:
+        case 0x58:
+            ndac_mode1_channel1_unit.innerText = 'mΩ';
+            ndac_mode1_channel2_unit.innerText = 'mΩ';
+            ndac_mode1_channel3_unit.innerText = 'mΩ';
+            ndac_mode1_channel4_unit.innerText = 'mΩ';
+            ndac_mode1_channel5_unit.innerText = 'mΩ';
+            ndac_mode1_channel6_unit.innerText = 'mΩ';
+            ndac_mode1_channel7_unit.innerText = 'mΩ';
+            ndac_mode1_channel8_unit.innerText = 'mΩ';
+            ndac_mode1_channel9_unit.innerText = 'mΩ';
+            ndac_mode1_channel10_unit.innerText = 'mΩ';
+            ndac_mode1_channel11_unit.innerText = 'mΩ';
+            ndac_mode1_channel12_unit.innerText = 'mΩ';
+            ndac_mode1_channel13_unit.innerText = 'mΩ';
+            ndac_mode1_channel14_unit.innerText = 'mΩ';
+            ndac_mode1_channel15_unit.innerText = 'mΩ';
+            ndac_mode1_channel16_unit.innerText = 'mΩ';
+            break;
+    }
+}
 
 
 /**

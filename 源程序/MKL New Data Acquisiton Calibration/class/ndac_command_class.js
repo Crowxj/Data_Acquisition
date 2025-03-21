@@ -27,6 +27,10 @@ class CommandFactory {
                 return this.generateUpdateBaudRate();
             case 'NDAC004'://查询板卡版本
                 return this.generateQueryBoardVersion();
+            case 'NDAC005'://获取通道信息命令
+                return this.generateGetChannelsValues();
+            case 'NDAC006'://调试状态命令
+                return this.generateDebugState();
             default:
                 throw new Error(`Unknown command: ${this.code}`);
         }
@@ -94,17 +98,38 @@ class CommandFactory {
 
     //生成恢复透传命令
     generateQueryBoardVersion() {
-        const param1 =Number( this.args);
-        console.log('param1', param1);
-        const Fid = param1 + 0x100;
+        const param1 = this.args;
         const sendBuf = new Uint8Array(69);
-        console.log('Fid', Fid);
         sendBuf[0] = 0x38; // 起始标志
         sendBuf[1] = 0x00; // 命令类型
-        sendBuf[3] = (Fid >> 8) & 0xFF; // 子命令类型
-        sendBuf[4] = Fid & 0xFF;
+        sendBuf[3] = (param1 >> 8) & 0xFF; // 子命令类型
+        sendBuf[4] = param1 & 0xFF;
         sendBuf[5] = 0x7c; // 固定值
         sendBuf[6] = 0x00; // 固定值
+        return sendBuf;
+    }
+    //生成获取通道信息命令
+    generateGetChannelsValues() {
+        const param1 = this.args;
+        const sendBuf = new Uint8Array(69);
+        sendBuf[0] = 0x30; // 起始标志
+        sendBuf[1] = 0x00; // 命令类型
+        sendBuf[3] = (param1 >> 8) & 0xFF; // 子命令类型
+        sendBuf[4] = param1 & 0xFF;
+        return sendBuf;
+    }
+
+    //生成调试状态
+    generateDebugState() {
+        const [param1, param2, param3] = this.args;
+        const sendBuf = new Uint8Array(69);
+        sendBuf[0] = 0x38;
+        sendBuf[1] = 0x00; // 命令类型
+        sendBuf[3] = (param1 >> 8) & 0xFF; // 子命令类型
+        sendBuf[4] = param1 & 0xFF;
+        sendBuf[5] = param2;
+        sendBuf[6] = param3;
+        sendBuf[7] = 0x00;
         return sendBuf;
     }
 

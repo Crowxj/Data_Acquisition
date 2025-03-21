@@ -4,7 +4,7 @@ module.exports = {
     setWindow, showStatus, showValue
 }
 const { ndac_mode1_display_TD } = require('./js/manage/ndac_jump_interface.js')
-const { mode1_parameter, query_mode1_tran, restore_mode1_tran,query_board_version } = require('./mode/mode1/mode1_client.js');
+const { mode1_parameter, query_mode1_tran, enter_mode1_debug, query_board_version, restore_mode1_baudRate,exit_mode1_debug } = require('./mode/mode1/mode1_client.js');
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -63,7 +63,7 @@ ipcMain.on('Buttoned', async (event, id) => {
             break;
         case 102://获取查询的透传模式和波特率参数
             Operation_tips = "恢复透传模式及波特率";
-            restore_mode1_tran();
+            restore_mode1_baudRate();
             break;
 
     }
@@ -73,7 +73,7 @@ ipcMain.on('Buttoned', async (event, id) => {
 ipcMain.on('toMain2', async (event, id, d1) => {
     switch (id) {
         case 1:
-            Operation_tips = `进入${d1}界面`;
+            Operation_tips = `#1进入${d1}界面`;
             mainWindow.loadFile("./html/" + d1);
             break;
         case 100:
@@ -83,6 +83,14 @@ ipcMain.on('toMain2', async (event, id, d1) => {
         case 101://查看板卡版本号
             Operation_tips = "#101查看板卡版本号";
             query_board_version(id, d1);
+            break;
+        case 102://进入调试模式
+            Operation_tips = "#102进入调试状态";
+            enter_mode1_debug(id, d1);
+            break;
+        case 103:
+            Operation_tips = "#103退出调试状态";
+            exit_mode1_debug(id,d1);
             break;
     }
     console.log(`ipc =toMain2 ${id},${Operation_tips}`);
@@ -125,59 +133,4 @@ function showValue(id, value) {
 // }
 
 
-// /**
-//  * 选择Connect_Settings_Configuration.json文件
-//  */
-// ipcMain.on('dsp-json', (_event) => {
-//     dialog.showOpenDialog(mainWindow, {
-//         title: 'Open JSON File',
-//         properties: ['openFile'],
-//         filters: [
-//             { name: 'JSON', extensions: ['json'] }
-//         ]
-//     }).then(result => {
-//         if (result.canceled == false) {
-//             const dsp_file = result.filePaths[0];
-//             if (dsp_file != null && path.basename(dsp_file) === 'DSP_Burn_Port_Channel_Profile.json') {
-//                 //读文件显示
-//                 mainWindow.webContents.send('dsp-file', dsp_file);
-//                 showStatus(`>>> ${getTimestamp()} 已选择烧录通道配置文件：DSP_Burn_Port_Channel_Profile.json`);
-//             } else {
-//                 mainWindow.webContents.send('dsp-file', "");
-//                 showStatus(`>>> ${getTimestamp()} 请选择烧录通道配置文件：DSP_Burn_Port_Channel_Profile.json`);
-//             }
-//         }
-//     }).catch(err => {
-//         console.log(err);
-//         showStatus(`>>> ${getTimestamp()} ${err}`);
-//     });
-// });
-
-// /**
-//  * 选择dsp文件
-//  */
-// ipcMain.on('dsp-hex', (_event) => {
-//     dialog.showOpenDialog(mainWindow, {
-//         Title: 'Open DSP program file',
-//         properties: ['openFile'],
-//         filters: [
-//             { name: 'HEX', extensions: ['hex'] }]
-//     }).then(result => {
-//         if (result.canceled == false) {
-//             const hex_file = result.filePaths[0];
-//             console.log(`dsp_file: ${hex_file}`);
-//             if (hex_file != null) {
-//                 mainWindow.webContents.send('dsp-hex', hex_file);
-//                 const fileName = path.basename(hex_file);
-//                 showStatus(`>>> ${getTimestamp()} 已选择 ${fileName} 烧录文件`);
-//             } else {
-//                 showStatus(`>>> ${getTimestamp()} 烧录文件未选择，请选择.hex格式的烧录文件`);
-//             }
-//         }
-//     })
-//         .catch(err => {
-//             console.log(err);
-//             showStatus(`>>> ${getTimestamp()} ${err}`);
-//         });
-// });
 

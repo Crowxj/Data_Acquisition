@@ -1,7 +1,7 @@
 module.exports = {
-    query_mode1_Tran_command, query_mode1_baudRate_command, start_mode1_Tran_command, 
+    query_mode1_Tran_command, query_mode1_baudRate_command, start_mode1_Tran_command,
     update_mode1_baudRate_command, restore_mode1_tran_command, restore_mode1_baudRate_command,
-    query_board_version_command
+    query_board_version_command, get_channels_values_command, enter_mode1_debug_command,exit_mode1_debug_command
 }
 const CommandFactory = require('../../class/ndac_command_class');
 const { showStatus } = require('../../ipc_main')
@@ -70,7 +70,6 @@ function update_mode1_baudRate_command(mode1_udpClient1, parm_canfd_num, mode1_p
 * 创建时间:2025/03/18 11:29:42
 */
 function restore_mode1_tran_command(mode1_udpClient2, parm_canfd_num, command1_byte1) {
-    showStatus(`>>> ${getTimestamp()} DPS 参数状态恢复进行中...`)
     const tran_function = 0x02;
     const tran_cmd = command1_byte1;
     const command_parm = [tran_function, parm_canfd_num, tran_cmd];
@@ -85,6 +84,7 @@ function restore_mode1_tran_command(mode1_udpClient2, parm_canfd_num, command1_b
 * 创建时间:2025/03/17 13:25:19
 */
 function restore_mode1_baudRate_command(mode1_udpClient1, parm_canfd_num, mode1_parm_SP, command1_byte1, command1_byte2) {
+    showStatus(`>>> ${getTimestamp()} DPS 参数状态恢复进行中...`)
     const control_domain_baudRate = command1_byte1;
     const data_domain_baudRate = command1_byte2;
     const command_parm = [parm_canfd_num, mode1_parm_SP, control_domain_baudRate, data_domain_baudRate];
@@ -93,19 +93,65 @@ function restore_mode1_baudRate_command(mode1_udpClient1, parm_canfd_num, mode1_
     showStatus(`>>> ${getTimestamp()} 恢复波特率进行中...`)
 }
 
-
 /**
-* 模块名:
+* 模块名:query_board_version_command
 * 代码描述:查看板卡版本号
 * 作者:Crow
 * 创建时间:2025/03/19 09:39:18
 */
 function query_board_version_command(mode1_udpClient1, boardId) {
     const boardID = boardId;
-    const command_parm = [boardID];
+    const Fid = boardID + 0x100;
+    const command_parm = [Fid];
     const query_board_version = new CommandFactory('NDAC004', command_parm);
     mode1_udpClient1.sendCommand(query_board_version.generate());
-    showStatus(`>>> ${getTimestamp()} 板卡程序版本信息查询：板卡${boardID}`);
+    showStatus(`>>> ${getTimestamp()} 板卡程序版本信息查询：板卡${Fid}`);
     showStatus(`>>> ${getTimestamp()} 查询板卡程序版本信息进行中...`)
     showStatus(`>>> ${getTimestamp()} ###############################################`)
+}
+
+/**
+* 模块名:take_test_values_command
+* 代码描述:发送要数命令
+* 作者:Crow
+* 创建时间:2025/03/19 15:08:16
+*/
+function get_channels_values_command(mode1_udpClient1) {
+    const Fid = 0x100;
+    const command_parm = [Fid];
+    const take_test_values = new CommandFactory('NDAC005', command_parm);
+    mode1_udpClient1.sendCommand(take_test_values.generate());
+}
+/**
+* 模块名:enter_mode1_debug_command
+* 代码描述:进入调试状态命令
+* 作者:Crow
+* 创建时间:2025/03/21 10:19:27
+*/
+function enter_mode1_debug_command(mode1_udpClient1, boardId) {
+    const boardID = boardId;
+    const Fid = boardID + 0x100;
+    const command1 = 0xda;
+    const command2 = 0xaa;
+    const command_parm = [Fid,command1,command2];
+    const enter_mode1_debug = new CommandFactory('NDAC006', command_parm);
+    mode1_udpClient1.sendCommand(enter_mode1_debug.generate());
+    showStatus(`>>> ${getTimestamp()} 进入调试状态进行中...`);
+}
+
+/**
+* 模块名:exit_mode1_debug_command
+* 代码描述:退出调试状态命令
+* 作者:Crow
+* 创建时间:2025/03/21 10:33:47
+*/
+function exit_mode1_debug_command(mode1_udpClient1, boardId) {
+    const boardID = boardId;
+    const Fid = boardID + 0x100;
+    const command1 = 0xda;
+    const command2 = 0xbb;
+    const command_parm = [Fid,command1,command2];
+    const exit_mode1_debug = new CommandFactory('NDAC006', command_parm);
+    mode1_udpClient1.sendCommand(exit_mode1_debug.generate());
+    showStatus(`>>> ${getTimestamp()} 退出调试状态进行中...`);
 }

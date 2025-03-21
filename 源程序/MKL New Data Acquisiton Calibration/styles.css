@@ -352,6 +352,7 @@ input:checked+.slider:before {
   height: 60px;
   /* 设置工具栏高度 */
 }
+
 .toolbar-item {
   position: relative;
   /* 设置元素的定位方式为相对定位，使其可以根据自身正常文档流位置进行偏移 */
@@ -362,10 +363,18 @@ input:checked+.slider:before {
   align-items: center;
   /* 将子元素沿横轴中心对齐，确保内容在容器内居中显示 */
 }
+
 .up-down-buttons {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.buttons button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .label {
@@ -388,19 +397,17 @@ input:checked+.slider:before {
   /* 分割线与其他元素的间距 */
 }
 
-
-.show-label-one{
+.show-label-one {
   font-size: 18px;
 }
 
-.show-label-two{
+.show-label-two {
   font-size: 17px;
 }
 
-
 .collapse-panel {
   width: 99.9%;
-  border: 1px solid #0e0e0e;
+  border: 1px solid #ccc;
   margin-bottom: 10px;
 }
 
@@ -428,7 +435,7 @@ input:checked+.slider:before {
 }
 
 .arrow.open {
-  transform: rotate(90deg); /* 旋转90度，使箭头朝下 */
+  transform: rotate(90deg);
 }
 
 .checkbox {
@@ -461,3 +468,5 @@ input:checked+.slider:before {
   border: 1px solid #ddd;
   background-color: #f9f9f9;
 }
+
+/* 
