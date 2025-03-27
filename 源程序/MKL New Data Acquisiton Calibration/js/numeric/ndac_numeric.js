@@ -15,3 +15,15 @@ function array_to_hex(array) {
     // 返回格式化后的16进制字符串
     return hexString;
 }
+
+/**
+* 模块名:转换波特率
+* 代码描述:formatBandwidth(bps)
+* 作者:Crow
+* 创建时间:2025/03/26 16:09:22
+*/
+// function formatBandwidth(bps){
+//     if(bps>=1000000){
+
+//     }
+// }

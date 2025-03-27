@@ -31,6 +31,8 @@ class CommandFactory {
                 return this.generateGetChannelsValues();
             case 'NDAC006'://调试状态命令
                 return this.generateDebugState();
+            case 'NDAC007'://初始化K/B
+                return this.generateInitializeKB();
             default:
                 throw new Error(`Unknown command: ${this.code}`);
         }
@@ -116,6 +118,7 @@ class CommandFactory {
         sendBuf[1] = 0x00; // 命令类型
         sendBuf[3] = (param1 >> 8) & 0xFF; // 子命令类型
         sendBuf[4] = param1 & 0xFF;
+        sendBuf[5] = 0x00;
         return sendBuf;
     }
 
@@ -132,7 +135,21 @@ class CommandFactory {
         sendBuf[7] = 0x00;
         return sendBuf;
     }
-
-
+    generateInitializeKB() {
+        const [param1, param2,param3,param4] = this.args;
+        const sendBuf = new Uint8Array(69);
+        sendBuf[0] = 0x3d;
+        sendBuf[1] = 0x00; // 命令类型
+        sendBuf[3] = (param1 >> 8) & 0xFF; // 子命令类型
+        sendBuf[4] = param1 & 0xFF;
+        sendBuf[5] = 0xdb;
+        sendBuf[6] = param2;
+        sendBuf[7] = (param3 >> 8) & 0xFF; 
+        sendBuf[8] = param3 & 0xFF;
+        sendBuf[9] = (param4 >> 8) & 0xFF;
+        sendBuf[10] = param4 & 0xFF;
+        sendBuf[11] = 0x00;
+        return sendBuf
+    }
 }
 module.exports = CommandFactory;

@@ -1,10 +1,11 @@
 module.exports = {
     mode1_parameter, query_mode1_tran, restore_mode1_tran, query_board_version, restore_mode1_baudRate, enter_mode1_debug, exit_mode1_debug
+    , initialize_KB_value, get_channels_values
 };
 
 const { get_ndac_mode1_parameter } = require('../../js/manage/ndac_jump_interface');
 const { query_mode1_Tran_command, query_mode1_baudRate_command, start_mode1_Tran_command, update_mode1_baudRate_command, restore_mode1_tran_command,
-    restore_mode1_baudRate_command, query_board_version_command, get_channels_values_command, enter_mode1_debug_command, exit_mode1_debug_command
+    restore_mode1_baudRate_command, query_board_version_command, get_channels_values_command, enter_mode1_debug_command, exit_mode1_debug_command, initialize_KB_command
 } = require('../mode1/mode1_command');
 const UDPClient = require('../../class/ndac_client_class');
 const { array_to_hex } = require('../../js/numeric/ndac_numeric');
@@ -29,7 +30,6 @@ var mode1_udpClient2 = null;
 var MODE1TRAN = "MODE1TRAN_query";//MODE1TRAN_start代表开启 代表恢复
 var MODE1BAUDRATE = "MODE1BAUDRATE_query";
 var MODE1RESTORE = false;//恢复状态未开启
-// var TIMER = null;
 
 /**
 * 模块名:mode1_restore_open
@@ -80,7 +80,7 @@ function mode1_restore_close() {
     if (commandsArray.length > 0) {
         MODE1RESTORE = true;
         // 删除数组的第一个元素
-        commandsArray.shift();
+        commandsArray.pop();
         console.log(commandsArray, commandsArray.length);
     }
     if (commandsArray.length === 0) {
@@ -126,24 +126,23 @@ function mode1_udpClient_create() {
     console.log(mode1_udpClient1);
     mode1_udpClient1.onMessage((msg, rinfo) => {
         console.log(`udpClient1 RX message from ${rinfo.address}:${rinfo.port}:${array_to_hex(msg)}`);
+        let foundDABB = false;
+        let foundDAAA = false;
         const msg1_cmd1 = msg[3];
+        const msg_frame_info = msg[0];
         const msg1_id1 = msg[3];
-        const msg1_id2 = msg[4];
+        const msg_frame_id3 = msg[4];
         switch (msg1_cmd1) {
             case 0x84:
-                if (msg[0] == 0x7b && msg[2] == 0x09 && msg[3] == 0x84 && msg[5] == 0x02 && msg[6] == 0x00 && msg[8] == 0x7d) {
+                if (msg[0] == 0x7b && msg[2] == 0x18 && msg[3] == 0x84 && msg[5] == 0x02 && msg[7] == 0x00 && msg[23] == 0x7d) {
                     switch (MODE1BAUDRATE) {
                         case "MODE1BAUDRATE_update":
                             mode1_restore_open();
-                            showStatus(`>>> ${getTimestamp()} 修改波特率完成`);
-                            showStatus(`>>> ${getTimestamp()} DPS参数状态初始化完成`)
-                            setTimeout(function () {//成功后进入下一个命令......
-                                console.log(mode1_parm_passback_time);
-                                return get_channels_values(mode1_parm_passback_time);
-                            }, 1000); // 1秒钟进入透传命令
+                            showStatus(`>>> ${getTimestamp()} DPS修改波特率完成`);
+                            showStatus(`>>> ${getTimestamp()} DPS参数状态初始化结束`)
                             break;
                         case "MODE1BAUDRATE_restore":
-                            showStatus(`>>> ${getTimestamp()} 恢复波特率完成`);
+                            showStatus(`>>> ${getTimestamp()} DPS恢复波特率完成`);
                             setTimeout(function () {//成功后进入下一个命令......
                                 mode1_restore_close()
                                 return restore_mode1_tran();//恢复波特率
@@ -163,9 +162,12 @@ function mode1_udpClient_create() {
                 }
                 break;
         }
-        switch (msg1_id1) {
-            case 0x00:
-                switch (msg1_id2) {
+        switch (msg_frame_info) {
+            case 0x3d:
+                convert_channels_values(msg);
+                break;
+            case 0x38:
+                switch (msg_frame_id3) {
                     case 0x01:
                     case 0x02:
                     case 0x03:
@@ -174,51 +176,42 @@ function mode1_udpClient_create() {
                     case 0x06:
                     case 0x07:
                     case 0x08:
-                        if (msg[0] === 0x3d) {
-                            convert_channels_values(msg);
-                            return 1;
+                        if (msg[5] === 0x01 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x02 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x03 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x04 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
                         }
-                        if (msg[0] === 0x38) {
-                            //查询板卡信息
-                            if (msg[5] === 0x01 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x01 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xaa) {
-                                const mode1_debug_status = false;
-                                const mode1_debug_type = "voltage";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xbb) {
-                                const mode1_debug_status = false;
-                                const mode1_debug_type = "voltage";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
+                        for (let i = 0; i < msg.length - 1; i++) {
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
+                                foundDAAA = true;
+                                break;
                             }
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xBB) || (msg[i] === 0x00 && msg[i + 1] === 0xBB)) {
+                                foundDABB = true;
+                                break;
+                            }
+                        }
+                        if (foundDAAA) {
+                            showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
+                            foundDAAA = false;
+                            return;
+                        } else if (foundDABB) {
+                            showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
+                            // showValue(102, mode1_debug_data);
+                            foundDABB = false;
+                            return;
                         }
                         break;
                     case 0x31:
@@ -229,51 +222,42 @@ function mode1_udpClient_create() {
                     case 0x36:
                     case 0x37:
                     case 0x38:
-                        if (msg[0] === 0x3d) {
-                            convert_channels_values(msg);
-                            return 1;
+                        if (msg[5] === 0x01 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x02 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x03 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x04 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
                         }
-                        if (msg[0] === 0x38) {
-                            //查询板卡信息
-                            if (msg[5] === 0x01 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x01 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xaa) {
-                                const mode1_debug_status = true;
-                                const mode1_debug_type = "Temp";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xbb) {
-                                const mode1_debug_status = false;
-                                const mode1_debug_type = "Temp";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
+                        for (let i = 0; i < msg.length - 1; i++) {
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
+                                foundDAAA = true;
+                                break;
                             }
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xBB) || (msg[i] === 0x00 && msg[i + 1] === 0xBB)) {
+                                foundDABB = true;
+                                break;
+                            }
+                        }
+                        if (foundDAAA) {
+                            showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
+                            foundDAAA = false;
+                            return;
+                        } else if (foundDABB) {
+                            showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
+                            // showValue(102, mode1_debug_data);
+                            foundDABB = false;
+                            return;
                         }
                         break;
                     case 0x51:
@@ -284,51 +268,42 @@ function mode1_udpClient_create() {
                     case 0x56:
                     case 0x57:
                     case 0x58:
-                        if (msg[0] === 0x3d) {
-                            convert_channels_values(msg);
-                            return 1;
+                        if (msg[5] === 0x01 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x02 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x03 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if (msg[5] === 0x04 && msg[9] === 0x16) {
+                            show_board_version(msg);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                        } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
                         }
-                        if (msg[0] === 0x38) {
-                            //查询板卡信息
-                            if (msg[5] === 0x01 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x01 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x02 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x03 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x01) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0x04 && msg[10] === 0x10) {
-                                show_board_version(msg);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xaa) {
-                                const mode1_debug_status = true;
-                                const mode1_debug_type = "Temp";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
-                            } else if (msg[5] === 0xda && msg[6] === 0xbb) {
-                                const mode1_debug_status = false;
-                                const mode1_debug_type = "Temp";
-                                const mode1_debug_data = { debug_status: mode1_debug_status, debug_type: mode1_debug_type }
-                                showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
-                                showValue(102, mode1_debug_data);
-                                return 1;
+                        for (let i = 0; i < msg.length - 1; i++) {
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
+                                foundDAAA = true;
+                                break;
                             }
+                            if ((msg[i] === 0xDA && msg[i + 1] === 0xBB) || (msg[i] === 0x00 && msg[i + 1] === 0xBB)) {
+                                foundDABB = true;
+                                break;
+                            }
+                        }
+                        if (foundDAAA) {
+                            showStatus(`>>> ${getTimestamp()} 设备进入调试状态完成`);
+                            foundDAAA = false;
+                            return;
+                        } else if (foundDABB) {
+                            showStatus(`>>> ${getTimestamp()} 设备退出调试状态完成`);
+                            // showValue(102, mode1_debug_data);
+                            foundDABB = false;
+                            return;
                         }
                         break;
                 }
@@ -381,7 +356,7 @@ function mode1_udpClient_create() {
                             canfd_type = '未定义';
                             break;
                     }
-                    showStatus(`>>> ${getTimestamp()} 已查询透传及模式状态 当前模式状态：${canfd_type}`);
+                    showStatus(`>>> ${getTimestamp()} DPS已查询透传及模式状态：${canfd_type}`);
                     setTimeout(function () {//成功后进入下一个命令......
                         // mode1_restore_open();
                         console.log(savedCommands);
@@ -390,7 +365,7 @@ function mode1_udpClient_create() {
                 } else if (msg[0] == 0x7b && msg[2] == 0x0a && msg[5] == 0x02 && msg[9] == 0x7d) {
                     switch (MODE1TRAN) {
                         case "MODE1TRAN_start":
-                            showStatus(`>>> ${getTimestamp()} 开启透传及模式完成`);
+                            showStatus(`>>> ${getTimestamp()} DPS开启透传及模式完成`);
                             setTimeout(function () {//成功后进入下一个命令......
                                 return update_mode1_baudRate();//修改波特率
                             }, 1000); // 添加1秒延迟，怕程序跑飞，可以多加点延时！
@@ -421,7 +396,7 @@ function mode1_udpClient_create() {
                     const byte20 = msg[20];
                     const byte21 = msg[21];
                     const data_domain_baudRate = (byte21 << 24) | (byte20 << 16) | (byte19 << 8) | byte18;
-                    showStatus(`>>> ${getTimestamp()} 已查询波特率状态  当前控制域波特率：${control_domain_baudRate}bps, 数据域波特率：${data_domain_baudRate}bps`);
+                    showStatus(`>>> ${getTimestamp()} DPS控制域波特率：${control_domain_baudRate}bps, 数据域波特率：${data_domain_baudRate}bps`);
                     console.log(savedCommands);//打印保存命令
                     // mode1_restore_open();
                     setTimeout(function () {//成功后进入下一个命令......
@@ -563,14 +538,23 @@ function exit_mode1_debug(id, boardId) {
 * 作者:Crow
 * 创建时间:2025/03/19 14:37:07
 */
-function get_channels_values(time) {
+function get_channels_values(id, board, time) {
+    showStatus(`>>> ${getTimestamp()} 正在获取板卡${board}的通道数据...`);
     let interval = time;
-    // TIMER = setInterval(() => {
-    console.log(`${getTimestamp()} ${interval} >>> 发送要数命令 `);
-    get_channels_values_command(mode1_udpClient1);
-    // }, interval);
+    let boardId = board;
+    get_channels_values_command(mode1_udpClient1, boardId, interval);
 }
 
+/**
+* 模块名:initialize_KB_value
+* 代码描述:初始化K/B值
+* 作者:Crow
+* 创建时间:2025/03/23 21:03:34
+*/
+function initialize_KB_value(id, boardId, channel) {
+    showStatus(`>>> ${getTimestamp()} 初始化K/B值已选择板卡${boardId},通道${channel}`);
+    return initialize_KB_command(mode1_udpClient1, boardId, channel);
+}
 /**
 * 模块名:convert_channels_values
 * 代码描述:转换通道值
@@ -583,7 +567,7 @@ function convert_channels_values(msg) {
     //通道1的值：
     const byte5 = message[5];
     const byte6 = message[6];
-    const mode1_channel1_value = (byte5 << 6) | byte6;
+    const mode1_channel1_value = (byte5 << 8) | byte6;
     //通道2的值：
     const byte7 = message[7];
     const byte8 = message[8];
@@ -686,26 +670,6 @@ function convert_channels_values(msg) {
             channel14_value = (mode1_channel14_value - 30000) / 1000;
             channel15_value = (mode1_channel15_value - 30000) / 1000;
             channel16_value = (mode1_channel16_value - 30000) / 1000;
-
-            channels_value = {
-                channels_type: mode1_channels_type,
-                channel1_value: channel1_value,
-                channel2_value: channel2_value,
-                channel3_value: channel3_value,
-                channel4_value: channel4_value,
-                channel5_value: channel5_value,
-                channel6_value: channel6_value,
-                channel7_value: channel7_value,
-                channel8_value: channel8_value,
-                channel9_value: channel9_value,
-                channel10_value: channel10_value,
-                channel11_value: channel11_value,
-                channel12_value: channel12_value,
-                channel13_value: channel13_value,
-                channel14_value: channel14_value,
-                channel15_value: channel15_value,
-                channel16_value: channel16_value
-            }
             break;
         case 0x31:
         case 0x32:
@@ -731,25 +695,6 @@ function convert_channels_values(msg) {
             channel14_value = (mode1_channel14_value - 500) / 10;
             channel15_value = (mode1_channel15_value - 500) / 10;
             channel16_value = (mode1_channel16_value - 500) / 10;
-            channels_value = {
-                channels_type: mode1_channels_type,
-                channel1_value: channel1_value,
-                channel2_value: channel2_value,
-                channel3_value: channel3_value,
-                channel4_value: channel4_value,
-                channel5_value: channel5_value,
-                channel6_value: channel6_value,
-                channel7_value: channel7_value,
-                channel8_value: channel8_value,
-                channel9_value: channel9_value,
-                channel10_value: channel10_value,
-                channel11_value: channel11_value,
-                channel12_value: channel12_value,
-                channel13_value: channel13_value,
-                channel14_value: channel14_value,
-                channel15_value: channel15_value,
-                channel16_value: channel16_value
-            }
             break;
         case 0x51:
         case 0x52:
@@ -775,26 +720,52 @@ function convert_channels_values(msg) {
             channel14_value = (mode1_channel14_value - 500) / 10;
             channel15_value = (mode1_channel15_value - 500) / 10;
             channel16_value = (mode1_channel16_value - 500) / 10;
-            channels_value = {
-                channels_type: mode1_channels_type,
-                channel1_value: channel1_value,
-                channel2_value: channel2_value,
-                channel3_value: channel3_value,
-                channel4_value: channel4_value,
-                channel5_value: channel5_value,
-                channel6_value: channel6_value,
-                channel7_value: channel7_value,
-                channel8_value: channel8_value,
-                channel9_value: channel9_value,
-                channel10_value: channel10_value,
-                channel11_value: channel11_value,
-                channel12_value: channel12_value,
-                channel13_value: channel13_value,
-                channel14_value: channel14_value,
-                channel15_value: channel15_value,
-                channel16_value: channel16_value
-            }
             break;
+        case 0x71:
+        case 0x72:
+        case 0x73:
+        case 0x74:
+        case 0x75:
+        case 0x76:
+        case 0x77:
+        case 0x78:
+            channel1_value = mode1_channel1_value;
+            channel2_value =mode1_channel2_value ;
+            channel3_value = mode1_channel3_value ;
+            channel4_value = mode1_channel4_value ;
+            channel5_value = mode1_channel5_value ;
+            channel6_value = mode1_channel6_value ;
+            channel7_value = mode1_channel7_value ;
+            channel8_value = mode1_channel8_value ;
+            channel9_value = mode1_channel9_value ;
+            channel10_value = mode1_channel10_value ;
+            channel11_value = mode1_channel11_value ;
+            channel12_value = mode1_channel12_value ;
+            channel13_value = mode1_channel13_value ;
+            channel14_value = mode1_channel14_value ;
+            channel15_value = mode1_channel15_value ;
+            channel16_value = mode1_channel16_value ;
+            break;
+    }
+    //显示通道数据
+    channels_value = {
+        channels_type: mode1_channels_type,
+        channel1_value: channel1_value,
+        channel2_value: channel2_value,
+        channel3_value: channel3_value,
+        channel4_value: channel4_value,
+        channel5_value: channel5_value,
+        channel6_value: channel6_value,
+        channel7_value: channel7_value,
+        channel8_value: channel8_value,
+        channel9_value: channel9_value,
+        channel10_value: channel10_value,
+        channel11_value: channel11_value,
+        channel12_value: channel12_value,
+        channel13_value: channel13_value,
+        channel14_value: channel14_value,
+        channel15_value: channel15_value,
+        channel16_value: channel16_value
     }
     showValue(101, channels_value);
 
@@ -819,11 +790,13 @@ function show_board_version(msg) {
         case 0x03:
             boardType = 'T型热电偶采集板';
             break;
-        default:
+        case 0x04:
             boardType = 'NTC型采集板';
             break;
+        default:
+            boardType = '未知产品类型';
+            break
     }
-    // console.log(`产品类型:${boardType}`);
     showValue(1, boardType);
     let accuracyType;//精度类型
     switch (message[6]) {
@@ -833,13 +806,19 @@ function show_board_version(msg) {
         case 0x01:
             accuracyType = '高精度(电压板万五精度，温度板±0.5℃)';
             break;
+        default:
+            boardType = '未知精度类型';
+            break
     }
-    // console.log(`精度类型:${accuracyType}`);
     let programName_H;//程序名高
     switch (message[7]) {
         case 0x01:
             programName_H = 'DTL-H';
             break;
+        default:
+            boardType = 'XXX-X';
+            break
+
     }
     let programName_M;
     switch (message[8]) {
@@ -855,32 +834,33 @@ function show_board_version(msg) {
         case 0x04:
             programName_M = 'CollectionUT'
             break;
+        default:
+            boardType = 'XXXXX';
+            break
     }
     let programName_L;
     switch (message[9]) {
-        case 0x10:
+        case 0x16:
             programName_L = '16U'
             break;
+        default:
+            boardType = 'XXXXX';
+            break
     }
     // console.log(`程序名:${programName_H} ${programName_M} ${programName_L}`);
     let programType;
-    switch (message[10]) {
-        case 0x01:
-            programType = '测试程序'
-            break;
-        case 0x10:
-            programType = '正式程序'
-            break;
-    }
+    const byte10 = message[10];
+    const highNibble = (byte10 >> 4) & 0x0f;
+    const lowNibble = byte10 & 0x0f;
+    const highCode = highNibble === 0x1 ? "R" : "B";
+    const lowCode = (lowNibble + 1).toString().padStart(2, '0');
+    programType = highCode + lowCode;
     // console.log(`程序类型:${programType}`);
     let boardVrsion;
-    boardVrsion = `V${message[11]}.${message[12]}版本`
+    boardVrsion = `V${message[11]}.${message[12]}`
     // console.log(`版本号:${boardVrsion}`);
     showStatus(`>>> ${getTimestamp()} 产品类型:${boardType}`)
     showStatus(`>>> ${getTimestamp()} 精度类型:${accuracyType}`)
-    showStatus(`>>> ${getTimestamp()} 程序名:${programName_H} ${programName_M} ${programName_L}`)
-    showStatus(`>>> ${getTimestamp()} 程序类型:${programType}`)
-    showStatus(`>>> ${getTimestamp()} 版本号:${boardVrsion}`)
-    showStatus(`>>> ${getTimestamp()} ###############################################`)
+    showStatus(`>>> ${getTimestamp()} 程序名:${programName_H}_${programName_M}_${programName_L}-${boardVrsion}-${programType}`)
     showStatus(`>>> ${getTimestamp()} 查询板卡程序版本信息完成`)
 }

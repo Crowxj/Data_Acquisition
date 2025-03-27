@@ -20,3 +20,6 @@
 
 #NDACODE = "NDAC006"
 #调试状态命令
+
+#NDACODE = "NDAC007"
+#初始化K/B值命令

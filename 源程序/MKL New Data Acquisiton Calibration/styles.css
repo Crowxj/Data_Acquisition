@@ -498,4 +498,13 @@ input:checked+.slider:before {
   background-color: #f9f9f9;
 }
 
-/* 
+.error{
+  border: 2px solid red;
+}
+
+.valid{
+  border: 2px solid green;
+}
+.error-message{
+  color: red;
+}

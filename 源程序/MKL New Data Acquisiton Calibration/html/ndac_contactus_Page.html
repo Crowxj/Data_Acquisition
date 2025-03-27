@@ -7,6 +7,31 @@
     <link href="../styles.css" rel="stylesheet">
     <title>MKL NDAC联系我们</title>
 </head>
+<style>
+    #mapContainer {
+        width: 100%;
+        height: 500px;
+    }
+
+    #info-window {
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-window h3 {
+        margin: 15px 5px 5px 5px;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .info-window p {
+        margin: 15px 5px 5px 5px;
+        font-size: 14px;
+        color: #666;
+    }
+</style>
 
 <body class="link-body">
     <!-- 主内容区域 -->
@@ -28,10 +53,14 @@
         <!-- 新增的内容框 -->
         <div class="content-box">
             <h2 class="content-title">联系我们</h2>
+            <div id="mapContainer">
+            </div>
         </div>
     </div>
 
-    <script src="../js/ndac_contactus_Page.js">
+    <script src="../js/ndac_contactus_Page.js"></script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=2788c90d402ce46194cf6db21b601af6">
+        // KEY仅供测试使用，正式环境请使用自己的key
     </script>
 </body>
 
