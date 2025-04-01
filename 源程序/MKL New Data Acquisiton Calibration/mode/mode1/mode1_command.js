@@ -159,7 +159,7 @@ function enter_mode1_debug_command(mode1_udpClient1, boardId) {
     const command_parm = [Fid, command1, command2];
     const enter_mode1_debug = new CommandFactory('NDAC006', command_parm);
     mode1_udpClient1.sendCommand(enter_mode1_debug.generate());
-    showStatus(`>>> ${getTimestamp()} 设备进入调试状态进行中 ...`);
+    showStatus(`>>> ${getTimestamp()} 板卡${boardID},进入调试状态进行中 ...`);
 }
 
 /**
@@ -176,7 +176,7 @@ function exit_mode1_debug_command(mode1_udpClient1, boardId) {
     const command_parm = [Fid, command1, command2];
     const exit_mode1_debug = new CommandFactory('NDAC006', command_parm);
     mode1_udpClient1.sendCommand(exit_mode1_debug.generate());
-    showStatus(`>>> ${getTimestamp()} 设备退出调试状态进行中 ...`);
+    showStatus(`>>> ${getTimestamp()} 板卡${boardID},设备退出调试状态进行中 ...`);
 }
 /**
 * 模块名:initialize_KB_command

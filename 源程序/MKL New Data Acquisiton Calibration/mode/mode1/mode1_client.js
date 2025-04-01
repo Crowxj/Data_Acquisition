@@ -128,6 +128,7 @@ function mode1_udpClient_create() {
         console.log(`udpClient1 RX message from ${rinfo.address}:${rinfo.port}:${array_to_hex(msg)}`);
         let foundDABB = false;
         let foundDAAA = false;
+        let controlDubug = true;
         const msg1_cmd1 = msg[3];
         const msg_frame_info = msg[0];
         const msg1_id1 = msg[3];
@@ -204,13 +205,16 @@ function mode1_udpClient_create() {
                             }
                         }
                         if (foundDAAA) {
-                            showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},进入调试状态完成`);
                             foundDAAA = false;
+                            controlDubug = false;
+                            showValue(102, controlDubug);
                             return;
                         } else if (foundDABB) {
-                            showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
-                            // showValue(102, mode1_debug_data);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},退出调试状态完成`);
                             foundDABB = false;
+                            controlDubug = true;
+                            showValue(102, controlDubug);
                             return;
                         }
                         break;
@@ -250,13 +254,16 @@ function mode1_udpClient_create() {
                             }
                         }
                         if (foundDAAA) {
-                            showStatus(`>>> ${getTimestamp()} 进入调试状态完成`);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},进入调试状态完成`);
                             foundDAAA = false;
+                            controlDubug = false;
+                            showValue(102, controlDubug);
                             return;
                         } else if (foundDABB) {
-                            showStatus(`>>> ${getTimestamp()} 退出调试状态完成`);
-                            // showValue(102, mode1_debug_data);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},退出调试状态完成`);
                             foundDABB = false;
+                            controlDubug = true;
+                            showValue(102, controlDubug);
                             return;
                         }
                         break;
@@ -296,13 +303,16 @@ function mode1_udpClient_create() {
                             }
                         }
                         if (foundDAAA) {
-                            showStatus(`>>> ${getTimestamp()} 设备进入调试状态完成`);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},进入调试状态完成`);
                             foundDAAA = false;
+                            controlDubug = false;
+                            showValue(102, controlDubug);
                             return;
                         } else if (foundDABB) {
-                            showStatus(`>>> ${getTimestamp()} 设备退出调试状态完成`);
-                            // showValue(102, mode1_debug_data);
+                            showStatus(`>>> ${getTimestamp()} 板卡${msg[4]},退出调试状态完成`);
                             foundDABB = false;
+                            controlDubug = true;
+                            showValue(102, controlDubug);
                             return;
                         }
                         break;
@@ -358,7 +368,6 @@ function mode1_udpClient_create() {
                     }
                     showStatus(`>>> ${getTimestamp()} DPS已查询透传及模式状态：${canfd_type}`);
                     setTimeout(function () {//成功后进入下一个命令......
-                        // mode1_restore_open();
                         console.log(savedCommands);
                         return query_mode1_baudRate();
                     }, 1000); // 添加1秒延迟，怕程序跑飞，可以多加点延时！
@@ -400,7 +409,6 @@ function mode1_udpClient_create() {
                     console.log(savedCommands);//打印保存命令
                     // mode1_restore_open();
                     setTimeout(function () {//成功后进入下一个命令......
-                        console.log(savedCommands);
                         return start_mode1_tran();
                     }, 1000); // 1秒钟进入透传命令
                 }
@@ -730,21 +738,21 @@ function convert_channels_values(msg) {
         case 0x77:
         case 0x78:
             channel1_value = mode1_channel1_value;
-            channel2_value =mode1_channel2_value ;
-            channel3_value = mode1_channel3_value ;
-            channel4_value = mode1_channel4_value ;
-            channel5_value = mode1_channel5_value ;
-            channel6_value = mode1_channel6_value ;
-            channel7_value = mode1_channel7_value ;
-            channel8_value = mode1_channel8_value ;
-            channel9_value = mode1_channel9_value ;
-            channel10_value = mode1_channel10_value ;
-            channel11_value = mode1_channel11_value ;
-            channel12_value = mode1_channel12_value ;
-            channel13_value = mode1_channel13_value ;
-            channel14_value = mode1_channel14_value ;
-            channel15_value = mode1_channel15_value ;
-            channel16_value = mode1_channel16_value ;
+            channel2_value = mode1_channel2_value;
+            channel3_value = mode1_channel3_value;
+            channel4_value = mode1_channel4_value;
+            channel5_value = mode1_channel5_value;
+            channel6_value = mode1_channel6_value;
+            channel7_value = mode1_channel7_value;
+            channel8_value = mode1_channel8_value;
+            channel9_value = mode1_channel9_value;
+            channel10_value = mode1_channel10_value;
+            channel11_value = mode1_channel11_value;
+            channel12_value = mode1_channel12_value;
+            channel13_value = mode1_channel13_value;
+            channel14_value = mode1_channel14_value;
+            channel15_value = mode1_channel15_value;
+            channel16_value = mode1_channel16_value;
             break;
     }
     //显示通道数据

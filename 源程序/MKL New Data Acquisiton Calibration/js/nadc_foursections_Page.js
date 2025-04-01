@@ -14,7 +14,8 @@ var ndac_mode1_passbacktime;//回传时间
 var NDACMODE1D;//模式显示值
 var NDACDISPLAYD = {};//显示值
 var MODE1TIMER = null;
-var SECTIONNUM = 0;//获取定标段的个数
+var SECTIONNUM = 1;//获取定标段的个数
+var CHANNELTYPE = 0x00;
 
 document.addEventListener('DOMContentLoaded', () => {
     ndac_mode1_device_num = sessionStorage.getItem('ndac_device_num');//设备号
@@ -50,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("设备号:", ndac_mode1_device_num, " DSP IP:", ndac_mode1_dspip_num, " CANFD:", ndac_mode1_canfd_num, " 端口:", ndac_mode1_port, " 模式:", NDACMODE1D, " 接收通道信息时间:", ndac_mode1_passbacktime, "ms")
     window.TheIPC.ButtonPressed(100);//传值到主进程
     window.TheIPC.ButtonPressed(101);//查询透传及波特率
+    const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
+    ndac_mode1_board_num.dataset.lastValue = ndac_mode1_board_num.value;
+    // sessionStorage.setItem('boardNum', Number(ndac_mode1_board_num.value));//保存板卡1信息
     //默认板卡通道数据为0-共16通道
     const ndac_mode1_channel1_data = document.getElementById('ndac_mode1_channel1_data');
     ndac_mode1_channel1_data.value = 0;
@@ -206,7 +210,7 @@ nadc_mode1_restore.addEventListener('click', () => {
 * 作者:Crow
 * 创建时间:2025/03/20 15:04:55
 */
-var MODE1DEBUG = true;
+var MODE1DEBUG = true;//初始为true，发送进入调试命令
 const nadc_mode1_debug = document.getElementById('nadc_mode1_debug');
 nadc_mode1_debug.addEventListener('click', () => {
     const nadc_mode1_debug_label = document.getElementById('nadc_mode1_debug_label');
@@ -217,6 +221,7 @@ nadc_mode1_debug.addEventListener('click', () => {
         nadc_mode1_debug_label.innerText = "退出调试";
         nadc_mode1_debug.title = "退出调试";
         nadc_mode1_debug_img.src = "../image/ndac_stop_debug.png";
+        ndac_mode1_board_num.dataset.lastValue = ndac_mode1_board_num.value;
         window.TheIPC.toMain2(102, Number(ndac_mode1_board_num.value));
         MODE1DEBUG = false;
     } else {
@@ -234,110 +239,117 @@ nadc_mode1_debug.addEventListener('click', () => {
 * 作者:Crow
 * 创建时间:2025/03/18 16:10:24
 */
-// const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
-// ndac_mode1_board_num.addEventListener('change', () => {
-//     const ndac_mode1_Parameter2 = document.getElementById('ndac_mode1_Parameter2');
-//     ndac_mode1_Parameter2.innerHTML = `
-//                       <span style="color: white;">产品类型:</span> <span style="color: #39FF14;">未查询类型</span>
-//      `
-//     //通道1的数据
-//     const ndac_mode1_channel1_data = document.getElementById('ndac_mode1_channel1_data');
-//     const ndac_mode1_channel1_unit = document.getElementById('ndac_mode1_channel1_unit');
-//     ndac_mode1_channel1_data.innerText = "...";
-//     ndac_mode1_channel1_data.value = 0;
-//     ndac_mode1_channel1_unit.innerText = "...";
-//     //通道2的数据
-//     const ndac_mode1_channel2_data = document.getElementById('ndac_mode1_channel2_data');
-//     const ndac_mode1_channel2_unit = document.getElementById('ndac_mode1_channel2_unit');
-//     ndac_mode1_channel2_data.innerText = "...";
-//     ndac_mode1_channel2_data.value = 0;
-//     ndac_mode1_channel2_unit.innerText = "...";
-//     //通道3的数据
-//     const ndac_mode1_channel3_data = document.getElementById('ndac_mode1_channel3_data');
-//     const ndac_mode1_channel3_unit = document.getElementById('ndac_mode1_channel3_unit');
-//     ndac_mode1_channel3_data.innerText = "...";
-//     ndac_mode1_channel3_data.value = 0;
-//     ndac_mode1_channel3_unit.innerText = "...";
-//     //通道4的数据
-//     const ndac_mode1_channel4_data = document.getElementById('ndac_mode1_channel4_data');
-//     const ndac_mode1_channel4_unit = document.getElementById('ndac_mode1_channel4_unit');
-//     ndac_mode1_channel4_data.innerText = "...";
-//     ndac_mode1_channel4_data.value = 0;
-//     ndac_mode1_channel4_unit.innerText = "...";
-//     //通道5的数据
-//     const ndac_mode1_channel5_data = document.getElementById('ndac_mode1_channel5_data');
-//     const ndac_mode1_channel5_unit = document.getElementById('ndac_mode1_channel5_unit');
-//     ndac_mode1_channel5_data.innerText = "...";
-//     ndac_mode1_channel5_data.value = 0;
-//     ndac_mode1_channel5_unit.innerText = "...";
-//     //通道6的数据
-//     const ndac_mode1_channel6_data = document.getElementById('ndac_mode1_channel6_data');
-//     const ndac_mode1_channel6_unit = document.getElementById('ndac_mode1_channel6_unit');
-//     ndac_mode1_channel6_data.innerText = "...";
-//     ndac_mode1_channel6_data.value = 0;
-//     ndac_mode1_channel6_unit.innerText = "...";
-//     //通道的数据
-//     const ndac_mode1_channel7_data = document.getElementById('ndac_mode1_channel7_data');
-//     const ndac_mode1_channel7_unit = document.getElementById('ndac_mode1_channel7_unit');
-//     ndac_mode1_channel7_data.innerText = "...";
-//     ndac_mode1_channel7_data.value = 0;
-//     ndac_mode1_channel7_unit.innerText = "...";
-//     //通道8的数据
-//     const ndac_mode1_channel8_data = document.getElementById('ndac_mode1_channel8_data');
-//     const ndac_mode1_channel8_unit = document.getElementById('ndac_mode1_channel8_unit');
-//     ndac_mode1_channel8_data.innerText = "...";
-//     ndac_mode1_channel8_data.value = 0;
-//     ndac_mode1_channel8_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel9_data = document.getElementById('ndac_mode1_channel9_data');
-//     const ndac_mode1_channel9_unit = document.getElementById('ndac_mode1_channel9_unit');
-//     ndac_mode1_channel9_data.innerText = "...";
-//     ndac_mode1_channel9_data.value = 0;
-//     ndac_mode1_channel9_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel10_data = document.getElementById('ndac_mode1_channel10_data');
-//     const ndac_mode1_channel10_unit = document.getElementById('ndac_mode1_channel10_unit');
-//     ndac_mode1_channel10_data.innerText = "...";
-//     ndac_mode1_channel10_data.value = 0;
-//     ndac_mode1_channel10_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel11_data = document.getElementById('ndac_mode1_channel11_data');
-//     const ndac_mode1_channel11_unit = document.getElementById('ndac_mode1_channel11_unit');
-//     ndac_mode1_channel11_data.innerText = "...";
-//     ndac_mode1_channel11_data.value = 0;
-//     ndac_mode1_channel11_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel12_data = document.getElementById('ndac_mode1_channel12_data');
-//     const ndac_mode1_channel12_unit = document.getElementById('ndac_mode1_channel12_unit');
-//     ndac_mode1_channel12_data.innerText = "...";
-//     ndac_mode1_channel12_data.value = 0;
-//     ndac_mode1_channel12_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel13_data = document.getElementById('ndac_mode1_channel13_data');
-//     const ndac_mode1_channel13_unit = document.getElementById('ndac_mode1_channel13_unit');
-//     ndac_mode1_channel13_data.innerText = "...";
-//     ndac_mode1_channel13_data.value = 0;
-//     ndac_mode1_channel13_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel14_data = document.getElementById('ndac_mode1_channel14_data');
-//     const ndac_mode1_channel14_unit = document.getElementById('ndac_mode1_channel14_unit');
-//     ndac_mode1_channel14_data.innerText = "...";
-//     ndac_mode1_channel14_data.value = 0;
-//     ndac_mode1_channel14_unit.innerText = "...";
-//     //通道9的数据
-//     const ndac_mode1_channel15_data = document.getElementById('ndac_mode1_channel15_data');
-//     const ndac_mode1_channel15_unit = document.getElementById('ndac_mode1_channel15_unit');
-//     ndac_mode1_channel15_data.innerText = "...";
-//     ndac_mode1_channel15_data.value = 0;
-//     ndac_mode1_channel15_unit.innerText = "...";
-//     //通道16的数据
-//     const ndac_mode1_channel16_data = document.getElementById('ndac_mode1_channel16_data');
-//     const ndac_mode1_channel16_unit = document.getElementById('ndac_mode1_channel16_unit');
-//     ndac_mode1_channel16_data.innerText = "...";
-//     ndac_mode1_channel16_data.value = 0;
-//     ndac_mode1_channel16_unit.innerText = "...";
-//     window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
-// })
+const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
+ndac_mode1_board_num.addEventListener('change', () => {
+    if (!MODE1DEBUG) {
+        ndac_mode1_board_num.value = ndac_mode1_board_num.dataset.lastValue || '1';
+        return;
+    } else {
+        ndac_mode1_board_num.dataset.lastValue = ndac_mode1_board_num.value;
+        const ndac_mode1_Parameter2 = document.getElementById('ndac_mode1_Parameter2');
+        ndac_mode1_Parameter2.innerHTML = `
+                      <span style="color: white;">产品类型:</span> <span style="color: #39FF14;">未查询类型</span>
+     `
+        //通道1的数据
+        const ndac_mode1_channel1_data = document.getElementById('ndac_mode1_channel1_data');
+        const ndac_mode1_channel1_unit = document.getElementById('ndac_mode1_channel1_unit');
+        ndac_mode1_channel1_data.innerText = "...";
+        ndac_mode1_channel1_data.value = 0;
+        ndac_mode1_channel1_unit.innerText = "...";
+        //通道2的数据
+        const ndac_mode1_channel2_data = document.getElementById('ndac_mode1_channel2_data');
+        const ndac_mode1_channel2_unit = document.getElementById('ndac_mode1_channel2_unit');
+        ndac_mode1_channel2_data.innerText = "...";
+        ndac_mode1_channel2_data.value = 0;
+        ndac_mode1_channel2_unit.innerText = "...";
+        //通道3的数据
+        const ndac_mode1_channel3_data = document.getElementById('ndac_mode1_channel3_data');
+        const ndac_mode1_channel3_unit = document.getElementById('ndac_mode1_channel3_unit');
+        ndac_mode1_channel3_data.innerText = "...";
+        ndac_mode1_channel3_data.value = 0;
+        ndac_mode1_channel3_unit.innerText = "...";
+        //通道4的数据
+        const ndac_mode1_channel4_data = document.getElementById('ndac_mode1_channel4_data');
+        const ndac_mode1_channel4_unit = document.getElementById('ndac_mode1_channel4_unit');
+        ndac_mode1_channel4_data.innerText = "...";
+        ndac_mode1_channel4_data.value = 0;
+        ndac_mode1_channel4_unit.innerText = "...";
+        //通道5的数据
+        const ndac_mode1_channel5_data = document.getElementById('ndac_mode1_channel5_data');
+        const ndac_mode1_channel5_unit = document.getElementById('ndac_mode1_channel5_unit');
+        ndac_mode1_channel5_data.innerText = "...";
+        ndac_mode1_channel5_data.value = 0;
+        ndac_mode1_channel5_unit.innerText = "...";
+        //通道6的数据
+        const ndac_mode1_channel6_data = document.getElementById('ndac_mode1_channel6_data');
+        const ndac_mode1_channel6_unit = document.getElementById('ndac_mode1_channel6_unit');
+        ndac_mode1_channel6_data.innerText = "...";
+        ndac_mode1_channel6_data.value = 0;
+        ndac_mode1_channel6_unit.innerText = "...";
+        //通道的数据
+        const ndac_mode1_channel7_data = document.getElementById('ndac_mode1_channel7_data');
+        const ndac_mode1_channel7_unit = document.getElementById('ndac_mode1_channel7_unit');
+        ndac_mode1_channel7_data.innerText = "...";
+        ndac_mode1_channel7_data.value = 0;
+        ndac_mode1_channel7_unit.innerText = "...";
+        //通道8的数据
+        const ndac_mode1_channel8_data = document.getElementById('ndac_mode1_channel8_data');
+        const ndac_mode1_channel8_unit = document.getElementById('ndac_mode1_channel8_unit');
+        ndac_mode1_channel8_data.innerText = "...";
+        ndac_mode1_channel8_data.value = 0;
+        ndac_mode1_channel8_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel9_data = document.getElementById('ndac_mode1_channel9_data');
+        const ndac_mode1_channel9_unit = document.getElementById('ndac_mode1_channel9_unit');
+        ndac_mode1_channel9_data.innerText = "...";
+        ndac_mode1_channel9_data.value = 0;
+        ndac_mode1_channel9_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel10_data = document.getElementById('ndac_mode1_channel10_data');
+        const ndac_mode1_channel10_unit = document.getElementById('ndac_mode1_channel10_unit');
+        ndac_mode1_channel10_data.innerText = "...";
+        ndac_mode1_channel10_data.value = 0;
+        ndac_mode1_channel10_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel11_data = document.getElementById('ndac_mode1_channel11_data');
+        const ndac_mode1_channel11_unit = document.getElementById('ndac_mode1_channel11_unit');
+        ndac_mode1_channel11_data.innerText = "...";
+        ndac_mode1_channel11_data.value = 0;
+        ndac_mode1_channel11_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel12_data = document.getElementById('ndac_mode1_channel12_data');
+        const ndac_mode1_channel12_unit = document.getElementById('ndac_mode1_channel12_unit');
+        ndac_mode1_channel12_data.innerText = "...";
+        ndac_mode1_channel12_data.value = 0;
+        ndac_mode1_channel12_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel13_data = document.getElementById('ndac_mode1_channel13_data');
+        const ndac_mode1_channel13_unit = document.getElementById('ndac_mode1_channel13_unit');
+        ndac_mode1_channel13_data.innerText = "...";
+        ndac_mode1_channel13_data.value = 0;
+        ndac_mode1_channel13_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel14_data = document.getElementById('ndac_mode1_channel14_data');
+        const ndac_mode1_channel14_unit = document.getElementById('ndac_mode1_channel14_unit');
+        ndac_mode1_channel14_data.innerText = "...";
+        ndac_mode1_channel14_data.value = 0;
+        ndac_mode1_channel14_unit.innerText = "...";
+        //通道9的数据
+        const ndac_mode1_channel15_data = document.getElementById('ndac_mode1_channel15_data');
+        const ndac_mode1_channel15_unit = document.getElementById('ndac_mode1_channel15_unit');
+        ndac_mode1_channel15_data.innerText = "...";
+        ndac_mode1_channel15_data.value = 0;
+        ndac_mode1_channel15_unit.innerText = "...";
+        //通道16的数据
+        const ndac_mode1_channel16_data = document.getElementById('ndac_mode1_channel16_data');
+        const ndac_mode1_channel16_unit = document.getElementById('ndac_mode1_channel16_unit');
+        ndac_mode1_channel16_data.innerText = "...";
+        ndac_mode1_channel16_data.value = 0;
+        ndac_mode1_channel16_unit.innerText = "...";
+        window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
+    }
+
+})
 /**
 * 模块名:ndac_select_all
 * 代码描述:全选
@@ -391,6 +403,7 @@ nadc_mode1_testValue1.addEventListener('click', () => {
     const ndac_mode1_cali_part = document.getElementById('ndac_mode1_cali_part');//定标段几的值
     const ndac_mode1_cali_partValue = ndac_mode1_cali_part.value;
     const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
+    const channeltype = CHANNELTYPE;
     let isTestValue2Selected = false;
     // 检查是否有通道被选中
     channelCheckboxes.forEach(checkbox => {
@@ -440,269 +453,2215 @@ nadc_mode1_testValue1.addEventListener('click', () => {
     const ndac_mode1_channel15_data = document.getElementById('ndac_mode1_channel15_data');//通道15的数据
     const ndac_mode1_channel16 = document.getElementById('ndac_mode1_channel16');//通道16
     const ndac_mode1_channel16_data = document.getElementById('ndac_mode1_channel16_data');//通道16的数据
-    switch (ndac_mode1_cali_partValue) {
-        case "1":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
-                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
-                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
-                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
-                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
-                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
-                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
-                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
-                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
-                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
-                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
-                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
-                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
-                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
-                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
-                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
-                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value
+    switch (DEBUGSTATUS) {
+        case false:
+            console.log("已经进入调试阶段");
+            switch (channeltype) {
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value * 1000
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x31:
+                case 0x32:
+                case 0x33:
+                case 0x34:
+                case 0x35:
+                case 0x36:
+                case 0x37:
+                case 0x38:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x51:
+                case 0x52:
+                case 0x53:
+                case 0x54:
+                case 0x55:
+                case 0x56:
+                case 0x57:
+                case 0x58:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x71:
+                case 0x72:
+                case 0x73:
+                case 0x74:
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
             }
             break;
-        case "2":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
-                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
-                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
-                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
-                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
-                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
-                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
-                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
-                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
-                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
-                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
-                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
-                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
-                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
-                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
-                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
-                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value
-            }
-            break;
-        case "3":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
-                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
-                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
-                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
-                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
-                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
-                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
-                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
-                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
-                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
-                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
-                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
-                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
-                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
-                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
-                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
-                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value
-            }
-            break;
-        case "4":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
-                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
-                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
-                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
-                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
-                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
-                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
-                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
-                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
-                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
-                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
-                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
-                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
-                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
-                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
-                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
-                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value
+        case true:
+            console.log("已经退出调试阶段");
+            switch (channeltype) {
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value * 1000
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x31:
+                case 0x32:
+                case 0x33:
+                case 0x34:
+                case 0x35:
+                case 0x36:
+                case 0x37:
+                case 0x38:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x51:
+                case 0x52:
+                case 0x53:
+                case 0x54:
+                case 0x55:
+                case 0x56:
+                case 0x57:
+                case 0x58:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x71:
+                case 0x72:
+                case 0x73:
+                case 0x74:
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1')//实际值1
+                                ndac_mode1_channel1_one_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+                                ndac_mode1_channel2_one_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+                                ndac_mode1_channel3_one_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+                                ndac_mode1_channel4_one_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+                                ndac_mode1_channel5_one_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+                                ndac_mode1_channel6_one_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+                                ndac_mode1_channel7_one_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+                                ndac_mode1_channel8_one_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+                                ndac_mode1_channel9_one_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+                                ndac_mode1_channel10_one_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+                                ndac_mode1_channel11_one_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1')
+                                ndac_mode1_channel12_one_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1')
+                                ndac_mode1_channel13_one_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1')
+                                ndac_mode1_channel14_one_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1')
+                                ndac_mode1_channel15_one_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1')
+                                ndac_mode1_channel16_one_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+                                ndac_mode1_channel1_two_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+                                ndac_mode1_channel2_two_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+                                ndac_mode1_channel3_two_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+                                ndac_mode1_channel4_two_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+                                ndac_mode1_channel5_two_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+                                ndac_mode1_channel6_two_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+                                ndac_mode1_channel7_two_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+                                ndac_mode1_channel8_two_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+                                ndac_mode1_channel9_two_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+                                ndac_mode1_channel10_two_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+                                ndac_mode1_channel11_two_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1')
+                                ndac_mode1_channel12_two_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1')
+                                ndac_mode1_channel13_two_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1')
+                                ndac_mode1_channel14_two_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1')
+                                ndac_mode1_channel15_two_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1')
+                                ndac_mode1_channel16_two_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+                                ndac_mode1_channel1_three_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+                                ndac_mode1_channel2_three_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+                                ndac_mode1_channel3_three_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+                                ndac_mode1_channel4_three_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+                                ndac_mode1_channel5_three_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+                                ndac_mode1_channel6_three_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+                                ndac_mode1_channel7_three_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+                                ndac_mode1_channel8_three_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+                                ndac_mode1_channel9_three_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+                                ndac_mode1_channel10_three_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+                                ndac_mode1_channel11_three_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1')
+                                ndac_mode1_channel12_three_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1')
+                                ndac_mode1_channel13_three_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1')
+                                ndac_mode1_channel14_three_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1')
+                                ndac_mode1_channel15_three_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1')
+                                ndac_mode1_channel16_three_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+                                ndac_mode1_channel1_four_test1.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+                                ndac_mode1_channel2_four_test1.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+                                ndac_mode1_channel3_four_test1.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+                                ndac_mode1_channel4_four_test1.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+                                ndac_mode1_channel5_four_test1.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+                                ndac_mode1_channel6_four_test1.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+                                ndac_mode1_channel7_four_test1.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+                                ndac_mode1_channel8_four_test1.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+                                ndac_mode1_channel9_four_test1.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+                                ndac_mode1_channel10_four_test1.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+                                ndac_mode1_channel11_four_test1.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1')
+                                ndac_mode1_channel12_four_test1.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1')
+                                ndac_mode1_channel13_four_test1.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1')
+                                ndac_mode1_channel14_four_test1.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1')
+                                ndac_mode1_channel15_four_test1.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1')
+                                ndac_mode1_channel16_four_test1.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
             }
             break;
     }
@@ -718,6 +2677,7 @@ nadc_mode1_testValue2.addEventListener('click', () => {
     const ndac_mode1_cali_part = document.getElementById('ndac_mode1_cali_part');//定标段几的值
     const ndac_mode1_cali_partValue = ndac_mode1_cali_part.value;
     const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
+    const channeltype = CHANNELTYPE;
     let isTestValue1Selected = false;
     // 检查是否有通道被选中
     channelCheckboxes.forEach(checkbox => {
@@ -767,269 +2727,2215 @@ nadc_mode1_testValue2.addEventListener('click', () => {
     const ndac_mode1_channel15_data = document.getElementById('ndac_mode1_channel15_data');//通道15的数据
     const ndac_mode1_channel16 = document.getElementById('ndac_mode1_channel16');//通道16
     const ndac_mode1_channel16_data = document.getElementById('ndac_mode1_channel16_data');//通道16的数据
-    switch (ndac_mode1_cali_partValue) {
-        case "1":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
-                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
-                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
-                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
-                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
-                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
-                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
-                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
-                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
-                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
-                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
-                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
-                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
-                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
-                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
-                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
-                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+    switch (DEBUGSTATUS) {
+        case false:
+            console.log("已经进入调试阶段");
+            switch (channeltype) {
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x31:
+                case 0x32:
+                case 0x33:
+                case 0x34:
+                case 0x35:
+                case 0x36:
+                case 0x37:
+                case 0x38:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x51:
+                case 0x52:
+                case 0x53:
+                case 0x54:
+                case 0x55:
+                case 0x56:
+                case 0x57:
+                case 0x58:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x71:
+                case 0x72:
+                case 0x73:
+                case 0x74:
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
             }
             break;
-        case "2":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
-                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
-                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
-                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
-                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
-                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
-                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
-                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
-                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
-                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
-                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
-                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
-                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
-                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
-                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
-                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
-                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
-            }
-            break;
-        case "3":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
-                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
-                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
-                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
-                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
-                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
-                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
-                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
-                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
-                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
-                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
-                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
-                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
-                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
-                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
-                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
-                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
-            }
-            break;
-        case "4":
-            if (ndac_mode1_channel1.checked) {
-                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
-                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
-            }
-            if (ndac_mode1_channel2.checked) {
-                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
-                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
-            }
-            if (ndac_mode1_channel3.checked) {
-                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
-                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
-            }
-            if (ndac_mode1_channel4.checked) {
-                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
-                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
-            }
-            if (ndac_mode1_channel5.checked) {
-                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
-                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
-            }
-            if (ndac_mode1_channel6.checked) {
-                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
-                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
-            }
-            if (ndac_mode1_channel7.checked) {
-                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
-                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
-            }
-            if (ndac_mode1_channel8.checked) {
-                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
-                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
-            }
-            if (ndac_mode1_channel9.checked) {
-                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
-                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
-            }
-            if (ndac_mode1_channel10.checked) {
-                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
-                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
-            }
-            if (ndac_mode1_channel11.checked) {
-                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
-                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
-            }
-            if (ndac_mode1_channel12.checked) {
-                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
-                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
-            }
-            if (ndac_mode1_channel13.checked) {
-                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
-                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
-            }
-            if (ndac_mode1_channel14.checked) {
-                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
-                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
-            }
-            if (ndac_mode1_channel15.checked) {
-                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
-                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
-            }
-            if (ndac_mode1_channel16.checked) {
-                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
-                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+        case true:
+            console.log("已经退出调试阶段");
+            switch (channeltype) {
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value * 1000;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value * 1000;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x31:
+                case 0x32:
+                case 0x33:
+                case 0x34:
+                case 0x35:
+                case 0x36:
+                case 0x37:
+                case 0x38:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x51:
+                case 0x52:
+                case 0x53:
+                case 0x54:
+                case 0x55:
+                case 0x56:
+                case 0x57:
+                case 0x58:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
+                case 0x71:
+                case 0x72:
+                case 0x73:
+                case 0x74:
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                    switch (ndac_mode1_cali_partValue) {
+                        case "1":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2')//实际值1
+                                ndac_mode1_channel1_one_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+                                ndac_mode1_channel2_one_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+                                ndac_mode1_channel3_one_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+                                ndac_mode1_channel4_one_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+                                ndac_mode1_channel5_one_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+                                ndac_mode1_channel6_one_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+                                ndac_mode1_channel7_one_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+                                ndac_mode1_channel8_one_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+                                ndac_mode1_channel9_one_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+                                ndac_mode1_channel10_one_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+                                ndac_mode1_channel11_one_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+                                ndac_mode1_channel12_one_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+                                ndac_mode1_channel13_one_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+                                ndac_mode1_channel14_one_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+                                ndac_mode1_channel15_one_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+                                ndac_mode1_channel16_one_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "2":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+                                ndac_mode1_channel1_two_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+                                ndac_mode1_channel2_two_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+                                ndac_mode1_channel3_two_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+                                ndac_mode1_channel4_two_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+                                ndac_mode1_channel5_two_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+                                ndac_mode1_channel6_two_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+                                ndac_mode1_channel7_two_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+                                ndac_mode1_channel8_two_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+                                ndac_mode1_channel9_two_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+                                ndac_mode1_channel10_two_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+                                ndac_mode1_channel11_two_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+                                ndac_mode1_channel12_two_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+                                ndac_mode1_channel13_two_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+                                ndac_mode1_channel14_two_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+                                ndac_mode1_channel15_two_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+                                ndac_mode1_channel16_two_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "3":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+                                ndac_mode1_channel1_three_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+                                ndac_mode1_channel2_three_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+                                ndac_mode1_channel3_three_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+                                ndac_mode1_channel4_three_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+                                ndac_mode1_channel5_three_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+                                ndac_mode1_channel6_three_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+                                ndac_mode1_channel7_three_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+                                ndac_mode1_channel8_three_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+                                ndac_mode1_channel9_three_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+                                ndac_mode1_channel10_three_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+                                ndac_mode1_channel11_three_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+                                ndac_mode1_channel12_three_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+                                ndac_mode1_channel13_three_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+                                ndac_mode1_channel14_three_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+                                ndac_mode1_channel15_three_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+                                ndac_mode1_channel16_three_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                        case "4":
+                            if (ndac_mode1_channel1.checked) {
+                                const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+                                ndac_mode1_channel1_four_test2.value = ndac_mode1_channel1_data.value;
+                            }
+                            if (ndac_mode1_channel2.checked) {
+                                const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+                                ndac_mode1_channel2_four_test2.value = ndac_mode1_channel2_data.value;
+                            }
+                            if (ndac_mode1_channel3.checked) {
+                                const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+                                ndac_mode1_channel3_four_test2.value = ndac_mode1_channel3_data.value;
+                            }
+                            if (ndac_mode1_channel4.checked) {
+                                const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+                                ndac_mode1_channel4_four_test2.value = ndac_mode1_channel4_data.value;
+                            }
+                            if (ndac_mode1_channel5.checked) {
+                                const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+                                ndac_mode1_channel5_four_test2.value = ndac_mode1_channel5_data.value;
+                            }
+                            if (ndac_mode1_channel6.checked) {
+                                const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+                                ndac_mode1_channel6_four_test2.value = ndac_mode1_channel6_data.value;
+                            }
+                            if (ndac_mode1_channel7.checked) {
+                                const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+                                ndac_mode1_channel7_four_test2.value = ndac_mode1_channel7_data.value;
+                            }
+                            if (ndac_mode1_channel8.checked) {
+                                const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+                                ndac_mode1_channel8_four_test2.value = ndac_mode1_channel8_data.value;
+                            }
+                            if (ndac_mode1_channel9.checked) {
+                                const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+                                ndac_mode1_channel9_four_test2.value = ndac_mode1_channel9_data.value;
+                            }
+                            if (ndac_mode1_channel10.checked) {
+                                const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+                                ndac_mode1_channel10_four_test2.value = ndac_mode1_channel10_data.value;
+                            }
+                            if (ndac_mode1_channel11.checked) {
+                                const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+                                ndac_mode1_channel11_four_test2.value = ndac_mode1_channel11_data.value;
+                            }
+                            if (ndac_mode1_channel12.checked) {
+                                const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+                                ndac_mode1_channel12_four_test2.value = ndac_mode1_channel12_data.value;
+                            }
+                            if (ndac_mode1_channel13.checked) {
+                                const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+                                ndac_mode1_channel13_four_test2.value = ndac_mode1_channel13_data.value;
+                            }
+                            if (ndac_mode1_channel14.checked) {
+                                const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+                                ndac_mode1_channel14_four_test2.value = ndac_mode1_channel14_data.value;
+                            }
+                            if (ndac_mode1_channel15.checked) {
+                                const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+                                ndac_mode1_channel15_four_test2.value = ndac_mode1_channel15_data.value;
+                            }
+                            if (ndac_mode1_channel16.checked) {
+                                const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+                                ndac_mode1_channel16_four_test2.value = ndac_mode1_channel16_data.value;
+                            }
+                            break;
+                    }
+                    break;
             }
             break;
     }
@@ -1060,9 +4966,6 @@ function validateDemarcValues() {
     const demarc2 = parseFloat(nadc_mode1_demarc2_value.value) || 0;
     const demarc3 = parseFloat(nadc_mode1_demarc3_value.value) || 0;
     ndac_mode1_cali_part.innerHTML = '';
-
-
-
     // 检查是否满足 demarc1 > demarc2 > 0 && demarc3 === 0 
     if (demarc1 > demarc2 && demarc2 > 0 && demarc3 === 0) {
         const newOption1 = document.createElement('option');
@@ -1197,6 +5100,7 @@ function validateDemarcValues() {
     setTimeout(() => {
         ndac_mode1_dialog.style.display = 'none';
     }, 1000);
+    SECTIONNUM = 0;
     const newOption1 = document.createElement('option');
     newOption1.setAttribute('value', '0');
     newOption1.textContent = '请检查分界点';
@@ -1444,59 +5348,6 @@ nadc_mode1_application.addEventListener('click', () => {
 });
 
 /**
-* 模块名:
-* 代码描述:
-* 作者:Crow
-* 创建时间:2025/03/23 20:04:04
-*/
-// const sure_demarc_dialog = document.getElementById('sure_demarc_dialog');
-// sure_demarc_dialog.addEventListener('click', function () {
-//     const mode1_demarc1_value = document.getElementById('mode1_demarc1_value')
-//     const mode1_demarc2_value = document.getElementById('mode1_demarc2_value')
-//     const mode1_demarc3_value = document.getElementById('mode1_demarc3_value')
-//     const mode1_demarc4_value = document.getElementById('mode1_demarc4_value')
-//     const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
-//     const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
-//     if ((mode1_demarc1_value.value != "") && (mode1_demarc1_value.value > mode1_demarc2_value.value > mode1_demarc3_value.value > mode1_demarc4_value.value)) {
-//         const ndac_mode1_demarc_dialog = document.getElementById('ndac_mode1_demarc_dialog');
-//         ndac_mode1_demarc_dialog.style.display = 'none';
-//         saveDemarcValue()
-//     } else {
-//         ndac_mode1_dialog.style.display = 'block';
-//         ndac_mode1_dialog_label.innerText = '请检查分界点1不能为空\n且前者比后者大'
-//         setTimeout(() => {
-//             ndac_mode1_dialog.style.display = 'none';
-//         }, 1000)
-//     }
-
-// });
-
-// // 确保 saveDemarcValue 函数正确
-// function saveDemarcValue() {
-//     const DemarcValueToSave = {
-//         demo1_demarc1_value: document.getElementById('mode1_demarc1_value').value,
-//         demo1_demarc2_value: document.getElementById('mode1_demarc2_value').value,
-//         demo1_demarc3_value: document.getElementById('mode1_demarc3_value').value,
-//         demo1_demarc4_value: document.getElementById('mode1_demarc4_value').value,
-//     };
-//     Object.keys(DemarcValueToSave).forEach(key => {
-//         const value = DemarcValueToSave[key];
-//         sessionStorage.setItem(key, value);
-//     });
-// }
-// // 定义 loadDemarcValue 函数
-// function loadDemarcValue() {
-//     const mode1_demarc1_value = sessionStorage.getItem('demo1_demarc1_value');
-//     const mode1_demarc2_value = sessionStorage.getItem('demo1_demarc2_value');
-//     const mode1_demarc3_value = sessionStorage.getItem('demo1_demarc3_value');
-//     const mode1_demarc4_value = sessionStorage.getItem('demo1_demarc4_value');
-//     document.getElementById('mode1_demarc1_value').value = mode1_demarc1_value;
-//     document.getElementById('mode1_demarc2_value').value = mode1_demarc2_value;
-//     document.getElementById('mode1_demarc3_value').value = mode1_demarc3_value;
-//     document.getElementById('mode1_demarc4_value').value = mode1_demarc4_value;
-// }
-
-/**
 * 模块名:nadc_mode1_initialize
 * 代码描述:初始化K/B值
 * 作者:Crow
@@ -1535,29 +5386,1917 @@ nadc_mode1_initialize.addEventListener('click', function () {
 * 作者:Crow
 * 创建时间:2025/03/23 17:59:11
 */
-//通道1-定标1段
-const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');
+/**
+*****************************
+* 通道1
+*****************************
+*/
+const ndac_mode1_channel1_error = document.getElementById('ndac_mode1_channel1_error');
+// 通道1-定标1段
 const ndac_mode1_channel1_one_actual1 = document.getElementById('ndac_mode1_channel1_one_actual1');
 const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1');
 const ndac_mode1_channel1_one_actual2 = document.getElementById('ndac_mode1_channel1_one_actual2');
 const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2');
 const ndac_mode1_channel1_one_k = document.getElementById('ndac_mode1_channel1_one_k');
 const ndac_mode1_channel1_one_b = document.getElementById('ndac_mode1_channel1_one_b');
-const ndac_mode1_channel1_error = document.getElementById('ndac_mode1_channel1_error');
-const mode1_channel1_one = [ndac_mode1_channel1_one_actual1, ndac_mode1_channel1_one_actual2, ndac_mode1_channel1_one_test1, ndac_mode1_channel1_one_test2]
+const mode1_channel1_one = [ndac_mode1_channel1_one_actual1, ndac_mode1_channel1_one_actual2, ndac_mode1_channel1_one_test1, ndac_mode1_channel1_one_test2];
 mode1_channel1_one.forEach(input => {
     input.addEventListener('input', function () {
-        const result = calculateKandB(mode1_channel1_one, ndac_mode1_channel1_one_actual1, ndac_mode1_channel1_one_actual2, ndac_mode1_channel1_one_test1, ndac_mode1_channel1_one_test2)
+        const result = calculateKandB(mode1_channel1_one, ndac_mode1_channel1_one_actual1, ndac_mode1_channel1_one_actual2, ndac_mode1_channel1_one_test1, ndac_mode1_channel1_one_test2);
         ndac_mode1_channel1_one_k.value = result.kValue;
         ndac_mode1_channel1_one_b.value = result.bValue;
-        ndac_mode1_channel1_error.textContent = result.errorMessage;
-    })
-})
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel1_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel1Error();
+        }
+    });
+});
+// 通道1-定标2段
+const ndac_mode1_channel1_two_actual1 = document.getElementById('ndac_mode1_channel1_two_actual1');
+const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');
+const ndac_mode1_channel1_two_actual2 = document.getElementById('ndac_mode1_channel1_two_actual2');
+const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');
+const ndac_mode1_channel1_two_k = document.getElementById('ndac_mode1_channel1_two_k');
+const ndac_mode1_channel1_two_b = document.getElementById('ndac_mode1_channel1_two_b');
+const mode1_channel1_two = [ndac_mode1_channel1_two_actual1, ndac_mode1_channel1_two_actual2, ndac_mode1_channel1_two_test1, ndac_mode1_channel1_two_test2];
+mode1_channel1_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel1_two, ndac_mode1_channel1_two_actual1, ndac_mode1_channel1_two_actual2, ndac_mode1_channel1_two_test1, ndac_mode1_channel1_two_test2);
+        ndac_mode1_channel1_two_k.value = result.kValue;
+        ndac_mode1_channel1_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel1_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel1Error();
+        }
+    });
+});
+// 通道1-定标3段
+const ndac_mode1_channel1_three_actual1 = document.getElementById('ndac_mode1_channel1_three_actual1');
+const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');
+const ndac_mode1_channel1_three_actual2 = document.getElementById('ndac_mode1_channel1_three_actual2');
+const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');
+const ndac_mode1_channel1_three_k = document.getElementById('ndac_mode1_channel1_three_k');
+const ndac_mode1_channel1_three_b = document.getElementById('ndac_mode1_channel1_three_b');
+const mode1_channel1_three = [ndac_mode1_channel1_three_actual1, ndac_mode1_channel1_three_actual2, ndac_mode1_channel1_three_test1, ndac_mode1_channel1_three_test2];
+mode1_channel1_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel1_three, ndac_mode1_channel1_three_actual1, ndac_mode1_channel1_three_actual2, ndac_mode1_channel1_three_test1, ndac_mode1_channel1_three_test2);
+        ndac_mode1_channel1_three_k.value = result.kValue;
+        ndac_mode1_channel1_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel1_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel1Error();
+        }
+    });
+});
+// 通道1-定标4段
+const ndac_mode1_channel1_four_actual1 = document.getElementById('ndac_mode1_channel1_four_actual1');
+const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');
+const ndac_mode1_channel1_four_actual2 = document.getElementById('ndac_mode1_channel1_four_actual2');
+const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');
+const ndac_mode1_channel1_four_k = document.getElementById('ndac_mode1_channel1_four_k');
+const ndac_mode1_channel1_four_b = document.getElementById('ndac_mode1_channel1_four_b');
+const mode1_channel1_four = [ndac_mode1_channel1_four_actual1, ndac_mode1_channel1_four_actual2, ndac_mode1_channel1_four_test1, ndac_mode1_channel1_four_test2];
+mode1_channel1_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel1_four, ndac_mode1_channel1_four_actual1, ndac_mode1_channel1_four_actual2, ndac_mode1_channel1_four_test1, ndac_mode1_channel1_four_test2);
+        ndac_mode1_channel1_four_k.value = result.kValue;
+        ndac_mode1_channel1_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel1_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel1Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel1Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel1_one, ndac_mode1_channel1_one_actual1, ndac_mode1_channel1_one_actual2, ndac_mode1_channel1_one_test1, ndac_mode1_channel1_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel1_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel1_two, ndac_mode1_channel1_two_actual1, ndac_mode1_channel1_two_actual2, ndac_mode1_channel1_two_test1, ndac_mode1_channel1_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel1_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel1_three, ndac_mode1_channel1_three_actual1, ndac_mode1_channel1_three_actual2, ndac_mode1_channel1_three_test1, ndac_mode1_channel1_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel1_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel1_four, ndac_mode1_channel1_four_actual1, ndac_mode1_channel1_four_actual2, ndac_mode1_channel1_four_test1, ndac_mode1_channel1_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel1_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel1_error.textContent = "";
+}
+/**
+*****************************
+* 通道2
+*****************************
+*/
+const ndac_mode1_channel2_error = document.getElementById('ndac_mode1_channel2_error');
+// 通道2-定标1段
+const ndac_mode1_channel2_one_actual1 = document.getElementById('ndac_mode1_channel2_one_actual1');
+const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
+const ndac_mode1_channel2_one_actual2 = document.getElementById('ndac_mode1_channel2_one_actual2');
+const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
+const ndac_mode1_channel2_one_k = document.getElementById('ndac_mode1_channel2_one_k');
+const ndac_mode1_channel2_one_b = document.getElementById('ndac_mode1_channel2_one_b');
+const mode1_channel2_one = [ndac_mode1_channel2_one_actual1, ndac_mode1_channel2_one_actual2, ndac_mode1_channel2_one_test1, ndac_mode1_channel2_one_test2];
+mode1_channel2_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel2_one, ndac_mode1_channel2_one_actual1, ndac_mode1_channel2_one_actual2, ndac_mode1_channel2_one_test1, ndac_mode1_channel2_one_test2);
+        ndac_mode1_channel2_one_k.value = result.kValue;
+        ndac_mode1_channel2_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel2_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel2Error();
+        }
+    });
+});
+// 通道2-定标2段
+const ndac_mode1_channel2_two_actual1 = document.getElementById('ndac_mode1_channel2_two_actual1');
+const ndac_mode1_channel2_two_test1 = document.getElementById('ndac_mode1_channel2_two_test1');
+const ndac_mode1_channel2_two_actual2 = document.getElementById('ndac_mode1_channel2_two_actual2');
+const ndac_mode1_channel2_two_test2 = document.getElementById('ndac_mode1_channel2_two_test2');
+const ndac_mode1_channel2_two_k = document.getElementById('ndac_mode1_channel2_two_k');
+const ndac_mode1_channel2_two_b = document.getElementById('ndac_mode1_channel2_two_b');
+const mode1_channel2_two = [ndac_mode1_channel2_two_actual1, ndac_mode1_channel2_two_actual2, ndac_mode1_channel2_two_test1, ndac_mode1_channel2_two_test2];
+mode1_channel2_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel2_two, ndac_mode1_channel2_two_actual1, ndac_mode1_channel2_two_actual2, ndac_mode1_channel2_two_test1, ndac_mode1_channel2_two_test2);
+        ndac_mode1_channel2_two_k.value = result.kValue;
+        ndac_mode1_channel2_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel2_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel2Error();
+        }
+    });
+});
+// 通道2-定标3段
+const ndac_mode1_channel2_three_actual1 = document.getElementById('ndac_mode1_channel2_three_actual1');
+const ndac_mode1_channel2_three_test1 = document.getElementById('ndac_mode1_channel2_three_test1');
+const ndac_mode1_channel2_three_actual2 = document.getElementById('ndac_mode1_channel2_three_actual2');
+const ndac_mode1_channel2_three_test2 = document.getElementById('ndac_mode1_channel2_three_test2');
+const ndac_mode1_channel2_three_k = document.getElementById('ndac_mode1_channel2_three_k');
+const ndac_mode1_channel2_three_b = document.getElementById('ndac_mode1_channel2_three_b');
+const mode1_channel2_three = [ndac_mode1_channel2_three_actual1, ndac_mode1_channel2_three_actual2, ndac_mode1_channel2_three_test1, ndac_mode1_channel2_three_test2];
+mode1_channel2_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel2_three, ndac_mode1_channel2_three_actual1, ndac_mode1_channel2_three_actual2, ndac_mode1_channel2_three_test1, ndac_mode1_channel2_three_test2);
+        ndac_mode1_channel2_three_k.value = result.kValue;
+        ndac_mode1_channel2_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel2_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel2Error();
+        }
+    });
+});
+// 通道2-定标4段
+const ndac_mode1_channel2_four_actual1 = document.getElementById('ndac_mode1_channel2_four_actual1');
+const ndac_mode1_channel2_four_test1 = document.getElementById('ndac_mode1_channel2_four_test1');
+const ndac_mode1_channel2_four_actual2 = document.getElementById('ndac_mode1_channel2_four_actual2');
+const ndac_mode1_channel2_four_test2 = document.getElementById('ndac_mode1_channel2_four_test2');
+const ndac_mode1_channel2_four_k = document.getElementById('ndac_mode1_channel2_four_k');
+const ndac_mode1_channel2_four_b = document.getElementById('ndac_mode1_channel2_four_b');
+const mode1_channel2_four = [ndac_mode1_channel2_four_actual1, ndac_mode1_channel2_four_actual2, ndac_mode1_channel2_four_test1, ndac_mode1_channel2_four_test2];
+mode1_channel2_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel2_four, ndac_mode1_channel2_four_actual1, ndac_mode1_channel2_four_actual2, ndac_mode1_channel2_four_test1, ndac_mode1_channel2_four_test2);
+        ndac_mode1_channel2_four_k.value = result.kValue;
+        ndac_mode1_channel2_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel2_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel2Error();
+        }
+    });
+});
 
+// 更新错误显示的函数 -
+function updateChannel2Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel2_one, ndac_mode1_channel2_one_actual1, ndac_mode1_channel2_one_actual2, ndac_mode1_channel2_one_test1, ndac_mode1_channel2_one_test2)
+    if (result1.errorMessage) {
+        ndac_mode1_channel2_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel2_two, ndac_mode1_channel2_two_actual1, ndac_mode1_channel2_two_actual2, ndac_mode1_channel2_two_test1, ndac_mode1_channel2_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel2_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel2_three, ndac_mode1_channel2_three_actual1, ndac_mode1_channel2_three_actual2, ndac_mode1_channel2_three_test1, ndac_mode1_channel2_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel2_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel2_four, ndac_mode1_channel2_four_actual1, ndac_mode1_channel2_four_actual2, ndac_mode1_channel2_four_test1, ndac_mode1_channel2_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel2_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel2_error.textContent = "";
+}
 
+/**
+*****************************
+* 通道3
+*****************************
+*/
+const ndac_mode1_channel3_error = document.getElementById('ndac_mode1_channel3_error');
+// 通道3-定标1段
+const ndac_mode1_channel3_one_actual1 = document.getElementById('ndac_mode1_channel3_one_actual1');
+const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
+const ndac_mode1_channel3_one_actual2 = document.getElementById('ndac_mode1_channel3_one_actual2');
+const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
+const ndac_mode1_channel3_one_k = document.getElementById('ndac_mode1_channel3_one_k');
+const ndac_mode1_channel3_one_b = document.getElementById('ndac_mode1_channel3_one_b');
+const mode1_channel3_one = [ndac_mode1_channel3_one_actual1, ndac_mode1_channel3_one_actual2, ndac_mode1_channel3_one_test1, ndac_mode1_channel3_one_test2];
+mode1_channel3_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel3_one, ndac_mode1_channel3_one_actual1, ndac_mode1_channel3_one_actual2, ndac_mode1_channel3_one_test1, ndac_mode1_channel3_one_test2);
+        ndac_mode1_channel3_one_k.value = result.kValue;
+        ndac_mode1_channel3_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel3_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel3Error();
+        }
+    });
+});
+// 通道3-定标2段
+const ndac_mode1_channel3_two_actual1 = document.getElementById('ndac_mode1_channel3_two_actual1');
+const ndac_mode1_channel3_two_test1 = document.getElementById('ndac_mode1_channel3_two_test1');
+const ndac_mode1_channel3_two_actual2 = document.getElementById('ndac_mode1_channel3_two_actual2');
+const ndac_mode1_channel3_two_test2 = document.getElementById('ndac_mode1_channel3_two_test2');
+const ndac_mode1_channel3_two_k = document.getElementById('ndac_mode1_channel3_two_k');
+const ndac_mode1_channel3_two_b = document.getElementById('ndac_mode1_channel3_two_b');
+const mode1_channel3_two = [ndac_mode1_channel3_two_actual1, ndac_mode1_channel3_two_actual2, ndac_mode1_channel3_two_test1, ndac_mode1_channel3_two_test2];
+mode1_channel3_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel3_two, ndac_mode1_channel3_two_actual1, ndac_mode1_channel3_two_actual2, ndac_mode1_channel3_two_test1, ndac_mode1_channel3_two_test2);
+        ndac_mode1_channel3_two_k.value = result.kValue;
+        ndac_mode1_channel3_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel3_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel3Error();
+        }
+    });
+});
+// 通道3-定标3段
+const ndac_mode1_channel3_three_actual1 = document.getElementById('ndac_mode1_channel3_three_actual1');
+const ndac_mode1_channel3_three_test1 = document.getElementById('ndac_mode1_channel3_three_test1');
+const ndac_mode1_channel3_three_actual2 = document.getElementById('ndac_mode1_channel3_three_actual2');
+const ndac_mode1_channel3_three_test2 = document.getElementById('ndac_mode1_channel3_three_test2');
+const ndac_mode1_channel3_three_k = document.getElementById('ndac_mode1_channel3_three_k');
+const ndac_mode1_channel3_three_b = document.getElementById('ndac_mode1_channel3_three_b');
+const mode1_channel3_three = [ndac_mode1_channel3_three_actual1, ndac_mode1_channel3_three_actual2, ndac_mode1_channel3_three_test1, ndac_mode1_channel3_three_test2];
+mode1_channel3_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel3_three, ndac_mode1_channel3_three_actual1, ndac_mode1_channel3_three_actual2, ndac_mode1_channel3_three_test1, ndac_mode1_channel3_three_test2);
+        ndac_mode1_channel3_three_k.value = result.kValue;
+        ndac_mode1_channel3_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel3_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel3Error();
+        }
+    });
+});
+// 通道3-定标4段
+const ndac_mode1_channel3_four_actual1 = document.getElementById('ndac_mode1_channel3_four_actual1');
+const ndac_mode1_channel3_four_test1 = document.getElementById('ndac_mode1_channel3_four_test1');
+const ndac_mode1_channel3_four_actual2 = document.getElementById('ndac_mode1_channel3_four_actual2');
+const ndac_mode1_channel3_four_test2 = document.getElementById('ndac_mode1_channel3_four_test2');
+const ndac_mode1_channel3_four_k = document.getElementById('ndac_mode1_channel3_four_k');
+const ndac_mode1_channel3_four_b = document.getElementById('ndac_mode1_channel3_four_b');
+const mode1_channel3_four = [ndac_mode1_channel3_four_actual1, ndac_mode1_channel3_four_actual2, ndac_mode1_channel3_four_test1, ndac_mode1_channel3_four_test2];
+mode1_channel3_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel3_four, ndac_mode1_channel3_four_actual1, ndac_mode1_channel3_four_actual2, ndac_mode1_channel3_four_test1, ndac_mode1_channel3_four_test2);
+        ndac_mode1_channel3_four_k.value = result.kValue;
+        ndac_mode1_channel3_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel3_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel3Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel3Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel3_one, ndac_mode1_channel3_one_actual1, ndac_mode1_channel3_one_actual2, ndac_mode1_channel3_one_test1, ndac_mode1_channel3_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel3_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel3_two, ndac_mode1_channel3_two_actual1, ndac_mode1_channel3_two_actual2, ndac_mode1_channel3_two_test1, ndac_mode1_channel3_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel3_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel3_three, ndac_mode1_channel3_three_actual1, ndac_mode1_channel3_three_actual2, ndac_mode1_channel3_three_test1, ndac_mode1_channel3_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel3_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel3_four, ndac_mode1_channel3_four_actual1, ndac_mode1_channel3_four_actual2, ndac_mode1_channel3_four_test1, ndac_mode1_channel3_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel3_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel3_error.textContent = "";
+}
+/**
+*****************************
+* 通道4
+*****************************
+*/
+const ndac_mode1_channel4_error = document.getElementById('ndac_mode1_channel4_error');
+// 通道4-定标1段
+const ndac_mode1_channel4_one_actual1 = document.getElementById('ndac_mode1_channel4_one_actual1');
+const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
+const ndac_mode1_channel4_one_actual2 = document.getElementById('ndac_mode1_channel4_one_actual2');
+const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
+const ndac_mode1_channel4_one_k = document.getElementById('ndac_mode1_channel4_one_k');
+const ndac_mode1_channel4_one_b = document.getElementById('ndac_mode1_channel4_one_b');
+const mode1_channel4_one = [ndac_mode1_channel4_one_actual1, ndac_mode1_channel4_one_actual2, ndac_mode1_channel4_one_test1, ndac_mode1_channel4_one_test2];
+mode1_channel4_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel4_one, ndac_mode1_channel4_one_actual1, ndac_mode1_channel4_one_actual2, ndac_mode1_channel4_one_test1, ndac_mode1_channel4_one_test2);
+        ndac_mode1_channel4_one_k.value = result.kValue;
+        ndac_mode1_channel4_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel4_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel4Error();
+        }
+    });
+});
+// 通道4-定标2段
+const ndac_mode1_channel4_two_actual1 = document.getElementById('ndac_mode1_channel4_two_actual1');
+const ndac_mode1_channel4_two_test1 = document.getElementById('ndac_mode1_channel4_two_test1');
+const ndac_mode1_channel4_two_actual2 = document.getElementById('ndac_mode1_channel4_two_actual2');
+const ndac_mode1_channel4_two_test2 = document.getElementById('ndac_mode1_channel4_two_test2');
+const ndac_mode1_channel4_two_k = document.getElementById('ndac_mode1_channel4_two_k');
+const ndac_mode1_channel4_two_b = document.getElementById('ndac_mode1_channel4_two_b');
+const mode1_channel4_two = [ndac_mode1_channel4_two_actual1, ndac_mode1_channel4_two_actual2, ndac_mode1_channel4_two_test1, ndac_mode1_channel4_two_test2];
+mode1_channel4_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel4_two, ndac_mode1_channel4_two_actual1, ndac_mode1_channel4_two_actual2, ndac_mode1_channel4_two_test1, ndac_mode1_channel4_two_test2);
+        ndac_mode1_channel4_two_k.value = result.kValue;
+        ndac_mode1_channel4_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel4_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel4Error();
+        }
+    });
+});
+// 通道4-定标3段
+const ndac_mode1_channel4_three_actual1 = document.getElementById('ndac_mode1_channel4_three_actual1');
+const ndac_mode1_channel4_three_test1 = document.getElementById('ndac_mode1_channel4_three_test1');
+const ndac_mode1_channel4_three_actual2 = document.getElementById('ndac_mode1_channel4_three_actual2');
+const ndac_mode1_channel4_three_test2 = document.getElementById('ndac_mode1_channel4_three_test2');
+const ndac_mode1_channel4_three_k = document.getElementById('ndac_mode1_channel4_three_k');
+const ndac_mode1_channel4_three_b = document.getElementById('ndac_mode1_channel4_three_b');
+const mode1_channel4_three = [ndac_mode1_channel4_three_actual1, ndac_mode1_channel4_three_actual2, ndac_mode1_channel4_three_test1, ndac_mode1_channel4_three_test2];
+mode1_channel4_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel4_three, ndac_mode1_channel4_three_actual1, ndac_mode1_channel4_three_actual2, ndac_mode1_channel4_three_test1, ndac_mode1_channel4_three_test2);
+        ndac_mode1_channel4_three_k.value = result.kValue;
+        ndac_mode1_channel4_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel4_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel4Error();
+        }
+    });
+});
+// 通道4-定标4段
+const ndac_mode1_channel4_four_actual1 = document.getElementById('ndac_mode1_channel4_four_actual1');
+const ndac_mode1_channel4_four_test1 = document.getElementById('ndac_mode1_channel4_four_test1');
+const ndac_mode1_channel4_four_actual2 = document.getElementById('ndac_mode1_channel4_four_actual2');
+const ndac_mode1_channel4_four_test2 = document.getElementById('ndac_mode1_channel4_four_test2');
+const ndac_mode1_channel4_four_k = document.getElementById('ndac_mode1_channel4_four_k');
+const ndac_mode1_channel4_four_b = document.getElementById('ndac_mode1_channel4_four_b');
+const mode1_channel4_four = [ndac_mode1_channel4_four_actual1, ndac_mode1_channel4_four_actual2, ndac_mode1_channel4_four_test1, ndac_mode1_channel4_four_test2];
+mode1_channel4_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel4_four, ndac_mode1_channel4_four_actual1, ndac_mode1_channel4_four_actual2, ndac_mode1_channel4_four_test1, ndac_mode1_channel4_four_test2);
+        ndac_mode1_channel4_four_k.value = result.kValue;
+        ndac_mode1_channel4_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel4_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel4Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel4Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel4_one, ndac_mode1_channel4_one_actual1, ndac_mode1_channel4_one_actual2, ndac_mode1_channel4_one_test1, ndac_mode1_channel4_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel4_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel4_two, ndac_mode1_channel4_two_actual1, ndac_mode1_channel4_two_actual2, ndac_mode1_channel4_two_test1, ndac_mode1_channel4_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel4_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel4_three, ndac_mode1_channel4_three_actual1, ndac_mode1_channel4_three_actual2, ndac_mode1_channel4_three_test1, ndac_mode1_channel4_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel4_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel4_four, ndac_mode1_channel4_four_actual1, ndac_mode1_channel4_four_actual2, ndac_mode1_channel4_four_test1, ndac_mode1_channel4_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel4_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel4_error.textContent = "";
+}
+/**
+*****************************
+* 通道5
+*****************************
+*/
+const ndac_mode1_channel5_error = document.getElementById('ndac_mode1_channel5_error');
+// 通道5-定标1段
+const ndac_mode1_channel5_one_actual1 = document.getElementById('ndac_mode1_channel5_one_actual1');
+const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
+const ndac_mode1_channel5_one_actual2 = document.getElementById('ndac_mode1_channel5_one_actual2');
+const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
+const ndac_mode1_channel5_one_k = document.getElementById('ndac_mode1_channel5_one_k');
+const ndac_mode1_channel5_one_b = document.getElementById('ndac_mode1_channel5_one_b');
+const mode1_channel5_one = [ndac_mode1_channel5_one_actual1, ndac_mode1_channel5_one_actual2, ndac_mode1_channel5_one_test1, ndac_mode1_channel5_one_test2];
+mode1_channel5_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel5_one, ndac_mode1_channel5_one_actual1, ndac_mode1_channel5_one_actual2, ndac_mode1_channel5_one_test1, ndac_mode1_channel5_one_test2);
+        ndac_mode1_channel5_one_k.value = result.kValue;
+        ndac_mode1_channel5_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel5_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel5Error();
+        }
+    });
+});
+// 通道5-定标2段
+const ndac_mode1_channel5_two_actual1 = document.getElementById('ndac_mode1_channel5_two_actual1');
+const ndac_mode1_channel5_two_test1 = document.getElementById('ndac_mode1_channel5_two_test1');
+const ndac_mode1_channel5_two_actual2 = document.getElementById('ndac_mode1_channel5_two_actual2');
+const ndac_mode1_channel5_two_test2 = document.getElementById('ndac_mode1_channel5_two_test2');
+const ndac_mode1_channel5_two_k = document.getElementById('ndac_mode1_channel5_two_k');
+const ndac_mode1_channel5_two_b = document.getElementById('ndac_mode1_channel5_two_b');
+const mode1_channel5_two = [ndac_mode1_channel5_two_actual1, ndac_mode1_channel5_two_actual2, ndac_mode1_channel5_two_test1, ndac_mode1_channel5_two_test2];
+mode1_channel5_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel5_two, ndac_mode1_channel5_two_actual1, ndac_mode1_channel5_two_actual2, ndac_mode1_channel5_two_test1, ndac_mode1_channel5_two_test2);
+        ndac_mode1_channel5_two_k.value = result.kValue;
+        ndac_mode1_channel5_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel5_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel5Error();
+        }
+    });
+});
+// 通道5-定标3段
+const ndac_mode1_channel5_three_actual1 = document.getElementById('ndac_mode1_channel5_three_actual1');
+const ndac_mode1_channel5_three_test1 = document.getElementById('ndac_mode1_channel5_three_test1');
+const ndac_mode1_channel5_three_actual2 = document.getElementById('ndac_mode1_channel5_three_actual2');
+const ndac_mode1_channel5_three_test2 = document.getElementById('ndac_mode1_channel5_three_test2');
+const ndac_mode1_channel5_three_k = document.getElementById('ndac_mode1_channel5_three_k');
+const ndac_mode1_channel5_three_b = document.getElementById('ndac_mode1_channel5_three_b');
+const mode1_channel5_three = [ndac_mode1_channel5_three_actual1, ndac_mode1_channel5_three_actual2, ndac_mode1_channel5_three_test1, ndac_mode1_channel5_three_test2];
+mode1_channel5_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel5_three, ndac_mode1_channel5_three_actual1, ndac_mode1_channel5_three_actual2, ndac_mode1_channel5_three_test1, ndac_mode1_channel5_three_test2);
+        ndac_mode1_channel5_three_k.value = result.kValue;
+        ndac_mode1_channel5_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel5_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel5Error();
+        }
+    });
+});
+// 通道5-定标4段
+const ndac_mode1_channel5_four_actual1 = document.getElementById('ndac_mode1_channel5_four_actual1');
+const ndac_mode1_channel5_four_test1 = document.getElementById('ndac_mode1_channel5_four_test1');
+const ndac_mode1_channel5_four_actual2 = document.getElementById('ndac_mode1_channel5_four_actual2');
+const ndac_mode1_channel5_four_test2 = document.getElementById('ndac_mode1_channel5_four_test2');
+const ndac_mode1_channel5_four_k = document.getElementById('ndac_mode1_channel5_four_k');
+const ndac_mode1_channel5_four_b = document.getElementById('ndac_mode1_channel5_four_b');
+const mode1_channel5_four = [ndac_mode1_channel5_four_actual1, ndac_mode1_channel5_four_actual2, ndac_mode1_channel5_four_test1, ndac_mode1_channel5_four_test2];
+mode1_channel5_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel5_four, ndac_mode1_channel5_four_actual1, ndac_mode1_channel5_four_actual2, ndac_mode1_channel5_four_test1, ndac_mode1_channel5_four_test2);
+        ndac_mode1_channel5_four_k.value = result.kValue;
+        ndac_mode1_channel5_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel5_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel5Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel5Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel5_one, ndac_mode1_channel5_one_actual1, ndac_mode1_channel5_one_actual2, ndac_mode1_channel5_one_test1, ndac_mode1_channel5_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel5_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel5_two, ndac_mode1_channel5_two_actual1, ndac_mode1_channel5_two_actual2, ndac_mode1_channel5_two_test1, ndac_mode1_channel5_two_test2)
+    if (result2.errorMessage) {
+        ndac_mode1_channel5_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel5_three, ndac_mode1_channel5_three_actual1, ndac_mode1_channel5_three_actual2, ndac_mode1_channel5_three_test1, ndac_mode1_channel5_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel5_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel5_four, ndac_mode1_channel5_four_actual1, ndac_mode1_channel5_four_actual2, ndac_mode1_channel5_four_test1, ndac_mode1_channel5_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel5_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel5_error.textContent = "";
+}
+/**
+*****************************
+* 通道6
+*****************************
+*/
+const ndac_mode1_channel6_error = document.getElementById('ndac_mode1_channel6_error');
+// 通道6-定标1段
+const ndac_mode1_channel6_one_actual1 = document.getElementById('ndac_mode1_channel6_one_actual1');
+const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
+const ndac_mode1_channel6_one_actual2 = document.getElementById('ndac_mode1_channel6_one_actual2');
+const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
+const ndac_mode1_channel6_one_k = document.getElementById('ndac_mode1_channel6_one_k');
+const ndac_mode1_channel6_one_b = document.getElementById('ndac_mode1_channel6_one_b');
+const mode1_channel6_one = [ndac_mode1_channel6_one_actual1, ndac_mode1_channel6_one_actual2, ndac_mode1_channel6_one_test1, ndac_mode1_channel6_one_test2];
+mode1_channel6_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel6_one, ndac_mode1_channel6_one_actual1, ndac_mode1_channel6_one_actual2, ndac_mode1_channel6_one_test1, ndac_mode1_channel6_one_test2);
+        ndac_mode1_channel6_one_k.value = result.kValue;
+        ndac_mode1_channel6_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel6_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel6Error();
+        }
+    });
+});
+// 通道6-定标2段
+const ndac_mode1_channel6_two_actual1 = document.getElementById('ndac_mode1_channel6_two_actual1');
+const ndac_mode1_channel6_two_test1 = document.getElementById('ndac_mode1_channel6_two_test1');
+const ndac_mode1_channel6_two_actual2 = document.getElementById('ndac_mode1_channel6_two_actual2');
+const ndac_mode1_channel6_two_test2 = document.getElementById('ndac_mode1_channel6_two_test2');
+const ndac_mode1_channel6_two_k = document.getElementById('ndac_mode1_channel6_two_k');
+const ndac_mode1_channel6_two_b = document.getElementById('ndac_mode1_channel6_two_b');
+const mode1_channel6_two = [ndac_mode1_channel6_two_actual1, ndac_mode1_channel6_two_actual2, ndac_mode1_channel6_two_test1, ndac_mode1_channel6_two_test2];
+mode1_channel6_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel6_two, ndac_mode1_channel6_two_actual1, ndac_mode1_channel6_two_actual2, ndac_mode1_channel6_two_test1, ndac_mode1_channel6_two_test2);
+        ndac_mode1_channel6_two_k.value = result.kValue;
+        ndac_mode1_channel6_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel6_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel6Error();
+        }
+    });
+});
+// 通道6-定标3段
+const ndac_mode1_channel6_three_actual1 = document.getElementById('ndac_mode1_channel6_three_actual1');
+const ndac_mode1_channel6_three_test1 = document.getElementById('ndac_mode1_channel6_three_test1');
+const ndac_mode1_channel6_three_actual2 = document.getElementById('ndac_mode1_channel6_three_actual2');
+const ndac_mode1_channel6_three_test2 = document.getElementById('ndac_mode1_channel6_three_test2');
+const ndac_mode1_channel6_three_k = document.getElementById('ndac_mode1_channel6_three_k');
+const ndac_mode1_channel6_three_b = document.getElementById('ndac_mode1_channel6_three_b');
+const mode1_channel6_three = [ndac_mode1_channel6_three_actual1, ndac_mode1_channel6_three_actual2, ndac_mode1_channel6_three_test1, ndac_mode1_channel6_three_test2];
+mode1_channel6_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel6_three, ndac_mode1_channel6_three_actual1, ndac_mode1_channel6_three_actual2, ndac_mode1_channel6_three_test1, ndac_mode1_channel6_three_test2);
+        ndac_mode1_channel6_three_k.value = result.kValue;
+        ndac_mode1_channel6_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel6_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel6Error();
+        }
+    });
+});
+// 通道6-定标4段
+const ndac_mode1_channel6_four_actual1 = document.getElementById('ndac_mode1_channel6_four_actual1');
+const ndac_mode1_channel6_four_test1 = document.getElementById('ndac_mode1_channel6_four_test1');
+const ndac_mode1_channel6_four_actual2 = document.getElementById('ndac_mode1_channel6_four_actual2');
+const ndac_mode1_channel6_four_test2 = document.getElementById('ndac_mode1_channel6_four_test2');
+const ndac_mode1_channel6_four_k = document.getElementById('ndac_mode1_channel6_four_k');
+const ndac_mode1_channel6_four_b = document.getElementById('ndac_mode1_channel6_four_b');
+const mode1_channel6_four = [ndac_mode1_channel6_four_actual1, ndac_mode1_channel6_four_actual2, ndac_mode1_channel6_four_test1, ndac_mode1_channel6_four_test2];
+mode1_channel6_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel6_four, ndac_mode1_channel6_four_actual1, ndac_mode1_channel6_four_actual2, ndac_mode1_channel6_four_test1, ndac_mode1_channel6_four_test2);
+        ndac_mode1_channel6_four_k.value = result.kValue;
+        ndac_mode1_channel6_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel6_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel6Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel6Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel6_one, ndac_mode1_channel6_one_actual1, ndac_mode1_channel6_one_actual2, ndac_mode1_channel6_one_test1, ndac_mode1_channel6_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel6_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel6_two, ndac_mode1_channel6_two_actual1, ndac_mode1_channel6_two_actual2, ndac_mode1_channel6_two_test1, ndac_mode1_channel6_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel6_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel6_three, ndac_mode1_channel6_three_actual1, ndac_mode1_channel6_three_actual2, ndac_mode1_channel6_three_test1, ndac_mode1_channel6_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel6_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel6_four, ndac_mode1_channel6_four_actual1, ndac_mode1_channel6_four_actual2, ndac_mode1_channel6_four_test1, ndac_mode1_channel6_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel6_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel6_error.textContent = "";
+}
 
+/**
+*****************************
+* 通道7
+*****************************
+*/
+const ndac_mode1_channel7_error = document.getElementById('ndac_mode1_channel7_error');
+// 通道7-定标1段
+const ndac_mode1_channel7_one_actual1 = document.getElementById('ndac_mode1_channel7_one_actual1');
+const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
+const ndac_mode1_channel7_one_actual2 = document.getElementById('ndac_mode1_channel7_one_actual2');
+const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
+const ndac_mode1_channel7_one_k = document.getElementById('ndac_mode1_channel7_one_k');
+const ndac_mode1_channel7_one_b = document.getElementById('ndac_mode1_channel7_one_b');
+const mode1_channel7_one = [ndac_mode1_channel7_one_actual1, ndac_mode1_channel7_one_actual2, ndac_mode1_channel7_one_test1, ndac_mode1_channel7_one_test2];
+mode1_channel7_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel7_one, ndac_mode1_channel7_one_actual1, ndac_mode1_channel7_one_actual2, ndac_mode1_channel7_one_test1, ndac_mode1_channel7_one_test2);
+        ndac_mode1_channel7_one_k.value = result.kValue;
+        ndac_mode1_channel7_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel7_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel7Error();
+        }
+    });
+});
+// 通道7-定标2段
+const ndac_mode1_channel7_two_actual1 = document.getElementById('ndac_mode1_channel7_two_actual1');
+const ndac_mode1_channel7_two_test1 = document.getElementById('ndac_mode1_channel7_two_test1');
+const ndac_mode1_channel7_two_actual2 = document.getElementById('ndac_mode1_channel7_two_actual2');
+const ndac_mode1_channel7_two_test2 = document.getElementById('ndac_mode1_channel7_two_test2');
+const ndac_mode1_channel7_two_k = document.getElementById('ndac_mode1_channel7_two_k');
+const ndac_mode1_channel7_two_b = document.getElementById('ndac_mode1_channel7_two_b');
+const mode1_channel7_two = [ndac_mode1_channel7_two_actual1, ndac_mode1_channel7_two_actual2, ndac_mode1_channel7_two_test1, ndac_mode1_channel7_two_test2];
+mode1_channel7_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel7_two, ndac_mode1_channel7_two_actual1, ndac_mode1_channel7_two_actual2, ndac_mode1_channel7_two_test1, ndac_mode1_channel7_two_test2);
+        ndac_mode1_channel7_two_k.value = result.kValue;
+        ndac_mode1_channel7_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel7_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel7Error();
+        }
+    });
+});
+// 通道7-定标3段
+const ndac_mode1_channel7_three_actual1 = document.getElementById('ndac_mode1_channel7_three_actual1');
+const ndac_mode1_channel7_three_test1 = document.getElementById('ndac_mode1_channel7_three_test1');
+const ndac_mode1_channel7_three_actual2 = document.getElementById('ndac_mode1_channel7_three_actual2');
+const ndac_mode1_channel7_three_test2 = document.getElementById('ndac_mode1_channel7_three_test2');
+const ndac_mode1_channel7_three_k = document.getElementById('ndac_mode1_channel7_three_k');
+const ndac_mode1_channel7_three_b = document.getElementById('ndac_mode1_channel7_three_b');
+const mode1_channel7_three = [ndac_mode1_channel7_three_actual1, ndac_mode1_channel7_three_actual2, ndac_mode1_channel7_three_test1, ndac_mode1_channel7_three_test2];
+mode1_channel7_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel7_three, ndac_mode1_channel7_three_actual1, ndac_mode1_channel7_three_actual2, ndac_mode1_channel7_three_test1, ndac_mode1_channel7_three_test2);
+        ndac_mode1_channel7_three_k.value = result.kValue;
+        ndac_mode1_channel7_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel7_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel7Error();
+        }
+    });
+});
+// 通道7-定标4段
+const ndac_mode1_channel7_four_actual1 = document.getElementById('ndac_mode1_channel7_four_actual1');
+const ndac_mode1_channel7_four_test1 = document.getElementById('ndac_mode1_channel7_four_test1');
+const ndac_mode1_channel7_four_actual2 = document.getElementById('ndac_mode1_channel7_four_actual2');
+const ndac_mode1_channel7_four_test2 = document.getElementById('ndac_mode1_channel7_four_test2');
+const ndac_mode1_channel7_four_k = document.getElementById('ndac_mode1_channel7_four_k');
+const ndac_mode1_channel7_four_b = document.getElementById('ndac_mode1_channel7_four_b');
+const mode1_channel7_four = [ndac_mode1_channel7_four_actual1, ndac_mode1_channel7_four_actual2, ndac_mode1_channel7_four_test1, ndac_mode1_channel7_four_test2];
+mode1_channel7_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel7_four, ndac_mode1_channel7_four_actual1, ndac_mode1_channel7_four_actual2, ndac_mode1_channel7_four_test1, ndac_mode1_channel7_four_test2);
+        ndac_mode1_channel7_four_k.value = result.kValue;
+        ndac_mode1_channel7_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel7_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel7Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel7Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel7_one, ndac_mode1_channel7_one_actual1, ndac_mode1_channel7_one_actual2, ndac_mode1_channel7_one_test1, ndac_mode1_channel7_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel7_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel7_two, ndac_mode1_channel7_two_actual1, ndac_mode1_channel7_two_actual2, ndac_mode1_channel7_two_test1, ndac_mode1_channel7_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel7_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel7_three, ndac_mode1_channel7_three_actual1, ndac_mode1_channel7_three_actual2, ndac_mode1_channel7_three_test1, ndac_mode1_channel7_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel7_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel7_four, ndac_mode1_channel7_four_actual1, ndac_mode1_channel7_four_actual2, ndac_mode1_channel7_four_test1, ndac_mode1_channel7_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel7_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel7_error.textContent = "";
+}
 
-//就算KB值的方法
+/**
+*****************************
+* 通道8
+*****************************
+*/
+const ndac_mode1_channel8_error = document.getElementById('ndac_mode1_channel8_error');
+// 通道7-定标1段
+const ndac_mode1_channel8_one_actual1 = document.getElementById('ndac_mode1_channel8_one_actual1');
+const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
+const ndac_mode1_channel8_one_actual2 = document.getElementById('ndac_mode1_channel8_one_actual2');
+const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
+const ndac_mode1_channel8_one_k = document.getElementById('ndac_mode1_channel8_one_k');
+const ndac_mode1_channel8_one_b = document.getElementById('ndac_mode1_channel8_one_b');
+const mode1_channel8_one = [ndac_mode1_channel8_one_actual1, ndac_mode1_channel8_one_actual2, ndac_mode1_channel8_one_test1, ndac_mode1_channel8_one_test2];
+mode1_channel8_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel8_one, ndac_mode1_channel8_one_actual1, ndac_mode1_channel8_one_actual2, ndac_mode1_channel8_one_test1, ndac_mode1_channel8_one_test2);
+        ndac_mode1_channel8_one_k.value = result.kValue;
+        ndac_mode1_channel8_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel8_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel8Error();
+        }
+    });
+});
+// 通道8-定标2段
+const ndac_mode1_channel8_two_actual1 = document.getElementById('ndac_mode1_channel8_two_actual1');
+const ndac_mode1_channel8_two_test1 = document.getElementById('ndac_mode1_channel8_two_test1');
+const ndac_mode1_channel8_two_actual2 = document.getElementById('ndac_mode1_channel8_two_actual2');
+const ndac_mode1_channel8_two_test2 = document.getElementById('ndac_mode1_channel8_two_test2');
+const ndac_mode1_channel8_two_k = document.getElementById('ndac_mode1_channel8_two_k');
+const ndac_mode1_channel8_two_b = document.getElementById('ndac_mode1_channel8_two_b');
+const mode1_channel8_two = [ndac_mode1_channel8_two_actual1, ndac_mode1_channel8_two_actual2, ndac_mode1_channel8_two_test1, ndac_mode1_channel8_two_test2];
+mode1_channel8_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel8_two, ndac_mode1_channel8_two_actual1, ndac_mode1_channel8_two_actual2, ndac_mode1_channel8_two_test1, ndac_mode1_channel8_two_test2);
+        ndac_mode1_channel8_two_k.value = result.kValue;
+        ndac_mode1_channel8_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel8_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel8Error();
+        }
+    });
+});
+// 通道8-定标3段
+const ndac_mode1_channel8_three_actual1 = document.getElementById('ndac_mode1_channel8_three_actual1');
+const ndac_mode1_channel8_three_test1 = document.getElementById('ndac_mode1_channel8_three_test1');
+const ndac_mode1_channel8_three_actual2 = document.getElementById('ndac_mode1_channel8_three_actual2');
+const ndac_mode1_channel8_three_test2 = document.getElementById('ndac_mode1_channel8_three_test2');
+const ndac_mode1_channel8_three_k = document.getElementById('ndac_mode1_channel8_three_k');
+const ndac_mode1_channel8_three_b = document.getElementById('ndac_mode1_channel8_three_b');
+const mode1_channel8_three = [ndac_mode1_channel8_three_actual1, ndac_mode1_channel8_three_actual2, ndac_mode1_channel8_three_test1, ndac_mode1_channel8_three_test2];
+mode1_channel8_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel8_three, ndac_mode1_channel8_three_actual1, ndac_mode1_channel8_three_actual2, ndac_mode1_channel8_three_test1, ndac_mode1_channel8_three_test2);
+        ndac_mode1_channel8_three_k.value = result.kValue;
+        ndac_mode1_channel8_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel8_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel8Error();
+        }
+    });
+});
+// 通道8-定标4段
+const ndac_mode1_channel8_four_actual1 = document.getElementById('ndac_mode1_channel8_four_actual1');
+const ndac_mode1_channel8_four_test1 = document.getElementById('ndac_mode1_channel8_four_test1');
+const ndac_mode1_channel8_four_actual2 = document.getElementById('ndac_mode1_channel8_four_actual2');
+const ndac_mode1_channel8_four_test2 = document.getElementById('ndac_mode1_channel8_four_test2');
+const ndac_mode1_channel8_four_k = document.getElementById('ndac_mode1_channel8_four_k');
+const ndac_mode1_channel8_four_b = document.getElementById('ndac_mode1_channel8_four_b');
+const mode1_channel8_four = [ndac_mode1_channel8_four_actual1, ndac_mode1_channel8_four_actual2, ndac_mode1_channel8_four_test1, ndac_mode1_channel8_four_test2];
+mode1_channel8_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel8_four, ndac_mode1_channel8_four_actual1, ndac_mode1_channel8_four_actual2, ndac_mode1_channel8_four_test1, ndac_mode1_channel8_four_test2);
+        ndac_mode1_channel8_four_k.value = result.kValue;
+        ndac_mode1_channel8_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel8_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel8Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel8Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel8_one, ndac_mode1_channel8_one_actual1, ndac_mode1_channel8_one_actual2, ndac_mode1_channel8_one_test1, ndac_mode1_channel8_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel8_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel8_two, ndac_mode1_channel8_two_actual1, ndac_mode1_channel8_two_actual2, ndac_mode1_channel8_two_test1, ndac_mode1_channel8_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel8_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel8_three, ndac_mode1_channel8_three_actual1, ndac_mode1_channel8_three_actual2, ndac_mode1_channel8_three_test1, ndac_mode1_channel8_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel8_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel8_four, ndac_mode1_channel8_four_actual1, ndac_mode1_channel8_four_actual2, ndac_mode1_channel8_four_test1, ndac_mode1_channel8_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel8_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel8_error.textContent = "";
+}
+/**
+*****************************
+* 通道9
+*****************************
+*/
+const ndac_mode1_channel9_error = document.getElementById('ndac_mode1_channel9_error');
+// 通道7-定标1段
+const ndac_mode1_channel9_one_actual1 = document.getElementById('ndac_mode1_channel9_one_actual1');
+const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
+const ndac_mode1_channel9_one_actual2 = document.getElementById('ndac_mode1_channel9_one_actual2');
+const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
+const ndac_mode1_channel9_one_k = document.getElementById('ndac_mode1_channel9_one_k');
+const ndac_mode1_channel9_one_b = document.getElementById('ndac_mode1_channel9_one_b');
+const mode1_channel9_one = [ndac_mode1_channel9_one_actual1, ndac_mode1_channel9_one_actual2, ndac_mode1_channel9_one_test1, ndac_mode1_channel9_one_test2];
+mode1_channel9_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel9_one, ndac_mode1_channel9_one_actual1, ndac_mode1_channel9_one_actual2, ndac_mode1_channel9_one_test1, ndac_mode1_channel9_one_test2);
+        ndac_mode1_channel9_one_k.value = result.kValue;
+        ndac_mode1_channel9_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel9_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel9Error();
+        }
+    });
+});
+// 通道9-定标2段
+const ndac_mode1_channel9_two_actual1 = document.getElementById('ndac_mode1_channel9_two_actual1');
+const ndac_mode1_channel9_two_test1 = document.getElementById('ndac_mode1_channel9_two_test1');
+const ndac_mode1_channel9_two_actual2 = document.getElementById('ndac_mode1_channel9_two_actual2');
+const ndac_mode1_channel9_two_test2 = document.getElementById('ndac_mode1_channel9_two_test2');
+const ndac_mode1_channel9_two_k = document.getElementById('ndac_mode1_channel9_two_k');
+const ndac_mode1_channel9_two_b = document.getElementById('ndac_mode1_channel9_two_b');
+const mode1_channel9_two = [ndac_mode1_channel9_two_actual1, ndac_mode1_channel9_two_actual2, ndac_mode1_channel9_two_test1, ndac_mode1_channel9_two_test2];
+mode1_channel9_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel9_two, ndac_mode1_channel9_two_actual1, ndac_mode1_channel9_two_actual2, ndac_mode1_channel9_two_test1, ndac_mode1_channel9_two_test2);
+        ndac_mode1_channel9_two_k.value = result.kValue;
+        ndac_mode1_channel9_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel9_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel9Error();
+        }
+    });
+});
+// 通道9-定标3段
+const ndac_mode1_channel9_three_actual1 = document.getElementById('ndac_mode1_channel9_three_actual1');
+const ndac_mode1_channel9_three_test1 = document.getElementById('ndac_mode1_channel9_three_test1');
+const ndac_mode1_channel9_three_actual2 = document.getElementById('ndac_mode1_channel9_three_actual2');
+const ndac_mode1_channel9_three_test2 = document.getElementById('ndac_mode1_channel9_three_test2');
+const ndac_mode1_channel9_three_k = document.getElementById('ndac_mode1_channel9_three_k');
+const ndac_mode1_channel9_three_b = document.getElementById('ndac_mode1_channel9_three_b');
+const mode1_channel9_three = [ndac_mode1_channel9_three_actual1, ndac_mode1_channel9_three_actual2, ndac_mode1_channel9_three_test1, ndac_mode1_channel9_three_test2];
+mode1_channel9_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel9_three, ndac_mode1_channel9_three_actual1, ndac_mode1_channel9_three_actual2, ndac_mode1_channel9_three_test1, ndac_mode1_channel9_three_test2);
+        ndac_mode1_channel9_three_k.value = result.kValue;
+        ndac_mode1_channel9_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel9_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel9Error();
+        }
+    });
+});
+// 通道9-定标4段
+const ndac_mode1_channel9_four_actual1 = document.getElementById('ndac_mode1_channel9_four_actual1');
+const ndac_mode1_channel9_four_test1 = document.getElementById('ndac_mode1_channel9_four_test1');
+const ndac_mode1_channel9_four_actual2 = document.getElementById('ndac_mode1_channel9_four_actual2');
+const ndac_mode1_channel9_four_test2 = document.getElementById('ndac_mode1_channel9_four_test2');
+const ndac_mode1_channel9_four_k = document.getElementById('ndac_mode1_channel9_four_k');
+const ndac_mode1_channel9_four_b = document.getElementById('ndac_mode1_channel9_four_b');
+const mode1_channel9_four = [ndac_mode1_channel9_four_actual1, ndac_mode1_channel9_four_actual2, ndac_mode1_channel9_four_test1, ndac_mode1_channel9_four_test2];
+mode1_channel9_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel9_four, ndac_mode1_channel9_four_actual1, ndac_mode1_channel9_four_actual2, ndac_mode1_channel9_four_test1, ndac_mode1_channel9_four_test2);
+        ndac_mode1_channel9_four_k.value = result.kValue;
+        ndac_mode1_channel9_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel9_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel9Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel9Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel9_one, ndac_mode1_channel9_one_actual1, ndac_mode1_channel9_one_actual2, ndac_mode1_channel9_one_test1, ndac_mode1_channel9_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel9_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel9_two, ndac_mode1_channel9_two_actual1, ndac_mode1_channel9_two_actual2, ndac_mode1_channel9_two_test1, ndac_mode1_channel9_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel9_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel9_three, ndac_mode1_channel9_three_actual1, ndac_mode1_channel9_three_actual2, ndac_mode1_channel9_three_test1, ndac_mode1_channel9_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel9_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel9_four, ndac_mode1_channel9_four_actual1, ndac_mode1_channel9_four_actual2, ndac_mode1_channel9_four_test1, ndac_mode1_channel9_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel9_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel9_error.textContent = "";
+}
+/**
+*****************************
+* 通道10
+*****************************
+*/
+const ndac_mode1_channel10_error = document.getElementById('ndac_mode1_channel10_error');
+// 通道10-定标1段
+const ndac_mode1_channel10_one_actual1 = document.getElementById('ndac_mode1_channel10_one_actual1');
+const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
+const ndac_mode1_channel10_one_actual2 = document.getElementById('ndac_mode1_channel10_one_actual2');
+const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
+const ndac_mode1_channel10_one_k = document.getElementById('ndac_mode1_channel10_one_k');
+const ndac_mode1_channel10_one_b = document.getElementById('ndac_mode1_channel10_one_b');
+const mode1_channel10_one = [ndac_mode1_channel10_one_actual1, ndac_mode1_channel10_one_actual2, ndac_mode1_channel10_one_test1, ndac_mode1_channel10_one_test2];
+mode1_channel10_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel10_one, ndac_mode1_channel10_one_actual1, ndac_mode1_channel10_one_actual2, ndac_mode1_channel10_one_test1, ndac_mode1_channel10_one_test2);
+        ndac_mode1_channel10_one_k.value = result.kValue;
+        ndac_mode1_channel10_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel10_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel10Error();
+        }
+    });
+});
+// 通道10-定标2段
+const ndac_mode1_channel10_two_actual1 = document.getElementById('ndac_mode1_channel10_two_actual1');
+const ndac_mode1_channel10_two_test1 = document.getElementById('ndac_mode1_channel10_two_test1');
+const ndac_mode1_channel10_two_actual2 = document.getElementById('ndac_mode1_channel10_two_actual2');
+const ndac_mode1_channel10_two_test2 = document.getElementById('ndac_mode1_channel10_two_test2');
+const ndac_mode1_channel10_two_k = document.getElementById('ndac_mode1_channel10_two_k');
+const ndac_mode1_channel10_two_b = document.getElementById('ndac_mode1_channel10_two_b');
+const mode1_channel10_two = [ndac_mode1_channel10_two_actual1, ndac_mode1_channel10_two_actual2, ndac_mode1_channel10_two_test1, ndac_mode1_channel10_two_test2];
+mode1_channel10_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel10_two, ndac_mode1_channel10_two_actual1, ndac_mode1_channel10_two_actual2, ndac_mode1_channel10_two_test1, ndac_mode1_channel10_two_test2);
+        ndac_mode1_channel10_two_k.value = result.kValue;
+        ndac_mode1_channel10_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel10_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel10Error();
+        }
+    });
+});
+// 通道10-定标3段
+const ndac_mode1_channel10_three_actual1 = document.getElementById('ndac_mode1_channel10_three_actual1');
+const ndac_mode1_channel10_three_test1 = document.getElementById('ndac_mode1_channel10_three_test1');
+const ndac_mode1_channel10_three_actual2 = document.getElementById('ndac_mode1_channel10_three_actual2');
+const ndac_mode1_channel10_three_test2 = document.getElementById('ndac_mode1_channel10_three_test2');
+const ndac_mode1_channel10_three_k = document.getElementById('ndac_mode1_channel10_three_k');
+const ndac_mode1_channel10_three_b = document.getElementById('ndac_mode1_channel10_three_b');
+const mode1_channel10_three = [ndac_mode1_channel10_three_actual1, ndac_mode1_channel10_three_actual2, ndac_mode1_channel10_three_test1, ndac_mode1_channel10_three_test2];
+mode1_channel10_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel10_three, ndac_mode1_channel10_three_actual1, ndac_mode1_channel10_three_actual2, ndac_mode1_channel10_three_test1, ndac_mode1_channel10_three_test2);
+        ndac_mode1_channel10_three_k.value = result.kValue;
+        ndac_mode1_channel10_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel10_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel10Error();
+        }
+    });
+});
+// 通道10-定标4段
+const ndac_mode1_channel10_four_actual1 = document.getElementById('ndac_mode1_channel10_four_actual1');
+const ndac_mode1_channel10_four_test1 = document.getElementById('ndac_mode1_channel10_four_test1');
+const ndac_mode1_channel10_four_actual2 = document.getElementById('ndac_mode1_channel10_four_actual2');
+const ndac_mode1_channel10_four_test2 = document.getElementById('ndac_mode1_channel10_four_test2');
+const ndac_mode1_channel10_four_k = document.getElementById('ndac_mode1_channel10_four_k');
+const ndac_mode1_channel10_four_b = document.getElementById('ndac_mode1_channel10_four_b');
+const mode1_channel10_four = [ndac_mode1_channel10_four_actual1, ndac_mode1_channel10_four_actual2, ndac_mode1_channel10_four_test1, ndac_mode1_channel10_four_test2];
+mode1_channel10_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel10_four, ndac_mode1_channel10_four_actual1, ndac_mode1_channel10_four_actual2, ndac_mode1_channel10_four_test1, ndac_mode1_channel10_four_test2);
+        ndac_mode1_channel10_four_k.value = result.kValue;
+        ndac_mode1_channel10_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel10_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel10Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel10Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel10_one, ndac_mode1_channel10_one_actual1, ndac_mode1_channel10_one_actual2, ndac_mode1_channel10_one_test1, ndac_mode1_channel10_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel10_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel10_two, ndac_mode1_channel10_two_actual1, ndac_mode1_channel10_two_actual2, ndac_mode1_channel10_two_test1, ndac_mode1_channel10_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel10_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel10_three, ndac_mode1_channel10_three_actual1, ndac_mode1_channel10_three_actual2, ndac_mode1_channel10_three_test1, ndac_mode1_channel10_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel10_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel10_four, ndac_mode1_channel10_four_actual1, ndac_mode1_channel10_four_actual2, ndac_mode1_channel10_four_test1, ndac_mode1_channel10_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel10_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel10_error.textContent = "";
+}
+
+/**
+*****************************
+* 通道11
+*****************************
+*/
+const ndac_mode1_channel11_error = document.getElementById('ndac_mode1_channel11_error');
+// 通道11-定标1段
+const ndac_mode1_channel11_one_actual1 = document.getElementById('ndac_mode1_channel11_one_actual1');
+const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
+const ndac_mode1_channel11_one_actual2 = document.getElementById('ndac_mode1_channel11_one_actual2');
+const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
+const ndac_mode1_channel11_one_k = document.getElementById('ndac_mode1_channel11_one_k');
+const ndac_mode1_channel11_one_b = document.getElementById('ndac_mode1_channel11_one_b');
+const mode1_channel11_one = [ndac_mode1_channel11_one_actual1, ndac_mode1_channel11_one_actual2, ndac_mode1_channel11_one_test1, ndac_mode1_channel11_one_test2];
+mode1_channel11_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel11_one, ndac_mode1_channel11_one_actual1, ndac_mode1_channel11_one_actual2, ndac_mode1_channel11_one_test1, ndac_mode1_channel11_one_test2);
+        ndac_mode1_channel11_one_k.value = result.kValue;
+        ndac_mode1_channel11_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel11_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel11Error();
+        }
+    });
+});
+// 通道11-定标2段
+const ndac_mode1_channel11_two_actual1 = document.getElementById('ndac_mode1_channel11_two_actual1');
+const ndac_mode1_channel11_two_test1 = document.getElementById('ndac_mode1_channel11_two_test1');
+const ndac_mode1_channel11_two_actual2 = document.getElementById('ndac_mode1_channel11_two_actual2');
+const ndac_mode1_channel11_two_test2 = document.getElementById('ndac_mode1_channel11_two_test2');
+const ndac_mode1_channel11_two_k = document.getElementById('ndac_mode1_channel11_two_k');
+const ndac_mode1_channel11_two_b = document.getElementById('ndac_mode1_channel11_two_b');
+const mode1_channel11_two = [ndac_mode1_channel11_two_actual1, ndac_mode1_channel11_two_actual2, ndac_mode1_channel11_two_test1, ndac_mode1_channel11_two_test2];
+mode1_channel11_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel11_two, ndac_mode1_channel11_two_actual1, ndac_mode1_channel11_two_actual2, ndac_mode1_channel11_two_test1, ndac_mode1_channel11_two_test2);
+        ndac_mode1_channel11_two_k.value = result.kValue;
+        ndac_mode1_channel11_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel11_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel11Error();
+        }
+    });
+});
+// 通道11-定标3段
+const ndac_mode1_channel11_three_actual1 = document.getElementById('ndac_mode1_channel11_three_actual1');
+const ndac_mode1_channel11_three_test1 = document.getElementById('ndac_mode1_channel11_three_test1');
+const ndac_mode1_channel11_three_actual2 = document.getElementById('ndac_mode1_channel11_three_actual2');
+const ndac_mode1_channel11_three_test2 = document.getElementById('ndac_mode1_channel11_three_test2');
+const ndac_mode1_channel11_three_k = document.getElementById('ndac_mode1_channel11_three_k');
+const ndac_mode1_channel11_three_b = document.getElementById('ndac_mode1_channel11_three_b');
+const mode1_channel11_three = [ndac_mode1_channel11_three_actual1, ndac_mode1_channel11_three_actual2, ndac_mode1_channel11_three_test1, ndac_mode1_channel11_three_test2];
+mode1_channel11_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel11_three, ndac_mode1_channel11_three_actual1, ndac_mode1_channel11_three_actual2, ndac_mode1_channel11_three_test1, ndac_mode1_channel11_three_test2);
+        ndac_mode1_channel11_three_k.value = result.kValue;
+        ndac_mode1_channel11_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel11_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel11Error();
+        }
+    });
+});
+// 通道11-定标4段
+const ndac_mode1_channel11_four_actual1 = document.getElementById('ndac_mode1_channel11_four_actual1');
+const ndac_mode1_channel11_four_test1 = document.getElementById('ndac_mode1_channel11_four_test1');
+const ndac_mode1_channel11_four_actual2 = document.getElementById('ndac_mode1_channel11_four_actual2');
+const ndac_mode1_channel11_four_test2 = document.getElementById('ndac_mode1_channel11_four_test2');
+const ndac_mode1_channel11_four_k = document.getElementById('ndac_mode1_channel11_four_k');
+const ndac_mode1_channel11_four_b = document.getElementById('ndac_mode1_channel11_four_b');
+const mode1_channel11_four = [ndac_mode1_channel11_four_actual1, ndac_mode1_channel11_four_actual2, ndac_mode1_channel11_four_test1, ndac_mode1_channel11_four_test2];
+mode1_channel11_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel11_four, ndac_mode1_channel11_four_actual1, ndac_mode1_channel11_four_actual2, ndac_mode1_channel11_four_test1, ndac_mode1_channel11_four_test2);
+        ndac_mode1_channel11_four_k.value = result.kValue;
+        ndac_mode1_channel11_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel11_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel11Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel11Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel11_one, ndac_mode1_channel11_one_actual1, ndac_mode1_channel11_one_actual2, ndac_mode1_channel11_one_test1, ndac_mode1_channel11_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel11_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel11_two, ndac_mode1_channel11_two_actual1, ndac_mode1_channel11_two_actual2, ndac_mode1_channel11_two_test1, ndac_mode1_channel11_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel11_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel11_three, ndac_mode1_channel11_three_actual1, ndac_mode1_channel11_three_actual2, ndac_mode1_channel11_three_test1, ndac_mode1_channel11_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel11_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel11_four, ndac_mode1_channel11_four_actual1, ndac_mode1_channel11_four_actual2, ndac_mode1_channel11_four_test1, ndac_mode1_channel11_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel11_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel11_error.textContent = "";
+}
+/**
+*****************************
+* 通道12
+*****************************
+*/
+const ndac_mode1_channel12_error = document.getElementById('ndac_mode1_channel12_error');
+// 通道11-定标1段
+const ndac_mode1_channel12_one_actual1 = document.getElementById('ndac_mode1_channel12_one_actual1');
+const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1');
+const ndac_mode1_channel12_one_actual2 = document.getElementById('ndac_mode1_channel12_one_actual2');
+const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
+const ndac_mode1_channel12_one_k = document.getElementById('ndac_mode1_channel12_one_k');
+const ndac_mode1_channel12_one_b = document.getElementById('ndac_mode1_channel12_one_b');
+const mode1_channel12_one = [ndac_mode1_channel12_one_actual1, ndac_mode1_channel12_one_actual2, ndac_mode1_channel12_one_test1, ndac_mode1_channel12_one_test2];
+mode1_channel12_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel12_one, ndac_mode1_channel12_one_actual1, ndac_mode1_channel12_one_actual2, ndac_mode1_channel12_one_test1, ndac_mode1_channel12_one_test2);
+        ndac_mode1_channel12_one_k.value = result.kValue;
+        ndac_mode1_channel12_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel12_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel12Error();
+        }
+    });
+});
+// 通道12-定标2段
+const ndac_mode1_channel12_two_actual1 = document.getElementById('ndac_mode1_channel12_two_actual1');
+const ndac_mode1_channel12_two_test1 = document.getElementById('ndac_mode1_channel12_two_test1');
+const ndac_mode1_channel12_two_actual2 = document.getElementById('ndac_mode1_channel12_two_actual2');
+const ndac_mode1_channel12_two_test2 = document.getElementById('ndac_mode1_channel12_two_test2');
+const ndac_mode1_channel12_two_k = document.getElementById('ndac_mode1_channel12_two_k');
+const ndac_mode1_channel12_two_b = document.getElementById('ndac_mode1_channel12_two_b');
+const mode1_channel12_two = [ndac_mode1_channel12_two_actual1, ndac_mode1_channel12_two_actual2, ndac_mode1_channel12_two_test1, ndac_mode1_channel12_two_test2];
+mode1_channel12_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel12_two, ndac_mode1_channel12_two_actual1, ndac_mode1_channel12_two_actual2, ndac_mode1_channel12_two_test1, ndac_mode1_channel12_two_test2);
+        ndac_mode1_channel12_two_k.value = result.kValue;
+        ndac_mode1_channel12_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel12_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel12Error();
+        }
+    });
+});
+// 通道12-定标3段
+const ndac_mode1_channel12_three_actual1 = document.getElementById('ndac_mode1_channel12_three_actual1');
+const ndac_mode1_channel12_three_test1 = document.getElementById('ndac_mode1_channel12_three_test1');
+const ndac_mode1_channel12_three_actual2 = document.getElementById('ndac_mode1_channel12_three_actual2');
+const ndac_mode1_channel12_three_test2 = document.getElementById('ndac_mode1_channel12_three_test2');
+const ndac_mode1_channel12_three_k = document.getElementById('ndac_mode1_channel12_three_k');
+const ndac_mode1_channel12_three_b = document.getElementById('ndac_mode1_channel12_three_b');
+const mode1_channel12_three = [ndac_mode1_channel12_three_actual1, ndac_mode1_channel12_three_actual2, ndac_mode1_channel12_three_test1, ndac_mode1_channel12_three_test2];
+mode1_channel12_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel12_three, ndac_mode1_channel12_three_actual1, ndac_mode1_channel12_three_actual2, ndac_mode1_channel12_three_test1, ndac_mode1_channel12_three_test2);
+        ndac_mode1_channel12_three_k.value = result.kValue;
+        ndac_mode1_channel12_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel12_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel12Error();
+        }
+    });
+});
+// 通道12-定标4段
+const ndac_mode1_channel12_four_actual1 = document.getElementById('ndac_mode1_channel12_four_actual1');
+const ndac_mode1_channel12_four_test1 = document.getElementById('ndac_mode1_channel12_four_test1');
+const ndac_mode1_channel12_four_actual2 = document.getElementById('ndac_mode1_channel12_four_actual2');
+const ndac_mode1_channel12_four_test2 = document.getElementById('ndac_mode1_channel12_four_test2');
+const ndac_mode1_channel12_four_k = document.getElementById('ndac_mode1_channel12_four_k');
+const ndac_mode1_channel12_four_b = document.getElementById('ndac_mode1_channel12_four_b');
+const mode1_channel12_four = [ndac_mode1_channel12_four_actual1, ndac_mode1_channel12_four_actual2, ndac_mode1_channel12_four_test1, ndac_mode1_channel12_four_test2];
+mode1_channel12_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel12_four, ndac_mode1_channel12_four_actual1, ndac_mode1_channel12_four_actual2, ndac_mode1_channel12_four_test1, ndac_mode1_channel12_four_test2);
+        ndac_mode1_channel12_four_k.value = result.kValue;
+        ndac_mode1_channel12_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel12_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel12Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel12Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel12_one, ndac_mode1_channel12_one_actual1, ndac_mode1_channel12_one_actual2, ndac_mode1_channel12_one_test1, ndac_mode1_channel12_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel12_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel12_two, ndac_mode1_channel12_two_actual1, ndac_mode1_channel12_two_actual2, ndac_mode1_channel12_two_test1, ndac_mode1_channel12_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel12_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel12_three, ndac_mode1_channel12_three_actual1, ndac_mode1_channel12_three_actual2, ndac_mode1_channel12_three_test1, ndac_mode1_channel12_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel12_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel12_four, ndac_mode1_channel12_four_actual1, ndac_mode1_channel12_four_actual2, ndac_mode1_channel12_four_test1, ndac_mode1_channel12_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel12_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel12_error.textContent = "";
+}
+/**
+*****************************
+* 通道13
+*****************************
+*/
+const ndac_mode1_channel13_error = document.getElementById('ndac_mode1_channel13_error');
+// 通道13-定标1段
+const ndac_mode1_channel13_one_actual1 = document.getElementById('ndac_mode1_channel13_one_actual1');
+const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1');
+const ndac_mode1_channel13_one_actual2 = document.getElementById('ndac_mode1_channel13_one_actual2');
+const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
+const ndac_mode1_channel13_one_k = document.getElementById('ndac_mode1_channel13_one_k');
+const ndac_mode1_channel13_one_b = document.getElementById('ndac_mode1_channel13_one_b');
+const mode1_channel13_one = [ndac_mode1_channel13_one_actual1, ndac_mode1_channel13_one_actual2, ndac_mode1_channel13_one_test1, ndac_mode1_channel13_one_test2];
+mode1_channel13_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel13_one, ndac_mode1_channel13_one_actual1, ndac_mode1_channel13_one_actual2, ndac_mode1_channel13_one_test1, ndac_mode1_channel13_one_test2);
+        ndac_mode1_channel13_one_k.value = result.kValue;
+        ndac_mode1_channel13_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel13_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel13Error();
+        }
+    });
+});
+// 通道13-定标2段
+const ndac_mode1_channel13_two_actual1 = document.getElementById('ndac_mode1_channel13_two_actual1');
+const ndac_mode1_channel13_two_test1 = document.getElementById('ndac_mode1_channel13_two_test1');
+const ndac_mode1_channel13_two_actual2 = document.getElementById('ndac_mode1_channel13_two_actual2');
+const ndac_mode1_channel13_two_test2 = document.getElementById('ndac_mode1_channel13_two_test2');
+const ndac_mode1_channel13_two_k = document.getElementById('ndac_mode1_channel13_two_k');
+const ndac_mode1_channel13_two_b = document.getElementById('ndac_mode1_channel13_two_b');
+const mode1_channel13_two = [ndac_mode1_channel13_two_actual1, ndac_mode1_channel13_two_actual2, ndac_mode1_channel13_two_test1, ndac_mode1_channel13_two_test2];
+mode1_channel13_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel13_two, ndac_mode1_channel13_two_actual1, ndac_mode1_channel13_two_actual2, ndac_mode1_channel13_two_test1, ndac_mode1_channel13_two_test2);
+        ndac_mode1_channel13_two_k.value = result.kValue;
+        ndac_mode1_channel13_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel13_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel13Error();
+        }
+    });
+});
+// 通道13-定标3段
+const ndac_mode1_channel13_three_actual1 = document.getElementById('ndac_mode1_channel13_three_actual1');
+const ndac_mode1_channel13_three_test1 = document.getElementById('ndac_mode1_channel13_three_test1');
+const ndac_mode1_channel13_three_actual2 = document.getElementById('ndac_mode1_channel13_three_actual2');
+const ndac_mode1_channel13_three_test2 = document.getElementById('ndac_mode1_channel13_three_test2');
+const ndac_mode1_channel13_three_k = document.getElementById('ndac_mode1_channel13_three_k');
+const ndac_mode1_channel13_three_b = document.getElementById('ndac_mode1_channel13_three_b');
+const mode1_channel13_three = [ndac_mode1_channel13_three_actual1, ndac_mode1_channel13_three_actual2, ndac_mode1_channel13_three_test1, ndac_mode1_channel13_three_test2];
+mode1_channel13_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel13_three, ndac_mode1_channel13_three_actual1, ndac_mode1_channel13_three_actual2, ndac_mode1_channel13_three_test1, ndac_mode1_channel13_three_test2);
+        ndac_mode1_channel13_three_k.value = result.kValue;
+        ndac_mode1_channel13_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel13_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel13Error();
+        }
+    });
+});
+// 通道13-定标4段
+const ndac_mode1_channel13_four_actual1 = document.getElementById('ndac_mode1_channel13_four_actual1');
+const ndac_mode1_channel13_four_test1 = document.getElementById('ndac_mode1_channel13_four_test1');
+const ndac_mode1_channel13_four_actual2 = document.getElementById('ndac_mode1_channel13_four_actual2');
+const ndac_mode1_channel13_four_test2 = document.getElementById('ndac_mode1_channel13_four_test2');
+const ndac_mode1_channel13_four_k = document.getElementById('ndac_mode1_channel13_four_k');
+const ndac_mode1_channel13_four_b = document.getElementById('ndac_mode1_channel13_four_b');
+const mode1_channel13_four = [ndac_mode1_channel13_four_actual1, ndac_mode1_channel13_four_actual2, ndac_mode1_channel13_four_test1, ndac_mode1_channel13_four_test2];
+mode1_channel13_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel13_four, ndac_mode1_channel13_four_actual1, ndac_mode1_channel13_four_actual2, ndac_mode1_channel13_four_test1, ndac_mode1_channel13_four_test2);
+        ndac_mode1_channel13_four_k.value = result.kValue;
+        ndac_mode1_channel13_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel13_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel13Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel13Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel13_one, ndac_mode1_channel13_one_actual1, ndac_mode1_channel13_one_actual2, ndac_mode1_channel13_one_test1, ndac_mode1_channel13_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel13_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel13_two, ndac_mode1_channel13_two_actual1, ndac_mode1_channel13_two_actual2, ndac_mode1_channel13_two_test1, ndac_mode1_channel13_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel13_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel13_three, ndac_mode1_channel13_three_actual1, ndac_mode1_channel13_three_actual2, ndac_mode1_channel13_three_test1, ndac_mode1_channel13_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel13_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel13_four, ndac_mode1_channel13_four_actual1, ndac_mode1_channel13_four_actual2, ndac_mode1_channel13_four_test1, ndac_mode1_channel13_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel13_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel13_error.textContent = "";
+}
+/**
+*****************************
+* 通道14
+*****************************
+*/
+const ndac_mode1_channel14_error = document.getElementById('ndac_mode1_channel14_error');
+// 通道13-定标1段
+const ndac_mode1_channel14_one_actual1 = document.getElementById('ndac_mode1_channel14_one_actual1');
+const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1');
+const ndac_mode1_channel14_one_actual2 = document.getElementById('ndac_mode1_channel14_one_actual2');
+const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
+const ndac_mode1_channel14_one_k = document.getElementById('ndac_mode1_channel14_one_k');
+const ndac_mode1_channel14_one_b = document.getElementById('ndac_mode1_channel14_one_b');
+const mode1_channel14_one = [ndac_mode1_channel14_one_actual1, ndac_mode1_channel14_one_actual2, ndac_mode1_channel14_one_test1, ndac_mode1_channel14_one_test2];
+mode1_channel14_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel14_one, ndac_mode1_channel14_one_actual1, ndac_mode1_channel14_one_actual2, ndac_mode1_channel14_one_test1, ndac_mode1_channel14_one_test2);
+        ndac_mode1_channel14_one_k.value = result.kValue;
+        ndac_mode1_channel14_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel14_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel14Error();
+        }
+    });
+});
+// 通道14-定标2段
+const ndac_mode1_channel14_two_actual1 = document.getElementById('ndac_mode1_channel14_two_actual1');
+const ndac_mode1_channel14_two_test1 = document.getElementById('ndac_mode1_channel14_two_test1');
+const ndac_mode1_channel14_two_actual2 = document.getElementById('ndac_mode1_channel14_two_actual2');
+const ndac_mode1_channel14_two_test2 = document.getElementById('ndac_mode1_channel14_two_test2');
+const ndac_mode1_channel14_two_k = document.getElementById('ndac_mode1_channel14_two_k');
+const ndac_mode1_channel14_two_b = document.getElementById('ndac_mode1_channel14_two_b');
+const mode1_channel14_two = [ndac_mode1_channel14_two_actual1, ndac_mode1_channel14_two_actual2, ndac_mode1_channel14_two_test1, ndac_mode1_channel14_two_test2];
+mode1_channel14_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel14_two, ndac_mode1_channel14_two_actual1, ndac_mode1_channel14_two_actual2, ndac_mode1_channel14_two_test1, ndac_mode1_channel14_two_test2);
+        ndac_mode1_channel14_two_k.value = result.kValue;
+        ndac_mode1_channel14_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel14_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel14Error();
+        }
+    });
+});
+// 通道14-定标3段
+const ndac_mode1_channel14_three_actual1 = document.getElementById('ndac_mode1_channel14_three_actual1');
+const ndac_mode1_channel14_three_test1 = document.getElementById('ndac_mode1_channel14_three_test1');
+const ndac_mode1_channel14_three_actual2 = document.getElementById('ndac_mode1_channel14_three_actual2');
+const ndac_mode1_channel14_three_test2 = document.getElementById('ndac_mode1_channel14_three_test2');
+const ndac_mode1_channel14_three_k = document.getElementById('ndac_mode1_channel14_three_k');
+const ndac_mode1_channel14_three_b = document.getElementById('ndac_mode1_channel14_three_b');
+const mode1_channel14_three = [ndac_mode1_channel14_three_actual1, ndac_mode1_channel14_three_actual2, ndac_mode1_channel14_three_test1, ndac_mode1_channel14_three_test2];
+mode1_channel14_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel14_three, ndac_mode1_channel14_three_actual1, ndac_mode1_channel14_three_actual2, ndac_mode1_channel14_three_test1, ndac_mode1_channel14_three_test2);
+        ndac_mode1_channel14_three_k.value = result.kValue;
+        ndac_mode1_channel14_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel14_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel14Error();
+        }
+    });
+});
+// 通道14-定标4段
+const ndac_mode1_channel14_four_actual1 = document.getElementById('ndac_mode1_channel14_four_actual1');
+const ndac_mode1_channel14_four_test1 = document.getElementById('ndac_mode1_channel14_four_test1');
+const ndac_mode1_channel14_four_actual2 = document.getElementById('ndac_mode1_channel14_four_actual2');
+const ndac_mode1_channel14_four_test2 = document.getElementById('ndac_mode1_channel14_four_test2');
+const ndac_mode1_channel14_four_k = document.getElementById('ndac_mode1_channel14_four_k');
+const ndac_mode1_channel14_four_b = document.getElementById('ndac_mode1_channel14_four_b');
+const mode1_channel14_four = [ndac_mode1_channel14_four_actual1, ndac_mode1_channel14_four_actual2, ndac_mode1_channel14_four_test1, ndac_mode1_channel14_four_test2];
+mode1_channel14_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel14_four, ndac_mode1_channel14_four_actual1, ndac_mode1_channel14_four_actual2, ndac_mode1_channel14_four_test1, ndac_mode1_channel14_four_test2);
+        ndac_mode1_channel14_four_k.value = result.kValue;
+        ndac_mode1_channel14_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel14_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel14Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel14Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel14_one, ndac_mode1_channel14_one_actual1, ndac_mode1_channel14_one_actual2, ndac_mode1_channel14_one_test1, ndac_mode1_channel14_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel14_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel14_two, ndac_mode1_channel14_two_actual1, ndac_mode1_channel14_two_actual2, ndac_mode1_channel14_two_test1, ndac_mode1_channel14_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel14_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel14_three, ndac_mode1_channel14_three_actual1, ndac_mode1_channel14_three_actual2, ndac_mode1_channel14_three_test1, ndac_mode1_channel14_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel14_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel14_four, ndac_mode1_channel14_four_actual1, ndac_mode1_channel14_four_actual2, ndac_mode1_channel14_four_test1, ndac_mode1_channel14_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel14_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel14_error.textContent = "";
+}
+
+/**
+*****************************
+* 通道15
+*****************************
+*/
+const ndac_mode1_channel15_error = document.getElementById('ndac_mode1_channel15_error');
+// 通道13-定标1段
+const ndac_mode1_channel15_one_actual1 = document.getElementById('ndac_mode1_channel15_one_actual1');
+const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1');
+const ndac_mode1_channel15_one_actual2 = document.getElementById('ndac_mode1_channel15_one_actual2');
+const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
+const ndac_mode1_channel15_one_k = document.getElementById('ndac_mode1_channel15_one_k');
+const ndac_mode1_channel15_one_b = document.getElementById('ndac_mode1_channel15_one_b');
+const mode1_channel15_one = [ndac_mode1_channel15_one_actual1, ndac_mode1_channel15_one_actual2, ndac_mode1_channel15_one_test1, ndac_mode1_channel15_one_test2];
+mode1_channel15_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel15_one, ndac_mode1_channel15_one_actual1, ndac_mode1_channel15_one_actual2, ndac_mode1_channel15_one_test1, ndac_mode1_channel15_one_test2);
+        ndac_mode1_channel15_one_k.value = result.kValue;
+        ndac_mode1_channel15_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel15_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel15Error();
+        }
+    });
+});
+// 通道15-定标2段
+const ndac_mode1_channel15_two_actual1 = document.getElementById('ndac_mode1_channel15_two_actual1');
+const ndac_mode1_channel15_two_test1 = document.getElementById('ndac_mode1_channel15_two_test1');
+const ndac_mode1_channel15_two_actual2 = document.getElementById('ndac_mode1_channel15_two_actual2');
+const ndac_mode1_channel15_two_test2 = document.getElementById('ndac_mode1_channel15_two_test2');
+const ndac_mode1_channel15_two_k = document.getElementById('ndac_mode1_channel15_two_k');
+const ndac_mode1_channel15_two_b = document.getElementById('ndac_mode1_channel15_two_b');
+const mode1_channel15_two = [ndac_mode1_channel15_two_actual1, ndac_mode1_channel15_two_actual2, ndac_mode1_channel15_two_test1, ndac_mode1_channel15_two_test2];
+mode1_channel15_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel15_two, ndac_mode1_channel15_two_actual1, ndac_mode1_channel15_two_actual2, ndac_mode1_channel15_two_test1, ndac_mode1_channel15_two_test2);
+        ndac_mode1_channel15_two_k.value = result.kValue;
+        ndac_mode1_channel15_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel15_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel15Error();
+        }
+    });
+});
+// 通道15-定标3段
+const ndac_mode1_channel15_three_actual1 = document.getElementById('ndac_mode1_channel15_three_actual1');
+const ndac_mode1_channel15_three_test1 = document.getElementById('ndac_mode1_channel15_three_test1');
+const ndac_mode1_channel15_three_actual2 = document.getElementById('ndac_mode1_channel15_three_actual2');
+const ndac_mode1_channel15_three_test2 = document.getElementById('ndac_mode1_channel15_three_test2');
+const ndac_mode1_channel15_three_k = document.getElementById('ndac_mode1_channel15_three_k');
+const ndac_mode1_channel15_three_b = document.getElementById('ndac_mode1_channel15_three_b');
+const mode1_channel15_three = [ndac_mode1_channel15_three_actual1, ndac_mode1_channel15_three_actual2, ndac_mode1_channel15_three_test1, ndac_mode1_channel15_three_test2];
+mode1_channel15_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel15_three, ndac_mode1_channel15_three_actual1, ndac_mode1_channel15_three_actual2, ndac_mode1_channel15_three_test1, ndac_mode1_channel15_three_test2);
+        ndac_mode1_channel15_three_k.value = result.kValue;
+        ndac_mode1_channel15_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel15_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel15Error();
+        }
+    });
+});
+// 通道15-定标4段
+const ndac_mode1_channel15_four_actual1 = document.getElementById('ndac_mode1_channel15_four_actual1');
+const ndac_mode1_channel15_four_test1 = document.getElementById('ndac_mode1_channel15_four_test1');
+const ndac_mode1_channel15_four_actual2 = document.getElementById('ndac_mode1_channel15_four_actual2');
+const ndac_mode1_channel15_four_test2 = document.getElementById('ndac_mode1_channel15_four_test2');
+const ndac_mode1_channel15_four_k = document.getElementById('ndac_mode1_channel15_four_k');
+const ndac_mode1_channel15_four_b = document.getElementById('ndac_mode1_channel15_four_b');
+const mode1_channel15_four = [ndac_mode1_channel15_four_actual1, ndac_mode1_channel15_four_actual2, ndac_mode1_channel15_four_test1, ndac_mode1_channel15_four_test2];
+mode1_channel15_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel15_four, ndac_mode1_channel15_four_actual1, ndac_mode1_channel15_four_actual2, ndac_mode1_channel15_four_test1, ndac_mode1_channel15_four_test2);
+        ndac_mode1_channel15_four_k.value = result.kValue;
+        ndac_mode1_channel15_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel15_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel15Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel15Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel15_one, ndac_mode1_channel15_one_actual1, ndac_mode1_channel15_one_actual2, ndac_mode1_channel15_one_test1, ndac_mode1_channel15_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel15_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 = calculateKandB(mode1_channel15_two, ndac_mode1_channel15_two_actual1, ndac_mode1_channel15_two_actual2, ndac_mode1_channel15_two_test1, ndac_mode1_channel15_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel15_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel15_three, ndac_mode1_channel15_three_actual1, ndac_mode1_channel15_three_actual2, ndac_mode1_channel15_three_test1, ndac_mode1_channel15_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel15_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel15_four, ndac_mode1_channel15_four_actual1, ndac_mode1_channel15_four_actual2, ndac_mode1_channel15_four_test1, ndac_mode1_channel15_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel15_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel15_error.textContent = "";
+}
+/**
+*****************************
+* 通道16
+*****************************
+*/
+const ndac_mode1_channel16_error = document.getElementById('ndac_mode1_channel16_error');
+// 通道13-定标1段
+const ndac_mode1_channel16_one_actual1 = document.getElementById('ndac_mode1_channel16_one_actual1');
+const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1');
+const ndac_mode1_channel16_one_actual2 = document.getElementById('ndac_mode1_channel16_one_actual2');
+const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
+const ndac_mode1_channel16_one_k = document.getElementById('ndac_mode1_channel16_one_k');
+const ndac_mode1_channel16_one_b = document.getElementById('ndac_mode1_channel16_one_b');
+const mode1_channel16_one = [ndac_mode1_channel16_one_actual1, ndac_mode1_channel16_one_actual2, ndac_mode1_channel16_one_test1, ndac_mode1_channel16_one_test2];
+mode1_channel16_one.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel16_one, ndac_mode1_channel16_one_actual1, ndac_mode1_channel16_one_actual2, ndac_mode1_channel16_one_test1, ndac_mode1_channel16_one_test2);
+        ndac_mode1_channel16_one_k.value = result.kValue;
+        ndac_mode1_channel16_one_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel16_error.textContent = "[定标1段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel16Error();
+        }
+    });
+});
+// 通道16-定标2段
+const ndac_mode1_channel16_two_actual1 = document.getElementById('ndac_mode1_channel16_two_actual1');
+const ndac_mode1_channel16_two_test1 = document.getElementById('ndac_mode1_channel16_two_test1');
+const ndac_mode1_channel16_two_actual2 = document.getElementById('ndac_mode1_channel16_two_actual2');
+const ndac_mode1_channel16_two_test2 = document.getElementById('ndac_mode1_channel16_two_test2');
+const ndac_mode1_channel16_two_k = document.getElementById('ndac_mode1_channel16_two_k');
+const ndac_mode1_channel16_two_b = document.getElementById('ndac_mode1_channel16_two_b');
+const mode1_channel16_two = [ndac_mode1_channel16_two_actual1, ndac_mode1_channel16_two_actual2, ndac_mode1_channel16_two_test1, ndac_mode1_channel16_two_test2];
+mode1_channel16_two.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel16_two, ndac_mode1_channel16_two_actual1, ndac_mode1_channel16_two_actual2, ndac_mode1_channel16_two_test1, ndac_mode1_channel16_two_test2);
+        ndac_mode1_channel16_two_k.value = result.kValue;
+        ndac_mode1_channel16_two_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel16_error.textContent = "[定标2段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel16Error();
+        }
+    });
+});
+// 通道16-定标3段
+const ndac_mode1_channel16_three_actual1 = document.getElementById('ndac_mode1_channel16_three_actual1');
+const ndac_mode1_channel16_three_test1 = document.getElementById('ndac_mode1_channel16_three_test1');
+const ndac_mode1_channel16_three_actual2 = document.getElementById('ndac_mode1_channel16_three_actual2');
+const ndac_mode1_channel16_three_test2 = document.getElementById('ndac_mode1_channel16_three_test2');
+const ndac_mode1_channel16_three_k = document.getElementById('ndac_mode1_channel16_three_k');
+const ndac_mode1_channel16_three_b = document.getElementById('ndac_mode1_channel16_three_b');
+const mode1_channel16_three = [ndac_mode1_channel16_three_actual1, ndac_mode1_channel16_three_actual2, ndac_mode1_channel16_three_test1, ndac_mode1_channel16_three_test2];
+mode1_channel16_three.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel16_three, ndac_mode1_channel16_three_actual1, ndac_mode1_channel16_three_actual2, ndac_mode1_channel16_three_test1, ndac_mode1_channel16_three_test2);
+        ndac_mode1_channel16_three_k.value = result.kValue;
+        ndac_mode1_channel16_three_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel16_error.textContent = "[定标3段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel16Error();
+        }
+    });
+});
+// 通道16-定标4段
+const ndac_mode1_channel16_four_actual1 = document.getElementById('ndac_mode1_channel16_four_actual1');
+const ndac_mode1_channel16_four_test1 = document.getElementById('ndac_mode1_channel16_four_test1');
+const ndac_mode1_channel16_four_actual2 = document.getElementById('ndac_mode1_channel16_four_actual2');
+const ndac_mode1_channel16_four_test2 = document.getElementById('ndac_mode1_channel16_four_test2');
+const ndac_mode1_channel16_four_k = document.getElementById('ndac_mode1_channel16_four_k');
+const ndac_mode1_channel16_four_b = document.getElementById('ndac_mode1_channel16_four_b');
+const mode1_channel16_four = [ndac_mode1_channel16_four_actual1, ndac_mode1_channel16_four_actual2, ndac_mode1_channel16_four_test1, ndac_mode1_channel16_four_test2];
+mode1_channel16_four.forEach(input => {
+    input.addEventListener('input', function () {
+        const result = calculateKandB(mode1_channel16_four, ndac_mode1_channel16_four_actual1, ndac_mode1_channel16_four_actual2, ndac_mode1_channel16_four_test1, ndac_mode1_channel16_four_test2);
+        ndac_mode1_channel16_four_k.value = result.kValue;
+        ndac_mode1_channel16_four_b.value = result.bValue;
+        // 添加错误来源标识
+        if (result.errorMessage) {
+            ndac_mode1_channel16_error.textContent = "[定标4段] " + result.errorMessage;
+        } else {
+            // 如果没有错误，检查其他段是否有错误
+            updateChannel16Error();
+        }
+    });
+});
+// 更新错误显示的函数 -
+function updateChannel16Error() {
+    // 按顺序检查定标段的错误状态
+    const result1 = calculateKandB(mode1_channel16_one, ndac_mode1_channel16_one_actual1, ndac_mode1_channel16_one_actual2, ndac_mode1_channel16_one_test1, ndac_mode1_channel16_one_test2);
+    if (result1.errorMessage) {
+        ndac_mode1_channel16_error.textContent = "[定标1段] " + result1.errorMessage;
+        return;
+    }
+    const result2 =calculateKandB(mode1_channel16_two, ndac_mode1_channel16_two_actual1, ndac_mode1_channel16_two_actual2, ndac_mode1_channel16_two_test1, ndac_mode1_channel16_two_test2);
+    if (result2.errorMessage) {
+        ndac_mode1_channel16_error.textContent = "[定标2段] " + result2.errorMessage;
+        return;
+    }
+    const result3 = calculateKandB(mode1_channel16_three, ndac_mode1_channel16_three_actual1, ndac_mode1_channel16_three_actual2, ndac_mode1_channel16_three_test1, ndac_mode1_channel16_three_test2);
+    if (result3.errorMessage) {
+        ndac_mode1_channel16_error.textContent = "[定标3段] " + result3.errorMessage;
+        return;
+    }
+    const result4 = calculateKandB(mode1_channel16_four, ndac_mode1_channel16_four_actual1, ndac_mode1_channel16_four_actual2, ndac_mode1_channel16_four_test1, ndac_mode1_channel16_four_test2);
+    if (result4.errorMessage) {
+        ndac_mode1_channel16_error.textContent = "[定标4段] " + result4.errorMessage;
+        return;
+    }
+    ndac_mode1_channel16_error.textContent = "";
+}
+//计算KB值的方法
 function calculateKandB(inputs, actual1, actual2, test1, test2) {
     //错误信息
     var errorMessage = "";
@@ -1629,481 +7368,139 @@ function calculateKandB(inputs, actual1, actual2, test1, test2) {
     return { kValue, bValue, errorMessage }
 }
 
+/**
+* 模块名:
+* 代码描述:批量发送kb值
+* 作者:Crow
+* 创建时间:2025/03/11 09:48:24
+*/
+var shendKBvalue = [];
+const nadc_mode1_batch_send = document.getElementById('nadc_mode1_batch_send');
+nadc_mode1_batch_send.addEventListener('click', () => {
+    shendKBvalue = [];//初始化
+    let isTestValue1Selected = false;
+    const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
+    // 检查是否有通道被选中
+    channelCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            isTestValue1Selected = true;
+        }
+    });
+    if (!isTestValue1Selected) {
+        const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
+        const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '请至少选择一个通道\n下发KB值';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //查询是否都选中
+    const nadc_mode1_demarc1_value = document.getElementById('nadc_mode1_demarc1_value');//分界点1
+    const nadc_mode1_demarc2_value = document.getElementById('nadc_mode1_demarc2_value');//分界点2
+    const nadc_mode1_demarc3_value = document.getElementById('nadc_mode1_demarc3_value');//分界点3
+    const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');//通道1;
+    const ndac_mode1_channel1_one_actual1 = document.getElementById('ndac_mode1_channel1_one_actual1');//1段实际值1
+    const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1');//1段测试值1
+    const ndac_mode1_channel1_one_actual2 = document.getElementById('ndac_mode1_channel1_one_actual2');//1段实际值2
+    const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2');//1段测试值2
+    const ndac_mode1_channel1_one_k = document.getElementById('ndac_mode1_channel1_one_k');//1段k值
+    const ndac_mode1_channel1_one_b = document.getElementById('ndac_mode1_channel1_one_b');//1段b值
+    const ndac_mode1_channel1_two_actual1 = document.getElementById('ndac_mode1_channel1_two_actual1');//2段实际值1
+    const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');//2段测试值1
+    const ndac_mode1_channel1_two_actual2 = document.getElementById('ndac_mode1_channel1_two_actual2');//2段实际值2
+    const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');//2段测试值2
+    const ndac_mode1_channel1_three_actual1 = document.getElementById('ndac_mode1_channel1_three_actual1');//3段实际值1;
+    const ndac_mode1_channel1_two_k = document.getElementById('ndac_mode1_channel1_two_k');//1段k值
+    const ndac_mode1_channel1_two_b = document.getElementById('ndac_mode1_channel1_two_b');//1段b值
+    const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');//3段测试值1;
+    const ndac_mode1_channel1_three_actual2 = document.getElementById('ndac_mode1_channel1_three_actual2');//3段实际值2;
+    const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');//3段测试值2;
+    const ndac_mode1_channel1_three_k = document.getElementById('ndac_mode1_channel1_three_k');//3段k值
+    const ndac_mode1_channel1_three_b = document.getElementById('ndac_mode1_channel1_three_b');//3段b值
+    const ndac_mode1_channel1_four_actual1 = document.getElementById('ndac_mode1_channel1_four_actual1');//4段实际值1;
+    const ndac_mode1_channel1_four_test1 = document.getElementById('ndac_mode1_channel1_four_test1');//4段测试值1;
+    const ndac_mode1_channel1_four_actual2 = document.getElementById('ndac_mode1_channel1_four_actual2');//4段实际值1;
+    const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');//4段测试值2;
+    const ndac_mode1_channel1_four_k = document.getElementById('ndac_mode1_channel1_four_k');//4段k值
+    const ndac_mode1_channel1_four_b = document.getElementById('ndac_mode1_channel1_four_b');//4段b值
 
 
+    const channeltype = CHANNELTYPE;
+    let channeltypeText = "";
+    const section = SECTIONNUM;
+    let settionText = "";
+    switch (section) {
+        case 0:
+            console.log("0段定标-请检查分界点")
+            return -1;
+            break
+        case 1:
+            console.log("1段定标-没设分界点1")
+            switch (channeltype) {
+                case 0x00:
+                // break;
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    channeltypeText = "电压采集板"
+                    settionText = "1段定标";
+                    if (ndac_mode1_channel1.checked) {
+                        const channelNum = 1;
+                        calibrate_One_Method(channeltypeText, settionText, channelNum, ndac_mode1_channel1_one_actual1.value, ndac_mode1_channel1_one_actual2.value,
+                            ndac_mode1_channel1_one_test1.value, ndac_mode1_channel1_one_test2.value, ndac_mode1_channel1_one_k.value, ndac_mode1_channel1_one_b.value,
+                            nadc_mode1_demarc1_value.value, nadc_mode1_demarc2_value.value, nadc_mode1_demarc3_value.value);
+                    }
+                    break;
+            }
+            break
+    }
+    console.log('定标类型：', channeltype, "定标段：", section, "定标值：", shendKBvalue)
+})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const nadc_mode1_count = document.getElementById('nadc_mode1_count');
-// nadc_mode1_count.addEventListener('click', function () {
-//     const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
-//     const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
-//     //判断那个选中
-//     const selectedChannels = [];
-//     channelCheckboxes.forEach((checkbox, index) => {
-//         if (checkbox.checked) {
-//             selectedChannels.push(index + 1); // 通道号从1开始
-//         }
-//     })
-//     const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
-//     const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
-//     const mode1_demarc1_value = document.getElementById('mode1_demarc1_value');//分界点1值
-//     const mode1_demarc2_value = document.getElementById('mode1_demarc2_value');//分界点2值
-//     const mode1_demarc3_value = document.getElementById('mode1_demarc3_value');//分界点3值
-//     const mode1_demarc4_value = document.getElementById('mode1_demarc4_value');//分界点4值
-//     //通道1 定标1段
-//     const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');
-//     const ndac_mode1_channel1_one_actual1 = document.getElementById('ndac_mode1_channel1_one_actual1');
-//     const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1');
-//     const ndac_mode1_channel1_one_actual2 = document.getElementById('ndac_mode1_channel1_one_actual2');
-//     const ndac_mode1_channel1_one_test2 = document.getElementById('ndac_mode1_channel1_one_test2');
-//     const ndac_mode1_channel1_one_k = document.getElementById('ndac_mode1_channel1_one_k');
-//     const ndac_mode1_channel1_one_b = document.getElementById('ndac_mode1_channel1_one_b');
-//     //通道2 定标1段
-//     const ndac_mode1_channel2 = document.getElementById('ndac_mode1_channel2');
-//     const ndac_mode1_channel2_one_actual1 = document.getElementById('ndac_mode1_channel2_one_actual1');
-//     const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');
-//     const ndac_mode1_channel2_one_actual2 = document.getElementById('ndac_mode1_channel2_one_actual2');
-//     const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');
-//     const ndac_mode1_channel2_one_k = document.getElementById('ndac_mode1_channel2_one_k');
-//     const ndac_mode1_channel2_one_b = document.getElementById('ndac_mode1_channel2_one_b');
-//     //通道3 定标1段
-//     const ndac_mode1_channel3 = document.getElementById('ndac_mode1_channel3');
-//     const ndac_mode1_channel3_one_actual1 = document.getElementById('ndac_mode1_channel3_one_actual1');
-//     const ndac_mode1_channel3_one_test1 = document.getElementById('ndac_mode1_channel3_one_test1');
-//     const ndac_mode1_channel3_one_actual2 = document.getElementById('ndac_mode1_channel3_one_actual2');
-//     const ndac_mode1_channel3_one_test2 = document.getElementById('ndac_mode1_channel3_one_test2');
-//     const ndac_mode1_channel3_one_k = document.getElementById('ndac_mode1_channel3_one_k');
-//     const ndac_mode1_channel3_one_b = document.getElementById('ndac_mode1_channel3_one_b');
-//     //通道4 定标段1  
-//     const ndac_mode1_channel4 = document.getElementById('ndac_mode1_channel4');
-//     const ndac_mode1_channel4_one_actual1 = document.getElementById('ndac_mode1_channel4_one_actual1');
-//     const ndac_mode1_channel4_one_test1 = document.getElementById('ndac_mode1_channel4_one_test1');
-//     const ndac_mode1_channel4_one_actual2 = document.getElementById('ndac_mode1_channel4_one_actual2');
-//     const ndac_mode1_channel4_one_test2 = document.getElementById('ndac_mode1_channel4_one_test2');
-//     const ndac_mode1_channel4_one_k = document.getElementById('ndac_mode1_channel4_one_k');
-//     const ndac_mode1_channel4_one_b = document.getElementById('ndac_mode1_channel4_one_b');
-//     //通道5 定标段1  
-//     const ndac_mode1_channel5 = document.getElementById('ndac_mode1_channel5');
-//     const ndac_mode1_channel5_one_actual1 = document.getElementById('ndac_mode1_channel5_one_actual1');
-//     const ndac_mode1_channel5_one_test1 = document.getElementById('ndac_mode1_channel5_one_test1');
-//     const ndac_mode1_channel5_one_actual2 = document.getElementById('ndac_mode1_channel5_one_actual2');
-//     const ndac_mode1_channel5_one_test2 = document.getElementById('ndac_mode1_channel5_one_test2');
-//     const ndac_mode1_channel5_one_k = document.getElementById('ndac_mode1_channel5_one_k');
-//     const ndac_mode1_channel5_one_b = document.getElementById('ndac_mode1_channel5_one_b');
-//     //通道6 定标段1  
-//     const ndac_mode1_channel6 = document.getElementById('ndac_mode1_channel6');
-//     const ndac_mode1_channel6_one_actual1 = document.getElementById('ndac_mode1_channel6_one_actual1');
-//     const ndac_mode1_channel6_one_test1 = document.getElementById('ndac_mode1_channel6_one_test1');
-//     const ndac_mode1_channel6_one_actual2 = document.getElementById('ndac_mode1_channel6_one_actual2');
-//     const ndac_mode1_channel6_one_test2 = document.getElementById('ndac_mode1_channel6_one_test2');
-//     const ndac_mode1_channel6_one_k = document.getElementById('ndac_mode1_channel6_one_k');
-//     const ndac_mode1_channel6_one_b = document.getElementById('ndac_mode1_channel6_one_b');
-//     //通道7 定标段1  
-//     const ndac_mode1_channel7 = document.getElementById('ndac_mode1_channel7');
-//     const ndac_mode1_channel7_one_actual1 = document.getElementById('ndac_mode1_channel7_one_actual1');
-//     const ndac_mode1_channel7_one_test1 = document.getElementById('ndac_mode1_channel7_one_test1');
-//     const ndac_mode1_channel7_one_actual2 = document.getElementById('ndac_mode1_channel7_one_actual2');
-//     const ndac_mode1_channel7_one_test2 = document.getElementById('ndac_mode1_channel7_one_test2');
-//     const ndac_mode1_channel7_one_k = document.getElementById('ndac_mode1_channel7_one_k');
-//     const ndac_mode1_channel7_one_b = document.getElementById('ndac_mode1_channel7_one_b');
-//     //通道8 定标段1  
-//     const ndac_mode1_channel8 = document.getElementById('ndac_mode1_channel8');
-//     const ndac_mode1_channel8_one_actual1 = document.getElementById('ndac_mode1_channel8_one_actual1');
-//     const ndac_mode1_channel8_one_test1 = document.getElementById('ndac_mode1_channel8_one_test1');
-//     const ndac_mode1_channel8_one_actual2 = document.getElementById('ndac_mode1_channel8_one_actual2');
-//     const ndac_mode1_channel8_one_test2 = document.getElementById('ndac_mode1_channel8_one_test2');
-//     const ndac_mode1_channel8_one_k = document.getElementById('ndac_mode1_channel8_one_k');
-//     const ndac_mode1_channel8_one_b = document.getElementById('ndac_mode1_channel8_one_b');
-//     //通道9 定标段1  
-//     const ndac_mode1_channel9 = document.getElementById('ndac_mode1_channel9');
-//     const ndac_mode1_channel9_one_actual1 = document.getElementById('ndac_mode1_channel9_one_actual1');
-//     const ndac_mode1_channel9_one_test1 = document.getElementById('ndac_mode1_channel9_one_test1');
-//     const ndac_mode1_channel9_one_actual2 = document.getElementById('ndac_mode1_channel9_one_actual2');
-//     const ndac_mode1_channel9_one_test2 = document.getElementById('ndac_mode1_channel9_one_test2');
-//     const ndac_mode1_channel9_one_k = document.getElementById('ndac_mode1_channel9_one_k');
-//     const ndac_mode1_channel9_one_b = document.getElementById('ndac_mode1_channel9_one_b');
-//     //通道10 定标段1  
-//     const ndac_mode1_channel10 = document.getElementById('ndac_mode1_channel10');
-//     const ndac_mode1_channel10_one_actual1 = document.getElementById('ndac_mode1_channel0_one_actual1');
-//     const ndac_mode1_channel10_one_test1 = document.getElementById('ndac_mode1_channel10_one_test1');
-//     const ndac_mode1_channel10_one_actual2 = document.getElementById('ndac_mode1_channel10_one_actual2');
-//     const ndac_mode1_channel10_one_test2 = document.getElementById('ndac_mode1_channel10_one_test2');
-//     const ndac_mode1_channel10_one_k = document.getElementById('ndac_mode1_channel10_one_k');
-//     const ndac_mode1_channel10_one_b = document.getElementById('ndac_mode1_channel10_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel11 = document.getElementById('ndac_mode1_channel11');
-//     const ndac_mode1_channel11_one_actual1 = document.getElementById('ndac_mode1_channel11_one_actual1');
-//     const ndac_mode1_channel11_one_test1 = document.getElementById('ndac_mode1_channel11_one_test1');
-//     const ndac_mode1_channel11_one_actual2 = document.getElementById('ndac_mode1_channel11_one_actual2');
-//     const ndac_mode1_channel11_one_test2 = document.getElementById('ndac_mode1_channel11_one_test2');
-//     const ndac_mode1_channel11_one_k = document.getElementById('ndac_mode1_channel11_one_k');
-//     const ndac_mode1_channel11_one_b = document.getElementById('ndac_mode1_channel11_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel12 = document.getElementById('ndac_mode1_channel12');
-//     const ndac_mode1_channel12_one_actual1 = document.getElementById('ndac_mode1_channel12_one_actual1');
-//     const ndac_mode1_channel12_one_test1 = document.getElementById('ndac_mode1_channel12_one_test1');
-//     const ndac_mode1_channel12_one_actual2 = document.getElementById('ndac_mode1_channel12_one_actual2');
-//     const ndac_mode1_channel12_one_test2 = document.getElementById('ndac_mode1_channel12_one_test2');
-//     const ndac_mode1_channel12_one_k = document.getElementById('ndac_mode1_channel12_one_k');
-//     const ndac_mode1_channel12_one_b = document.getElementById('ndac_mode1_channel12_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel13 = document.getElementById('ndac_mode1_channel13');
-//     const ndac_mode1_channel13_one_actual1 = document.getElementById('ndac_mode1_channel13_one_actual1');
-//     const ndac_mode1_channel13_one_test1 = document.getElementById('ndac_mode1_channel13_one_test1');
-//     const ndac_mode1_channel13_one_actual2 = document.getElementById('ndac_mode1_channel13_one_actual2');
-//     const ndac_mode1_channel13_one_test2 = document.getElementById('ndac_mode1_channel13_one_test2');
-//     const ndac_mode1_channel13_one_k = document.getElementById('ndac_mode1_channel13_one_k');
-//     const ndac_mode1_channel13_one_b = document.getElementById('ndac_mode1_channel13_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel14 = document.getElementById('ndac_mode1_channel14');
-//     const ndac_mode1_channel14_one_actual1 = document.getElementById('ndac_mode1_channel14_one_actual1');
-//     const ndac_mode1_channel14_one_test1 = document.getElementById('ndac_mode1_channel14_one_test1');
-//     const ndac_mode1_channel14_one_actual2 = document.getElementById('ndac_mode1_channel14_one_actual2');
-//     const ndac_mode1_channel14_one_test2 = document.getElementById('ndac_mode1_channel14_one_test2');
-//     const ndac_mode1_channel14_one_k = document.getElementById('ndac_mode1_channel14_one_k');
-//     const ndac_mode1_channel14_one_b = document.getElementById('ndac_mode1_channel14_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel15 = document.getElementById('ndac_mode1_channel15');
-//     const ndac_mode1_channel15_one_actual1 = document.getElementById('ndac_mode1_channel15_one_actual1');
-//     const ndac_mode1_channel15_one_test1 = document.getElementById('ndac_mode1_channel15_one_test1');
-//     const ndac_mode1_channel15_one_actual2 = document.getElementById('ndac_mode1_channel15_one_actual2');
-//     const ndac_mode1_channel15_one_test2 = document.getElementById('ndac_mode1_channel15_one_test2');
-//     const ndac_mode1_channel15_one_k = document.getElementById('ndac_mode1_channel15_one_k');
-//     const ndac_mode1_channel15_one_b = document.getElementById('ndac_mode1_channel15_one_b');
-//     //通道11 定标段1  
-//     const ndac_mode1_channel16 = document.getElementById('ndac_mode1_channel16');
-//     const ndac_mode1_channel16_one_actual1 = document.getElementById('ndac_mode1_channel16_one_actual1');
-//     const ndac_mode1_channel16_one_test1 = document.getElementById('ndac_mode1_channel16_one_test1');
-//     const ndac_mode1_channel16_one_actual2 = document.getElementById('ndac_mode1_channel16_one_actual2');
-//     const ndac_mode1_channel16_one_test2 = document.getElementById('ndac_mode1_channel16_one_test2');
-//     const ndac_mode1_channel16_one_k = document.getElementById('ndac_mode1_channel16_one_k');
-//     const ndac_mode1_channel16_one_b = document.getElementById('ndac_mode1_channel16_one_b');
-//     // 定义一个数组用于存储空值对应的通道编号
-//     const emptyChannelArray = [];
-//     const channelKBarray = [];
-
-//     if (selectedChannels.length > 0) {
-//         if (mode1_demarc1_value.value != '' && mode1_demarc2_value.value == '' && mode1_demarc3_value.value == '' && mode1_demarc4_value.value == '') {
-//             //定标一段
-//             if (ndac_mode1_channel1.checked) {
-//                 const channel1_one_actual1_value = ndac_mode1_channel1_one_actual1.value;
-//                 const channel1_one_test1_value = ndac_mode1_channel1_one_test1.value;
-//                 const channel1_one_actual2_value = ndac_mode1_channel1_one_actual2.value;
-//                 const channel1_one_test2_value = ndac_mode1_channel1_one_test2.value;
-//                 if (channel1_one_actual1_value == "" || channel1_one_test1_value == "" || channel1_one_actual2_value == "" || channel1_one_test2_value == "") {
-//                     emptyChannelArray.push(1); // 通道号从1开始
-//                 } else {
-//                     const one_channel1_kb1 = count_KB_value(channel1_one_actual1_value, channel1_one_test1_value, channel1_one_actual2_value, channel1_one_test2_value)
-//                     ndac_mode1_channel1_one_k.value = one_channel1_kb1[0];
-//                     ndac_mode1_channel1_one_b.value = one_channel1_kb1[1];
-//                     if (one_channel1_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 1, k1: one_channel1_kb1[0], b1: one_channel1_kb1[1] })
-//                     } else {
-
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel2.checked) {
-//                 const channel2_one_actual1_value = ndac_mode1_channel2_one_actual1.value;
-//                 const channel2_one_test1_value = ndac_mode1_channel2_one_test1.value;
-//                 const channel2_one_actual2_value = ndac_mode1_channel2_one_actual2.value;
-//                 const channel2_one_test2_value = ndac_mode1_channel2_one_test2.value;
-//                 if (channel2_one_actual2_value == "" || channel2_one_test1_value == "" || channel2_one_actual2_value == "" || channel2_one_test2_value == "") {
-//                     emptyChannelArray.push(2); // 通道号从1开始
-//                 } else {
-//                     const one_channel2_kb1 = count_KB_value(channel2_one_actual1_value, channel2_one_test1_value, channel2_one_actual2_value, channel2_one_test2_value)
-//                     ndac_mode1_channel2_one_k.value = one_channel2_kb1[0];
-//                     ndac_mode1_channel2_one_b.value = one_channel2_kb1[1];
-//                     if (one_channel2_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 2, k1: one_channel2_kb1[0], b1: one_channel2_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel3.checked) {
-//                 const channel3_one_actual1_value = ndac_mode1_channel3_one_actual1.value;
-//                 const channel3_one_test1_value = ndac_mode1_channel3_one_test1.value;
-//                 const channel3_one_actual2_value = ndac_mode1_channel3_one_actual2.value;
-//                 const channel3_one_test2_value = ndac_mode1_channel3_one_test2.value;
-//                 if (channel3_one_actual1_value == "" || channel3_one_test1_value == "" || channel3_one_actual2_value == "" || channel3_one_test2_value == "") {
-//                     emptyChannelArray.push(3); // 通道号从1开始
-//                 } else {
-//                     const one_channel3_kb1 = count_KB_value(channel3_one_actual1_value, channel3_one_test1_value, channel3_one_actual2_value, channel3_one_test2_value)
-//                     ndac_mode1_channel3_one_k.value = one_channel3_kb1[0];
-//                     ndac_mode1_channel3_one_b.value = one_channel3_kb1[1];
-//                     if (one_channel3_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 3, k1: one_channel3_kb1[0], b1: one_channel3_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel4.checked) {
-//                 const channel4_one_actual1_value = ndac_mode1_channel4_one_actual1.value;
-//                 const channel4_one_test1_value = ndac_mode1_channel4_one_test1.value;
-//                 const channel4_one_actual2_value = ndac_mode1_channel4_one_actual2.value;
-//                 const channel4_one_test2_value = ndac_mode1_channel4_one_test2.value;
-//                 if (channel4_one_actual1_value == "" || channel4_one_test1_value == "" || channel4_one_actual2_value == "" || channel4_one_test2_value == "") {
-//                     emptyChannelArray.push(4); // 通道号从1开始
-//                 } else {
-//                     const one_channel4_kb1 = count_KB_value(channel4_one_actual1_value, channel4_one_test1_value, channel4_one_actual2_value, channel4_one_test2_value)
-//                     ndac_mode1_channel4_one_k.value = one_channel4_kb1[0];
-//                     ndac_mode1_channel4_one_b.value = one_channel4_kb1[1];
-//                     if (one_channel4_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 4, k1: one_channel4_kb1[0], b1: one_channel4_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel5.checked) {
-//                 const channel5_one_actual1_value = ndac_mode1_channel5_one_actual1.value;
-//                 const channel5_one_test1_value = ndac_mode1_channel5_one_test1.value;
-//                 const channel5_one_actual2_value = ndac_mode1_channel5_one_actual2.value;
-//                 const channel5_one_test2_value = ndac_mode1_channel5_one_test2.value;
-//                 if (channel5_one_actual1_value == "" || channel5_one_test1_value == "" || channel5_one_actual2_value == "" || channel5_one_test2_value == "") {
-//                     emptyChannelArray.push(5); // 通道号从1开始
-//                 } else {
-//                     const one_channel5_kb1 = count_KB_value(channel5_one_actual1_value, channel5_one_test1_value, channel5_one_actual2_value, channel5_one_test2_value)
-//                     ndac_mode1_channel5_one_k.value = one_channel5_kb1[0];
-//                     ndac_mode1_channel5_one_b.value = one_channel5_kb1[1];
-//                     if (one_channel5_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 5, k1: one_channel5_kb1[0], b1: one_channel5_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel6.checked) {
-//                 const channel6_one_actual1_value = ndac_mode1_channel6_one_actual1.value;
-//                 const channel6_one_test1_value = ndac_mode1_channel6_one_test1.value;
-//                 const channel6_one_actual2_value = ndac_mode1_channel6_one_actual2.value;
-//                 const channel6_one_test2_value = ndac_mode1_channel6_one_test2.value;
-//                 if (channel6_one_actual1_value == "" || channel6_one_test1_value == "" || channel6_one_actual2_value == "" || channel6_one_test2_value == "") {
-//                     emptyChannelArray.push(6); // 通道号从1开始
-//                 } else {
-//                     const one_channel6_kb1 = count_KB_value(channel6_one_actual1_value, channel6_one_test1_value, channel6_one_actual2_value, channel6_one_test2_value)
-//                     ndac_mode1_channel6_one_k.value = one_channel6_kb1[0];
-//                     ndac_mode1_channel6_one_b.value = one_channel6_kb1[1];
-//                     if (one_channel6_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 6, k1: one_channel6_kb1[0], b1: one_channel6_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel7.checked) {
-//                 const channel7_one_actual1_value = ndac_mode1_channel7_one_actual1.value;
-//                 const channel7_one_test1_value = ndac_mode1_channel7_one_test1.value;
-//                 const channel7_one_actual2_value = ndac_mode1_channel7_one_actual2.value;
-//                 const channel7_one_test2_value = ndac_mode1_channel7_one_test2.value;
-//                 if (channel7_one_actual1_value == "" || channel7_one_test1_value == "" || channel7_one_actual2_value == "" || channel7_one_test2_value == "") {
-//                     emptyChannelArray.push(7); // 通道号从1开始
-//                 } else {
-//                     const one_channel7_kb1 = count_KB_value(channel7_one_actual1_value, channel7_one_test1_value, channel7_one_actual2_value, channel7_one_test2_value)
-//                     ndac_mode1_channel7_one_k.value = one_channel7_kb1[0];
-//                     ndac_mode1_channel7_one_b.value = one_channel7_kb1[1];
-//                     if (one_channel7_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 7, k1: one_channel7_kb1[0], b1: one_channel7_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel8.checked) {
-//                 const channel8_one_actual1_value = ndac_mode1_channel8_one_actual1.value;
-//                 const channel8_one_test1_value = ndac_mode1_channel8_one_test1.value;
-//                 const channel8_one_actual2_value = ndac_mode1_channel8_one_actual2.value;
-//                 const channel8_one_test2_value = ndac_mode1_channel8_one_test2.value;
-//                 if (channel8_one_actual1_value == "" || channel8_one_test1_value == "" || channel8_one_actual2_value == "" || channel8_one_test2_value == "") {
-//                     emptyChannelArray.push(8); // 通道号从1开始
-//                 } else {
-//                     const one_channel8_kb1 = count_KB_value(channel8_one_actual1_value, channel8_one_test1_value, channel8_one_actual2_value, channel8_one_test2_value)
-//                     ndac_mode1_channel8_one_k.value = one_channel8_kb1[0];
-//                     ndac_mode1_channel8_one_b.value = one_channel8_kb1[1];
-//                     if (one_channel8_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 8, k1: one_channel8_kb1[0], b1: one_channel8_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel9.checked) {
-//                 const channel9_one_actual1_value = ndac_mode1_channel9_one_actual1.value;
-//                 const channel9_one_test1_value = ndac_mode1_channel9_one_test1.value;
-//                 const channel9_one_actual2_value = ndac_mode1_channel9_one_actual2.value;
-//                 const channel9_one_test2_value = ndac_mode1_channel9_one_test2.value;
-//                 if (channel9_one_actual1_value == "" || channel9_one_test1_value == "" || channel9_one_actual2_value == "" || channel9_one_test2_value == "") {
-//                     emptyChannelArray.push(9); // 通道号从1开始
-//                 } else {
-//                     const one_channel9_kb1 = count_KB_value(channel9_one_actual1_value, channel9_one_test1_value, channel9_one_actual2_value, channel9_one_test2_value)
-//                     ndac_mode1_channel9_one_k.value = one_channel9_kb1[0];
-//                     ndac_mode1_channel9_one_b.value = one_channel9_kb1[1];
-//                     if (one_channel9_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 9, k1: one_channel9_kb1[0], b1: one_channel9_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel10.checked) {
-//                 const channel10_one_actual1_value = ndac_mode1_channel10_one_actual1.value;
-//                 const channel10_one_test1_value = ndac_mode1_channel10_one_test1.value;
-//                 const channel10_one_actual2_value = ndac_mode1_channel10_one_actual2.value;
-//                 const channel10_one_test2_value = ndac_mode1_channel10_one_test2.value;
-//                 if (channel10_one_actual1_value == "" || channel10_one_test1_value == "" || channel10_one_actual2_value == "" || channel10_one_test2_value == "") {
-//                     emptyChannelArray.push(10); // 通道号从1开始
-//                 } else {
-//                     const one_channel10_kb1 = count_KB_value(channel10_one_actual1_value, channel10_one_test1_value, channel10_one_actual2_value, channel10_one_test2_value)
-//                     ndac_mode1_channel10_one_k.value = one_channel10_kb1[0];
-//                     ndac_mode1_channel10_one_b.value = one_channel10_kb1[1];
-//                     if (one_channel10_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 10, k1: one_channel10_kb1[0], b1: one_channel10_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel11.checked) {
-//                 const channel11_one_actual1_value = ndac_mode1_channel11_one_actual1.value;
-//                 const channel11_one_test1_value = ndac_mode1_channel11_one_test1.value;
-//                 const channel11_one_actual2_value = ndac_mode1_channel11_one_actual2.value;
-//                 const channel11_one_test2_value = ndac_mode1_channel11_one_test2.value;
-//                 if (channel11_one_actual1_value == "" || channel11_one_test1_value == "" || channel11_one_actual2_value == "" || channel11_one_test2_value == "") {
-//                     emptyChannelArray.push(11); // 通道号从1开始
-//                 } else {
-//                     const one_channel11_kb1 = count_KB_value(channel11_one_actual1_value, channel11_one_test1_value, channel11_one_actual2_value, channel11_one_test2_value)
-//                     ndac_mode1_channel11_one_k.value = one_channel11_kb1[0];
-//                     ndac_mode1_channel11_one_b.value = one_channel11_kb1[1];
-//                     if (one_channel11_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 11, k1: one_channel11_kb1[0], b1: one_channel11_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel12.checked) {
-//                 const channel12_one_actual1_value = ndac_mode1_channel12_one_actual1.value;
-//                 const channel12_one_test1_value = ndac_mode1_channel12_one_test1.value;
-//                 const channel12_one_actual2_value = ndac_mode1_channel12_one_actual2.value;
-//                 const channel12_one_test2_value = ndac_mode1_channel12_one_test2.value;
-//                 if (channel12_one_actual1_value == "" || channel12_one_test1_value == "" || channel12_one_actual2_value == "" || channel12_one_test2_value == "") {
-//                     emptyChannelArray.push(12); // 通道号从1开始
-//                 } else {
-//                     const one_channel12_kb1 = count_KB_value(channel12_one_actual1_value, channel12_one_test1_value, channel12_one_actual2_value, channel12_one_test2_value)
-//                     ndac_mode1_channel12_one_k.value = one_channel12_kb1[0];
-//                     ndac_mode1_channel12_one_b.value = one_channel12_kb1[1];
-//                     if (one_channel12_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 12, k1: one_channel12_kb1[0], b1: one_channel12_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel13.checked) {
-//                 const channel13_one_actual1_value = ndac_mode1_channel13_one_actual1.value;
-//                 const channel13_one_test1_value = ndac_mode1_channel13_one_test1.value;
-//                 const channel13_one_actual2_value = ndac_mode1_channel13_one_actual2.value;
-//                 const channel13_one_test2_value = ndac_mode1_channel13_one_test2.value;
-//                 if (channel13_one_actual1_value == "" || channel13_one_test1_value == "" || channel13_one_actual2_value == "" || channel13_one_test2_value == "") {
-//                     emptyChannelArray.push(13); // 通道号从1开始
-//                 } else {
-//                     const one_channel13_kb1 = count_KB_value(channel13_one_actual1_value, channel13_one_test1_value, channel13_one_actual2_value, channel13_one_test2_value)
-//                     ndac_mode1_channel13_one_k.value = one_channel13_kb1[0];
-//                     ndac_mode1_channel13_one_b.value = one_channel13_kb1[1];
-//                     if (one_channel13_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 13, k1: one_channel13_kb1[0], b1: one_channel13_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel14.checked) {
-//                 const channel14_one_actual1_value = ndac_mode1_channel14_one_actual1.value;
-//                 const channel14_one_test1_value = ndac_mode1_channel14_one_test1.value;
-//                 const channel14_one_actual2_value = ndac_mode1_channel14_one_actual2.value;
-//                 const channel14_one_test2_value = ndac_mode1_channel14_one_test2.value;
-//                 if (channel14_one_actual1_value == "" || channel14_one_test1_value == "" || channel14_one_actual2_value == "" || channel14_one_test2_value == "") {
-//                     emptyChannelArray.push(14); // 通道号从1开始
-//                 } else {
-//                     const one_channel14_kb1 = count_KB_value(channel14_one_actual1_value, channel14_one_test1_value, channel14_one_actual2_value, channel14_one_test2_value)
-//                     ndac_mode1_channel14_one_k.value = one_channel14_kb1[0];
-//                     ndac_mode1_channel14_one_b.value = one_channel14_kb1[1];
-//                     if (one_channel14_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 14, k1: one_channel14_kb1[0], b1: one_channel14_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel15.checked) {
-//                 const channel15_one_actual1_value = ndac_mode1_channel15_one_actual1.value;
-//                 const channel15_one_test1_value = ndac_mode1_channel15_one_test1.value;
-//                 const channel15_one_actual2_value = ndac_mode1_channel15_one_actual2.value;
-//                 const channel15_one_test2_value = ndac_mode1_channel15_one_test2.value;
-//                 if (channel15_one_actual1_value == "" || channel15_one_test1_value == "" || channel15_one_actual2_value == "" || channel15_one_test2_value == "") {
-//                     emptyChannelArray.push(15); // 通道号从1开始
-//                 } else {
-//                     const one_channel15_kb1 = count_KB_value(channel15_one_actual1_value, channel15_one_test1_value, channel15_one_actual2_value, channel15_one_test2_value)
-//                     ndac_mode1_channel15_one_k.value = one_channel15_kb1[0];
-//                     ndac_mode1_channel15_one_b.value = one_channel15_kb1[1];
-//                     if (one_channel15_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 15, k1: one_channel15_kb1[0], b1: one_channel15_kb1[1] })
-//                     }
-//                 }
-//             }
-//             if (ndac_mode1_channel16.checked) {
-//                 const channel16_one_actual1_value = ndac_mode1_channel16_one_actual1.value;
-//                 const channel16_one_test1_value = ndac_mode1_channel16_one_test1.value;
-//                 const channel16_one_actual2_value = ndac_mode1_channel16_one_actual2.value;
-//                 const channel16_one_test2_value = ndac_mode1_channel16_one_test2.value;
-//                 if (channel16_one_actual1_value == "" || channel16_one_test1_value == "" || channel16_one_actual2_value == "" || channel16_one_test2_value == "") {
-//                     emptyChannelArray.push(14); // 通道号从1开始
-//                 } else {
-//                     const one_channel16_kb1 = count_KB_value(channel16_one_actual1_value, channel16_one_test1_value, channel16_one_actual2_value, channel16_one_test2_value)
-//                     ndac_mode1_channel16_one_k.value = one_channel16_kb1[0];
-//                     ndac_mode1_channel16_one_b.value = one_channel16_kb1[1];
-//                     if (one_channel16_kb1 > mode1_demarc1_value.value) {
-//                         channelKBarray.push({ channel: 16, k1: one_channel16_kb1[0], b1: one_channel16_kb1[1] })
-//                     }
-//                 }
-//             }
-
-//             window.TheIPC.toMain3(100, Number(ndac_mode1_board_num.value), selectedChannels)
-
-
-//         } else {
-//             ndac_mode1_dialog.style.display = 'block';
-//             ndac_mode1_dialog_label.innerText = '请设置分界点值'
-//             setTimeout(() => {
-//                 ndac_mode1_dialog.style.display = 'none';
-//             }, 1000)
-//         }
-
-//     } else {
-//         ndac_mode1_dialog.style.display = 'block';
-//         ndac_mode1_dialog_label.innerText = '请检查通道是否选择'
-//         setTimeout(() => {
-//             ndac_mode1_dialog.style.display = 'none';
-//         }, 1000)
-//     }
-// });
-
-// function count_KB_value(actual1, test1, actual2, test2) {
-//     // 检查分母是否为零
-//     if (test2 - test1 === 0) {
-//         const k = 0;
-//         const b = 0; // 当K值为0时，B值等于实际值1
-//         console.log(`K值:${k},B值:${b}`);
-//         return [0, 0, 0];
-//     }
-//     const k = Number((actual2 - actual1) / (test2 - test1));
-//     const b = Number(actual2 - (k * test2));
-
-//     if (b === 0) {
-//         console.warn("B值为零，k/b 无法计算");
-//         return [k, b, 0]; // 返回 NaN 表示 k/b 无法计算
-//     }
-//     const kb_ratio = Number(k / b);
-//     console.log(`K值:${k},B值:${b},k/b值:${kb_ratio}`);
-//     return [k, b, kb_ratio];
-// }
-
+//定标一段的方法
+function calibrate_One_Method(ChannelType, Settion, ChannelNum, OneActual1, OneActual2, OneTest1, OneTest2, OneK, OneB, DemarcOne, DemarcTwo, DemarcThree) {
+    const lssued_value = {
+        "channel": Number(ChannelNum),
+        "actualOne1": Number(OneActual1),//1段实际值1
+        "actualOne2": Number(OneActual2),//1段实际值2
+        "testOne1": Number(OneTest1),//1段测试值1
+        "testOne2": Number(OneTest2),//1段测试值2
+        "bvalueOne1": Number(OneK),//1段K值
+        "kbvalueOne1": Number(OneB),//1段B值
+        "demarcValue1": Number(DemarcOne),//分界点1。
+        "actualTwo1": Number(0),//2段实际值1
+        "actualTwo2": Number(0),//2段实际值2
+        "testTwo1": Number(0),//2段测试值1
+        "testTwo2": Number(0),//2段测试值2
+        "bvalueTwo1": Number(0),//1段K值
+        "kbvalueTwo1": Number(0),//1段B值
+        "demarcValue2": Number(DemarcTwo),//分界点2。
+        "actualThree1": Number(0),//3段实际值1
+        "actualThree2": Number(0),//3段实际值2
+        "testThree1": Number(0),//3段测试值1
+        "testThree2": Number(0),//3段测试值2
+        "bvalueThree1": Number(0),//3段K值
+        "kbvalueThree1": Number(0),//3段B值
+        "demarcValue3": Number(DemarcThree),//分界点3。
+        "actualfour1": Number(0),//4段实际值1
+        "actualfour2": Number(0),//4
+        "testfour1": Number(0),//4段测试值1
+        "testfour2": Number(0),//4段测试值2
+        "bvaluefour1": Number(0),//4段K值
+        "kbvaluefour1": Number(0),//4段B值
+        "channeltypeText": ChannelType,
+        "settionText": Settion,
+    }
+    shendKBvalue.push(lssued_value);
+}
 
 
 /**
@@ -2114,7 +7511,7 @@ function calculateKandB(inputs, actual1, actual2, test1, test2) {
 */
 const ndac_mode1_displaydata = document.getElementById('ndac_mode1_displaydata');// 获取页面上id为'status_bar'的元素，用于显示状态文本
 const ndac_mode1_display = document.getElementById('ndac_mode1_display');// 获取页面上id为'displayData'的元素，用于展示数据和滚动
-const ndacMode1_TD = '<tr><td style="width: 100%; color:white; font-style: italic;font-size: 15px;">'; // color: #39FF14; 定义一个表格行模板，用于包装状态文本，使其在显示时格式化
+const ndacMode1_TD = '<tr><td style="width: 100%; color:black;font-style: italic;font-weight: bold;font-size: 15px;">'; // color: #39FF14; 定义一个表格行模板，用于包装状态文本，使其在显示时格式化
 window.TheIPC.onStatus((text) => {
     // 将接收到的文本信息转换为字符串，然后添加到状态栏中
     ndac_mode1_displaydata.innerHTML += ndacMode1_TD + text.toString() + '</td></tr>';
@@ -2122,7 +7519,7 @@ window.TheIPC.onStatus((text) => {
     ndac_mode1_display.scrollTop = ndac_mode1_display.scrollHeight;
 });
 
-
+var DEBUGSTATUS = true;
 window.TheIPC.onMultiData((id, data) => {
     console.log("id:", id, "data:", data);
     switch (id) {
@@ -2138,94 +7535,10 @@ window.TheIPC.onMultiData((id, data) => {
         case 101:
             show_channels_data(data);//显示通道信息
             break;
-        // case 102:
-        //     const mode1_debug_data = data;
-        //     console.log("进入调试状态", mode1_debug_data);
-        //     const mode1_debug_type = mode1_debug_data.debug_type;
-        //     const mode1_debug_status = mode1_debug_data.debug_status;
-        //     switch (mode1_debug_type) {
-        //         case "voltage":
-        //             switch (mode1_debug_status) {
-        //                 case true:
-        //                     ndac_mode1_channel1_unit.innerText = 'mV';
-        //                     ndac_mode1_channel2_unit.innerText = 'mV';
-        //                     ndac_mode1_channel3_unit.innerText = 'mV';
-        //                     ndac_mode1_channel4_unit.innerText = 'mV';
-        //                     ndac_mode1_channel5_unit.innerText = 'mV';
-        //                     ndac_mode1_channel6_unit.innerText = 'mV';
-        //                     ndac_mode1_channel7_unit.innerText = 'mV';
-        //                     ndac_mode1_channel8_unit.innerText = 'mV';
-        //                     ndac_mode1_channel9_unit.innerText = 'mV';
-        //                     ndac_mode1_channel10_unit.innerText = 'mV';
-        //                     ndac_mode1_channel11_unit.innerText = 'mV';
-        //                     ndac_mode1_channel12_unit.innerText = 'mV';
-        //                     ndac_mode1_channel13_unit.innerText = 'mV';
-        //                     ndac_mode1_channel14_unit.innerText = 'mV';
-        //                     ndac_mode1_channel15_unit.innerText = 'mV';
-        //                     ndac_mode1_channel16_unit.innerText = 'mV';
-        //                     break;
-        //                 case false:
-        //                     ndac_mode1_channel1_unit.innerText = 'mV';
-        //                     ndac_mode1_channel2_unit.innerText = 'mV';
-        //                     ndac_mode1_channel3_unit.innerText = 'mV';
-        //                     ndac_mode1_channel4_unit.innerText = 'mV';
-        //                     ndac_mode1_channel5_unit.innerText = 'mV';
-        //                     ndac_mode1_channel6_unit.innerText = 'mV';
-        //                     ndac_mode1_channel7_unit.innerText = 'mV';
-        //                     ndac_mode1_channel8_unit.innerText = 'mV';
-        //                     ndac_mode1_channel9_unit.innerText = 'mV';
-        //                     ndac_mode1_channel10_unit.innerText = 'mV';
-        //                     ndac_mode1_channel11_unit.innerText = 'mV';
-        //                     ndac_mode1_channel12_unit.innerText = 'mV';
-        //                     ndac_mode1_channel13_unit.innerText = 'mV';
-        //                     ndac_mode1_channel14_unit.innerText = 'mV';
-        //                     ndac_mode1_channel15_unit.innerText = 'mV';
-        //                     ndac_mode1_channel16_unit.innerText = 'mV';
-        //                     break;
-        //             }
-        //             break;
-        //         case "Temp":
-        //             switch (mode1_debug_status) {
-        //                 case true:
-        //                     ndac_mode1_channel1_unit.innerText = 'mV';
-        //                     ndac_mode1_channel2_unit.innerText = 'mV';
-        //                     ndac_mode1_channel3_unit.innerText = 'mV';
-        //                     ndac_mode1_channel4_unit.innerText = 'mV';
-        //                     ndac_mode1_channel5_unit.innerText = 'mV';
-        //                     ndac_mode1_channel6_unit.innerText = 'mV';
-        //                     ndac_mode1_channel7_unit.innerText = 'mV';
-        //                     ndac_mode1_channel8_unit.innerText = 'mV';
-        //                     ndac_mode1_channel9_unit.innerText = 'mV';
-        //                     ndac_mode1_channel10_unit.innerText = 'mV';
-        //                     ndac_mode1_channel11_unit.innerText = 'mV';
-        //                     ndac_mode1_channel12_unit.innerText = 'mV';
-        //                     ndac_mode1_channel13_unit.innerText = 'mV';
-        //                     ndac_mode1_channel14_unit.innerText = 'mV';
-        //                     ndac_mode1_channel15_unit.innerText = 'mV';
-        //                     ndac_mode1_channel16_unit.innerText = 'mV';
-        //                     break;
-        //                 case false:
-        //                     ndac_mode1_channel1_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel2_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel3_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel4_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel5_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel6_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel7_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel8_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel9_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel10_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel11_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel12_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel13_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel14_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel15_unit.innerText = 'mΩ';
-        //                     ndac_mode1_channel16_unit.innerText = 'mΩ';
-        //                     break;
-        //             }
-        //             break;
-        // }
-        // break;
+        case 102:
+            DEBUGSTATUS = data;
+            break;
+
     }
 });
 
@@ -2278,10 +7591,8 @@ function mode1_open_restore(data) {
     const nadc_mode1_demarc2_value = document.getElementById('nadc_mode1_demarc2_value');//分界点2
     const nadc_mode1_demarc3_value = document.getElementById('nadc_mode1_demarc3_value');//分界点3
     const nadc_mode1_application = document.getElementById('nadc_mode1_application');//一键应用恢复
-    const nadc_mode1_count = document.getElementById('nadc_mode1_count');//计算kb值恢复
     const nadc_mode1_initialize = document.getElementById('nadc_mode1_initialize');//初始化K/B值恢复
     const nadc_mode1_batch_send = document.getElementById('nadc_mode1_batch_send');//批量发送KB值恢复
-    // const fieldset_mode1 = document.getElementById('fieldset_mode1');//fieldset恢复
     const restore_state = data;
     if (restore_state === true) {
         mode1_query_state.checked = true;
@@ -2300,16 +7611,14 @@ function mode1_open_restore(data) {
         nadc_mode1_demarc1_value.disabled = false;//分界点1恢复
         nadc_mode1_demarc2_value.disabled = false;//分界点2恢复
         nadc_mode1_demarc3_value.disabled = false;//分界点3恢复
-        nadc_mode1_count.disabled = false;//计算kb值恢复
         nadc_mode1_initialize.disabled = false;//初始化K/B值恢复
         nadc_mode1_batch_send.disabled = false;//批量发送K/B值恢复
-        // fieldset_mode1.disabled = false;//fieldset恢复
         ndac_mode1_dialog.style.display = 'block';
         ndac_mode1_dialog_label.innerText = 'DPS参数状态初始化\n完成'
         clearTimeout(MODE1TIMER);
         setTimeout(() => {
             ndac_mode1_dialog.style.display = 'none';
-            // window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
+            window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
         }, 1000)
     } else if (restore_state == false) {
         const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
@@ -2330,10 +7639,8 @@ function mode1_open_restore(data) {
         nadc_mode1_demarc2_value.disabled = true;//分界点2不可选
         nadc_mode1_demarc3_value.disabled = true;//分界点3不可选
         nadc_mode1_application.disabled = true;//一键应用不可选
-        nadc_mode1_count.disabled = true;//计算kb值恢复不可选
         nadc_mode1_initialize.disabled = true;//初始化KB值不可选
         nadc_mode1_batch_send.disabled = true;//批量发送K/B值不可选
-        // fieldset_mode1.disabled = true;//fieldset恢复
         setTimeout(() => {
             ndac_mode1_dialog.style.display = 'none';
         }, 1000); // 调整为1秒
@@ -2351,7 +7658,7 @@ function mode1_open_restore(data) {
 */
 function show_channels_data(data) {
     const mode1_channels_data = data;
-    const mode1_channels_type = mode1_channels_data.channels_type;
+    CHANNELTYPE = mode1_channels_data.channels_type;
     //通道1的数据
     const ndac_mode1_channel1_data = document.getElementById('ndac_mode1_channel1_data');
     ndac_mode1_channel1_data.innerText = mode1_channels_data.channel1_value;

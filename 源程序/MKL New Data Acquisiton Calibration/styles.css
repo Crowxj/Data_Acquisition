@@ -3,16 +3,29 @@
 * ndac_home_Page界面主样式
 *****************************
 */
+.window-bar {
+  height: 45px;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  margin-left: -8px;
+  margin-right: -8px;
+  text-align: right;
+  background-color: #484848;
+  padding-left: 0px;
+  padding-right: 0px;
+  border-bottom: 3px solid black;
+}
+
 .box {
-  border: 5px solid #ececf0;
+  border: 5px solid black;
   /* 设置边框颜色为蓝色 */
   width: 700px;
   height: 400px;
   /* 设置背景透明 */
-  background: transparent;
+  /* background: transparent; */
   margin: 0 auto;
   /* 设置边框为圆形 */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
+  /* box-shadow: 0 0 20px rgba(0, 0, 0, 200); */
   display: flex;
   /* 使用 Flexbox 布局 */
   /* justify-content: space-around; */
@@ -20,17 +33,11 @@
   /* 添加阴影效果 */
 }
 
-.inner-box {
-  /* 设置高度 */
-  background: transparent;
-  /* 设置背景颜色 */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 200);
-  /* 添加阴影效果 */
-}
+
 
 .left-box {
   /* 可以在这里添加特定于左边框的样式 */
-  border: 2px solid #ececf0;
+  border: 3px solid black;
   /* 设置边框颜色 */
   margin-left: 15px;
   margin-top: 8px;
@@ -40,7 +47,7 @@
 }
 
 .right-box {
-  border: 4px solid #ececf0;
+  border: 4px solid black;
   /* 设置边框颜色 */
   margin-left: 5px;
   margin-top: 9px;
@@ -75,8 +82,8 @@ footer {
 
 .footer-nav ul li a {
   text-decoration: none;
-  color: #888;
-  text-shadow: 2px 2px 5px rgb(73, 105, 230);
+  color: #302f2f;
+  /* text-shadow: 2px 2px 5px rgb(73, 105, 230); */
 }
 
 /* 版权信息样式 */
@@ -97,12 +104,12 @@ footer {
 *****************************
 */
 .button {
-  background-color: transparent;
-  color: white;
+  /* background-color: transparent;
+  color: white; */
   font-weight: bolder;
-  border: 2px solid white;
+  border: 2px solid black;
   border-radius: 5px;
-  box-shadow: 2px 2px 5px rgb(73, 105, 230);
+  /* box-shadow: 2px 2px 5px rgb(73, 105, 230); */
 }
 
 /**
@@ -133,7 +140,8 @@ footer {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #545454;
+  /* border: 2px solid #181818; */
   transition: 0.4s;
   border-radius: 24px;
 }
@@ -219,46 +227,27 @@ input:checked+.slider:before {
 * ndac_guide_Page界面主样式
 *****************************
 */
-.link-body {
-  background-image: url('./image/nadc_home_Page_link.png');
-  background-size: cover;
-  margin: 0;
-  padding: 0;
-  display: flex;
-}
 
 
-.main-content {
-  flex: 1;
-  padding: 40px 20px 20px;
-  /* 增加顶部padding给控制按钮留空间 */
-  position: relative;
-}
 
 /* 内容框样式 */
 .content-box {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(217, 217, 215, 0.7);
   border-radius: 10px;
   padding: 20px;
   margin: 20px;
+  border:black 3px solid;
   /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); */
   min-height: 590px;
 }
 
-/* 控制按钮位置微调 */
-.window-controls {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  z-index: 100;
-}
 
 /* 内容框标题样式 */
 .content-title {
   font-size: 30px;
   color: #022348;
   margin-bottom: 20px;
-  border-bottom: 2px solid #00a8ff;
+  border-bottom: 2px solid black;
   padding-bottom: 10px;
 
 }
@@ -274,7 +263,8 @@ input:checked+.slider:before {
 /* 左侧导航栏样式 */
 /* 左侧导航栏样式 */
 .sidebar {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 2px solid #022348;
   border-radius: 10px;
   width: 200px;
   height: 460px;
@@ -286,7 +276,8 @@ input:checked+.slider:before {
 }
 
 .sidebar2 {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 2px solid #022348;
   border-radius: 10px;
   width: 1075px;
   height: 480px;
@@ -303,16 +294,14 @@ input:checked+.slider:before {
 
 .nav-item {
   padding: 15px 25px;
-  color: #fff;
   cursor: pointer;
   transition: all 0.3s;
   position: relative;
   transform: skewX(-20deg);
-  text-shadow: 0 0 20px rgba(0, 0, 0, 200);
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(9, 9, 9, 0.1);
   padding-left: 30px;
 }
 
@@ -323,7 +312,7 @@ input:checked+.slider:before {
   top: 0;
   width: 3px;
   height: 100%;
-  background-color: #00a8ff;
+  background-color: black;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -341,7 +330,7 @@ input:checked+.slider:before {
 /* 网页信息容器样式 */
 .web-info-container {
   position: fixed;
-  top: 80px;
+  top: 110px;
   /* 根据需要调整 */
   left: 50px;
   /* 根据需要调整 */
@@ -349,7 +338,7 @@ input:checked+.slider:before {
   /* 根据需要调整 */
   height: 600px;
   /* 根据需要调整 */
-  border: #00a8ff 3px solid;
+  border:black 3px solid;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -409,10 +398,9 @@ input:checked+.slider:before {
 .label {
   font-size: 13px;
   font-weight: bold;
-  color: white;
+  /* color: white; */
   text-transform: uppercase;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 200);
 }
 
 .separator {
@@ -468,6 +456,7 @@ input:checked+.slider:before {
 }
 
 .checkbox {
+  border: 2px solid black;
   margin-right: 10px;
 }
 
@@ -498,13 +487,14 @@ input:checked+.slider:before {
   background-color: #f9f9f9;
 }
 
-.error{
+.error {
   border: 2px solid red;
 }
 
-.valid{
+.valid {
   border: 2px solid green;
 }
-.error-message{
+
+.error-message {
   color: red;
 }

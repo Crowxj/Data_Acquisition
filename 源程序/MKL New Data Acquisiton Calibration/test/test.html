@@ -3,99 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自动计算K值和B值</title>
+    <title>板卡调试系统</title>
     <style>
-        .show-label-two {
-            font-size: 14px;
-            color: #333;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        input {
-            margin-left: 5px;
-            width: 80px;
-            height: 20px;
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        select, button {
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .debug-mode {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+        .normal-mode {
+            background-color: #ccffcc;
+            color: #006600;
         }
     </style>
 </head>
 <body>
-    <div style="margin-right: 10px;">
+    <div class="container">
+        <h2>板卡调试系统</h2>
+        
         <div>
-            <!-- 通道1 实际值1 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 5px;">实际值1: </label>
-                <input id="ndac_mode1_channel1_one_actual1" type="number">
-            </span>
-            <!-- 通道1 测试值1 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 20px;">测试值1: </label>
-                <input id="ndac_mode1_channel1_one_test1" disabled>
-            </span>
-            <!-- 通道1 K值 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 20px;">斜率K值: </label>
-                <input id="ndac_mode1_channel1_one_k" disabled>
-            </span>
+            <label for="boardSelect">选择板卡:</label>
+            <select id="boardSelect">
+                <option value="1" selected>板卡一</option>
+                <option value="2">板卡二</option>
+                <option value="3">板卡三</option>
+                <option value="4">板卡四</option>
+            </select>
         </div>
-        <div style="margin-top: 10px;">
-            <!-- 通道1 实际值2 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 5px;">实际值2: </label>
-                <input id="ndac_mode1_channel1_one_actual2" type="number">
-            </span>
-            <!-- 通道1 测试值2 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 20px;">测试值2: </label>
-                <input id="ndac_mode1_channel1_one_test2" disabled>
-            </span>
-            <!-- 通道1 B值 -->
-            <span>
-                <label class="show-label-two" style="margin-left: 20px;">偏差B值: </label>
-                <input id="ndac_mode1_channel1_one_b" disabled>
-            </span>
-        </div>
+        
+        <div id="statusDisplay" class="status normal-mode">当前状态: 退出调试</div>
+        
+        <button id="toggleDebugBtn">进入调试</button>
     </div>
 
     <script>
-        // 获取输入框元素
-        const actual1 = document.getElementById('ndac_mode1_channel1_one_actual1');
-        const actual2 = document.getElementById('ndac_mode1_channel1_one_actual2');
-        const test1 = document.getElementById('ndac_mode1_channel1_one_test1');
-        const test2 = document.getElementById('ndac_mode1_channel1_one_test2');
-        const kValue = document.getElementById('ndac_mode1_channel1_one_k');
-        const bValue = document.getElementById('ndac_mode1_channel1_one_b');
-
-        // 监听实际值1和实际值2的变化
-        actual1.addEventListener('input', calculateKB);
-        actual2.addEventListener('input', calculateKB);
-
-        // 计算K值和B值
-        function calculateKB() {
-            const x1 = parseFloat(actual1.value); // 实际值1
-            const x2 = parseFloat(actual2.value); // 实际值2
-
-            if (!isNaN(x1) && !isNaN(x2)) {
-                // 假设测试值1和测试值2是固定的（可以根据需求修改）
-                const y1 = 10; // 测试值1的固定值
-                const y2 = 20; // 测试值2的固定值
-
-                // 计算斜率K值
-                const k = (y2 - y1) / (x2 - x1);
-                kValue.value = k.toFixed(2); // 保留两位小数
-
-                // 计算偏差B值
-                const b = y1 - k * x1;
-                bValue.value = b.toFixed(2); // 保留两位小数
-
-                // 更新测试值1和测试值2
-                test1.value = (k * x1 + b).toFixed(2);
-                test2.value = (k * x2 + b).toFixed(2);
-            } else {
-                // 如果输入无效，清空K值和B值
-                kValue.value = '';
-                bValue.value = '';
-                test1.value = '';
-                test2.value = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            const boardSelect = document.getElementById('boardSelect');//选择板卡
+            const toggleDebugBtn = document.getElementById('toggleDebugBtn');//进入调试
+            const statusDisplay = document.getElementById('statusDisplay');
+            
+            let isDebugMode = false;
+            
+            // 初始化状态
+            updateUI();
+            
+            // 切换调试模式按钮点击事件
+            toggleDebugBtn.addEventListener('click', function() {
+                isDebugMode = !isDebugMode;
+                updateUI();
+                
+                if (isDebugMode) {
+                    alert(`已进入调试模式，当前板卡: ${boardSelect.options[boardSelect.selectedIndex].text}`);
+                } else {
+                    alert(`已退出调试模式`);
+                }
+            });
+            
+            // 板卡选择变化事件
+            boardSelect.addEventListener('change', function() {
+                if (isDebugMode) {
+                    alert('请先退出调试模式再更改板卡！');
+                    // 恢复之前的值
+                    boardSelect.value = boardSelect.dataset.lastValue || '1';
+                } else {
+                    // 保存当前值作为最后一次有效的选择
+                    boardSelect.dataset.lastValue = boardSelect.value;
+                    alert(`已切换板卡为: ${boardSelect.options[boardSelect.selectedIndex].text}`);
+                }
+            });
+            
+            // 更新UI状态
+            function updateUI() {
+                if (isDebugMode) {
+                    toggleDebugBtn.textContent = '退出调试';
+                    statusDisplay.textContent = '当前状态: 进入调试';
+                    statusDisplay.className = 'status debug-mode';
+                    
+                    // 保存当前选择的值
+                    boardSelect.dataset.lastValue = boardSelect.value;
+                } else {
+                    toggleDebugBtn.textContent = '进入调试';
+                    statusDisplay.textContent = '当前状态: 退出调试';
+                    statusDisplay.className = 'status normal-mode';
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
