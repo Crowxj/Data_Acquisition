@@ -1,11 +1,12 @@
 module.exports = {
     mode1_parameter, query_mode1_tran, restore_mode1_tran, query_board_version, restore_mode1_baudRate, enter_mode1_debug, exit_mode1_debug
-    , initialize_KB_value, get_channels_values
+    , initialize_KB_value, get_channels_values, batch_KB_write
 };
 
 const { get_ndac_mode1_parameter } = require('../../js/manage/ndac_jump_interface');
 const { query_mode1_Tran_command, query_mode1_baudRate_command, start_mode1_Tran_command, update_mode1_baudRate_command, restore_mode1_tran_command,
-    restore_mode1_baudRate_command, query_board_version_command, get_channels_values_command, enter_mode1_debug_command, exit_mode1_debug_command, initialize_KB_command
+    restore_mode1_baudRate_command, query_board_version_command, get_channels_values_command, enter_mode1_debug_command, exit_mode1_debug_command, initialize_KB_command,
+    batch_KB_command
 } = require('../mode1/mode1_command');
 const UDPClient = require('../../class/ndac_client_class');
 const { array_to_hex } = require('../../js/numeric/ndac_numeric');
@@ -186,13 +187,13 @@ function mode1_udpClient_create() {
                         } else if (msg[5] === 0x04 && msg[9] === 0x16) {
                             show_board_version(msg);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入正常`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入失败`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值命令错误`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值繁忙未执行`);
                         }
                         for (let i = 0; i < msg.length - 1; i++) {
                             if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
@@ -235,13 +236,13 @@ function mode1_udpClient_create() {
                         } else if (msg[5] === 0x04 && msg[9] === 0x16) {
                             show_board_version(msg);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入正常`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入失败`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值命令错误`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值繁忙未执行`);
                         }
                         for (let i = 0; i < msg.length - 1; i++) {
                             if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
@@ -284,13 +285,13 @@ function mode1_udpClient_create() {
                         } else if (msg[5] === 0x04 && msg[9] === 0x16) {
                             show_board_version(msg);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入正常`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入正常`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值写入失败`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值写入失败`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值命令错误`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值命令错误`);
                         } else if ((msg[5] == 0x00 && msg[6] != 0xaa && msg[7] == 0x00 && msg[10] == 0x00) && (msg[5] == 0x00 && msg[6] != 0xbb && msg[7] == 0x00 && msg[10] == 0x00)) {
-                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道初始化K/B值繁忙未执行`);
+                            showStatus(`>>> ${getTimestamp()} ${msg[6]}通道K/B值繁忙未执行`);
                         }
                         for (let i = 0; i < msg.length - 1; i++) {
                             if ((msg[i] === 0xDA && msg[i + 1] === 0xAA) || (msg[i] === 0x00 && msg[i + 1] === 0xAA)) {
@@ -560,9 +561,20 @@ function get_channels_values(id, board, time) {
 * 创建时间:2025/03/23 21:03:34
 */
 function initialize_KB_value(id, boardId, channel) {
-    showStatus(`>>> ${getTimestamp()} 初始化K/B值已选择板卡${boardId},通道${channel}`);
+    showStatus(`>>> ${getTimestamp()} 初始化已选择板卡${boardId},所选通道${channel}K/B值`);
     return initialize_KB_command(mode1_udpClient1, boardId, channel);
 }
+/**
+* 模块名:batch_KB_write
+* 代码描述:批量下发K/B值
+* 作者:Crow
+* 创建时间:2025/03/23 21:03:34
+*/
+function batch_KB_write(id, boardId, channelKB) {
+    showStatus(`>>> ${getTimestamp()} 批量下发已选择板卡${boardId},所选通道KB值`);
+    return batch_KB_command(mode1_udpClient1, boardId, channelKB);
+}
+
 /**
 * 模块名:convert_channels_values
 * 代码描述:转换通道值

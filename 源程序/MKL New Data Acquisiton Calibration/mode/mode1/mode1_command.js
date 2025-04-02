@@ -2,7 +2,7 @@ module.exports = {
     query_mode1_Tran_command, query_mode1_baudRate_command, start_mode1_Tran_command,
     update_mode1_baudRate_command, restore_mode1_tran_command, restore_mode1_baudRate_command,
     query_board_version_command, get_channels_values_command, enter_mode1_debug_command, exit_mode1_debug_command,
-    initialize_KB_command
+    initialize_KB_command, batch_KB_command
 }
 const CommandFactory = require('../../class/ndac_command_class');
 const { showStatus } = require('../../ipc_main')
@@ -190,7 +190,6 @@ function initialize_KB_command(mode1_udpClient1, boardId, channel) {
     const fK = 10000;
     const fb = 0;
     let currentIndex = 0; // 当前要打印的元素的索引
-
     const intervalId = setInterval(() => {
         if (currentIndex < channel.length) {
             const command_parm = [Fid, channel[currentIndex], fK, fb];
@@ -204,3 +203,52 @@ function initialize_KB_command(mode1_udpClient1, boardId, channel) {
     }, 500); // 每隔 1000 毫秒（1 秒）打印一个元素
 }
 
+
+function batch_KB_command(mode1_udpClient1, boardId, channelsKB) {
+    const boardID = boardId;
+    const Fid = boardID + 0x100;
+    let currentIndex = 0; // 当前要打印的元素的索引
+    const channelData = channelsKB;
+    const intervalId = setInterval(() => {
+        if (currentIndex < channelData.length) {
+            const channel = channelData[currentIndex].channel;//通道号
+            const actualOne1=channelData[currentIndex].actualOne1;//定标1段实际值1
+            const testOne1=channelData[currentIndex].testOne1;//定标1段测试值1
+            const actualOne2=channelData[currentIndex].actualOne2;//定标1段测试值2
+            const testOne2=channelData[currentIndex].testOne2;//定标1段实际值2
+            const kvalueOne1=channelData[currentIndex].kvalueOne1;//定标1段B值
+            const bvalueOne1=channelData[currentIndex].bvalueOne1;//定标1段K值
+            const demarcValue1=channelData[currentIndex].demarcValue1;//定标1段分界点1
+            const actualTwo1=channelData[currentIndex].actualTwo1;//定标2段实际值1
+            const testTwo1=channelData[currentIndex].testTwo1;//定标2段测试值1
+            const actualTwo2=channelData[currentIndex].actualTwo2;//定标2段实际值2
+            const testTwo2=channelData[currentIndex].testTwo2;//定标2段测试值2
+            const kvalueTwo1=channelData[currentIndex].kvalueTwo1;//定标2段B值
+            const bvalueTwo1=channelData[currentIndex].bvalueTwo1;//定标2段K值
+            const demarcValue2=channelData[currentIndex].demarcValue2;//定标2段分界点2
+            const actualThree1=channelData[currentIndex].actualThree1;//定标3段实际值1
+            const testThree1=channelData[currentIndex].testThree1;//定标3段测试值1
+            const actualThree2=channelData[currentIndex].actualThree2;//定标3段实际值2
+            const testThree2=channelData[currentIndex].testThree2;//定标3段测试值2
+            const kvalueThree1=channelData[currentIndex].kvalueThree1;//定标3段B值
+            const bvalueThree1=channelData[currentIndex].bvalueThree1;//定标3段K值
+            const demarcValue3=channelData[currentIndex].demarcValue3;//定标3段分界点3
+            const actualfour1=channelData[currentIndex].actualfour1;//定标4段实际值1
+            const testfour1=channelData[currentIndex].testfour1;//定标4段测试值1
+            const actualfour2=channelData[currentIndex].actualfour2;//定标4段实际值2
+            const testfour2=channelData[currentIndex].testfour2;//定标4段测试值2
+            const kvaluefour1=channelData[currentIndex].kvaluefour1;//定标4段B值
+            const bvaluefour1=channelData[currentIndex].bvaluefour1;//定标4段K值 
+            const channeltypeText=channelData[currentIndex].channeltypeText;//通道类型
+            const settionText=channelData[currentIndex].settionText;//定标类型
+            const command_parm = [Fid,channel, kvalueOne1, bvalueOne1,demarcValue1,kvalueTwo1,bvalueTwo1,demarcValue2,kvalueThree1,bvalueThree1,demarcValue3,kvaluefour1,bvaluefour1];
+            showStatus(`>>> ${getTimestamp()} 板卡${boardID}，通道${channel}，${settionText}进行中...`);
+            // console.log("wxj",command_parm);
+            const batch_KB = new CommandFactory('NDAC008', command_parm);
+            mode1_udpClient1.sendCommand(batch_KB.generate());
+            currentIndex++;
+        } else {
+            clearInterval(intervalId); // 打印完所有元素后清除定时器
+        }
+    }, 500);
+}

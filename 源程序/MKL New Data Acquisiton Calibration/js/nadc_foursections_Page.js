@@ -5358,13 +5358,72 @@ nadc_mode1_initialize.addEventListener('click', function () {
     const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
     const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
     const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
-    const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
     const selectedChannels = [];
-    channelCheckboxes.forEach((checkbox, index) => {
-        if (checkbox.checked) {
-            selectedChannels.push(index + 1); // 通道号从1开始
-        }
-    });
+    const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');
+    if (ndac_mode1_channel1.checked) {
+        selectedChannels.push(1);
+    }
+    const ndac_mode1_channel2 = document.getElementById('ndac_mode1_channel2');
+    if (ndac_mode1_channel2.checked) {
+        selectedChannels.push(2);
+    }
+    const ndac_mode1_channel3 = document.getElementById('ndac_mode1_channel3');
+    if (ndac_mode1_channel3.checked) {
+        selectedChannels.push(3);
+    }
+    const ndac_mode1_channel4 = document.getElementById('ndac_mode1_channel4');
+    if (ndac_mode1_channel4.checked) {
+        selectedChannels.push(4);
+    }
+    const ndac_mode1_channel5 = document.getElementById('ndac_mode1_channel5');
+    if (ndac_mode1_channel5.checked) {
+        selectedChannels.push(5);
+    }
+    const ndac_mode1_channel6 = document.getElementById('ndac_mode1_channel6');
+    if (ndac_mode1_channel6.checked) {
+        selectedChannels.push(6);
+    }
+    const ndac_mode1_channel7 = document.getElementById('ndac_mode1_channel7');
+    if (ndac_mode1_channel7.checked) {
+        selectedChannels.push(7);
+    }
+    const ndac_mode1_channel8 = document.getElementById('ndac_mode1_channel8');
+    if (ndac_mode1_channel8.checked) {
+        selectedChannels.push(8);
+    }
+    const ndac_mode1_channel9 = document.getElementById('ndac_mode1_channel9');
+    if (ndac_mode1_channel9.checked) {
+        selectedChannels.push(9);
+    }
+    const ndac_mode1_channel10 = document.getElementById('ndac_mode1_channel10');
+    if (ndac_mode1_channel10.checked) {
+        selectedChannels.push(10);
+    }
+    const ndac_mode1_channel11 = document.getElementById('ndac_mode1_channel11');
+    if (ndac_mode1_channel11.checked) {
+        selectedChannels.push(11);
+    }
+    const ndac_mode1_channel12 = document.getElementById('ndac_mode1_channel12');
+    if (ndac_mode1_channel12.checked) {
+        selectedChannels.push(12);
+    }
+    const ndac_mode1_channel13 = document.getElementById('ndac_mode1_channel13');
+    if (ndac_mode1_channel13.checked) {
+        selectedChannels.push(13);
+    }
+    const ndac_mode1_channel14 = document.getElementById('ndac_mode1_channel14');
+    if (ndac_mode1_channel14.checked) {
+        selectedChannels.push(14);
+    }
+    const ndac_mode1_channel15 = document.getElementById('ndac_mode1_channel15');
+    if (ndac_mode1_channel15.checked) {
+        selectedChannels.push(15);
+    }
+    const ndac_mode1_channel16 = document.getElementById('ndac_mode1_channel16');
+    if (ndac_mode1_channel16.checked) {
+        selectedChannels.push(16);
+    }
+
     if (selectedChannels.length > 0) {
         window.TheIPC.toMain3(100, Number(ndac_mode1_board_num.value), selectedChannels)
         ndac_mode1_dialog.style.display = 'block';
@@ -7279,7 +7338,7 @@ function updateChannel16Error() {
         ndac_mode1_channel16_error.textContent = "[定标1段] " + result1.errorMessage;
         return;
     }
-    const result2 =calculateKandB(mode1_channel16_two, ndac_mode1_channel16_two_actual1, ndac_mode1_channel16_two_actual2, ndac_mode1_channel16_two_test1, ndac_mode1_channel16_two_test2);
+    const result2 = calculateKandB(mode1_channel16_two, ndac_mode1_channel16_two_actual1, ndac_mode1_channel16_two_actual2, ndac_mode1_channel16_two_test1, ndac_mode1_channel16_two_test2);
     if (result2.errorMessage) {
         ndac_mode1_channel16_error.textContent = "[定标2段] " + result2.errorMessage;
         return;
@@ -7374,11 +7433,15 @@ function calculateKandB(inputs, actual1, actual2, test1, test2) {
 * 作者:Crow
 * 创建时间:2025/03/11 09:48:24
 */
+var VOLTAGETOFFSET = 30000;
 var shendKBvalue = [];
 const nadc_mode1_batch_send = document.getElementById('nadc_mode1_batch_send');
 nadc_mode1_batch_send.addEventListener('click', () => {
+    //对话框
+    const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
+    const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
     shendKBvalue = [];//初始化
-    let isTestValue1Selected = false;
+    let isTestValue1Selected = false;//开始有
     const channelCheckboxes = document.querySelectorAll('.checkbox'); // 假设所有通道复选框的类名为 checkbox
     // 检查是否有通道被选中
     channelCheckboxes.forEach(checkbox => {
@@ -7387,8 +7450,6 @@ nadc_mode1_batch_send.addEventListener('click', () => {
         }
     });
     if (!isTestValue1Selected) {
-        const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');
-        const ndac_mode1_dialog_label = document.getElementById('ndac_mode1_dialog_label');
         ndac_mode1_dialog.style.display = 'block';
         ndac_mode1_dialog_label.innerText = '请至少选择一个通道\n下发KB值';
         setTimeout(() => {
@@ -7396,11 +7457,189 @@ nadc_mode1_batch_send.addEventListener('click', () => {
         }, 1000);
         return; // 如果没有通道被选中，直接返回，不执行后续代码
     }
-    //查询是否都选中
+    //通道1：
+    const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');
+    const ndac_mode1_channel1_error = document.getElementById('ndac_mode1_channel1_error');
+    if (ndac_mode1_channel1.checked && ndac_mode1_channel1_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道1,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道2：
+    const ndac_mode1_channel2 = document.getElementById('ndac_mode1_channel2');
+    const ndac_mode1_channel2_error = document.getElementById('ndac_mode1_channel2_error');
+    if (ndac_mode1_channel2.checked && ndac_mode1_channel2_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道2,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道3：
+    const ndac_mode1_channel3 = document.getElementById('ndac_mode1_channel3');
+    const ndac_mode1_channel3_error = document.getElementById('ndac_mode1_channel3_error');
+    if (ndac_mode1_channel3.checked && ndac_mode1_channel3_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道3,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道3：
+    const ndac_mode1_channel4 = document.getElementById('ndac_mode1_channel4');
+    const ndac_mode1_channel4_error = document.getElementById('ndac_mode1_channel4_error');
+    if (ndac_mode1_channel4.checked && ndac_mode1_channel4_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道4,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道5：
+    const ndac_mode1_channel5 = document.getElementById('ndac_mode1_channel5');
+    const ndac_mode1_channel5_error = document.getElementById('ndac_mode1_channel5_error');
+    if (ndac_mode1_channel5.checked && ndac_mode1_channel5_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道5,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道6：
+    const ndac_mode1_channel6 = document.getElementById('ndac_mode1_channel6');
+    const ndac_mode1_channel6_error = document.getElementById('ndac_mode1_channel6_error');
+    if (ndac_mode1_channel6.checked && ndac_mode1_channel6_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道6,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道7：
+    const ndac_mode1_channel7 = document.getElementById('ndac_mode1_channel7');
+    const ndac_mode1_channel7_error = document.getElementById('ndac_mode1_channel7_error');
+    if (ndac_mode1_channel7.checked && ndac_mode1_channel7_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道7,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道8：
+    const ndac_mode1_channel8 = document.getElementById('ndac_mode1_channel8');
+    const ndac_mode1_channel8_error = document.getElementById('ndac_mode1_channel8_error');
+    if (ndac_mode1_channel8.checked && ndac_mode1_channel8_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道8,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道9：
+    const ndac_mode1_channel9 = document.getElementById('ndac_mode1_channel9');
+    const ndac_mode1_channel9_error = document.getElementById('ndac_mode1_channel9_error');
+    if (ndac_mode1_channel9.checked && ndac_mode1_channel9_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道9,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道10：
+    const ndac_mode1_channel10 = document.getElementById('ndac_mode1_channel10');
+    const ndac_mode1_channel10_error = document.getElementById('ndac_mode1_channel10_error');
+    if (ndac_mode1_channel10.checked && ndac_mode1_channel10_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道3,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道11：
+    const ndac_mode1_channel11 = document.getElementById('ndac_mode1_channel11');
+    const ndac_mode1_channel11_error = document.getElementById('ndac_mode1_channel11_error');
+    if (ndac_mode1_channel11.checked && ndac_mode1_channel11_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道11,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道12：
+    const ndac_mode1_channel12 = document.getElementById('ndac_mode1_channel12');
+    const ndac_mode1_channel12_error = document.getElementById('ndac_mode1_channel12_error');
+    if (ndac_mode1_channel12.checked && ndac_mode1_channel12_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道12,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道13：
+    const ndac_mode1_channel13 = document.getElementById('ndac_mode1_channel13');
+    const ndac_mode1_channel13_error = document.getElementById('ndac_mode1_channel13_error');
+    if (ndac_mode1_channel13.checked && ndac_mode1_channel13_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道13,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通14：
+    const ndac_mode1_channel14 = document.getElementById('ndac_mode1_channel14');
+    const ndac_mode1_channel14_error = document.getElementById('ndac_mode1_channel14_error');
+    if (ndac_mode1_channel14.checked && ndac_mode1_channel14_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道14,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道15：
+    const ndac_mode1_channel15 = document.getElementById('ndac_mode1_channel15');
+    const ndac_mode1_channel15_error = document.getElementById('ndac_mode1_channel15_error');
+    if (ndac_mode1_channel15.checked && ndac_mode1_channel15_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道15,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //通道16：
+    const ndac_mode1_channel16 = document.getElementById('ndac_mode1_channel16');
+    const ndac_mode1_channel16_error = document.getElementById('ndac_mode1_channel16_error');
+    if (ndac_mode1_channel16.checked && ndac_mode1_channel16_error.textContent != "") {
+        ndac_mode1_dialog.style.display = 'block';
+        ndac_mode1_dialog_label.innerText = '通道16,存在错误信息';
+        setTimeout(() => {
+            ndac_mode1_dialog.style.display = 'none';
+        }, 1000);
+        return; // 如果没有通道被选中，直接返回，不执行后续代码
+    }
+    //     //查询是否都选中
     const nadc_mode1_demarc1_value = document.getElementById('nadc_mode1_demarc1_value');//分界点1
     const nadc_mode1_demarc2_value = document.getElementById('nadc_mode1_demarc2_value');//分界点2
     const nadc_mode1_demarc3_value = document.getElementById('nadc_mode1_demarc3_value');//分界点3
-    const ndac_mode1_channel1 = document.getElementById('ndac_mode1_channel1');//通道1;
+    //板卡号
+    const ndac_mode1_board_num = document.getElementById('ndac_mode1_board_num');
+    //通道1
     const ndac_mode1_channel1_one_actual1 = document.getElementById('ndac_mode1_channel1_one_actual1');//1段实际值1
     const ndac_mode1_channel1_one_test1 = document.getElementById('ndac_mode1_channel1_one_test1');//1段测试值1
     const ndac_mode1_channel1_one_actual2 = document.getElementById('ndac_mode1_channel1_one_actual2');//1段实际值2
@@ -7411,9 +7650,9 @@ nadc_mode1_batch_send.addEventListener('click', () => {
     const ndac_mode1_channel1_two_test1 = document.getElementById('ndac_mode1_channel1_two_test1');//2段测试值1
     const ndac_mode1_channel1_two_actual2 = document.getElementById('ndac_mode1_channel1_two_actual2');//2段实际值2
     const ndac_mode1_channel1_two_test2 = document.getElementById('ndac_mode1_channel1_two_test2');//2段测试值2
-    const ndac_mode1_channel1_three_actual1 = document.getElementById('ndac_mode1_channel1_three_actual1');//3段实际值1;
     const ndac_mode1_channel1_two_k = document.getElementById('ndac_mode1_channel1_two_k');//1段k值
     const ndac_mode1_channel1_two_b = document.getElementById('ndac_mode1_channel1_two_b');//1段b值
+    const ndac_mode1_channel1_three_actual1 = document.getElementById('ndac_mode1_channel1_three_actual1');//3段实际值1;
     const ndac_mode1_channel1_three_test1 = document.getElementById('ndac_mode1_channel1_three_test1');//3段测试值1;
     const ndac_mode1_channel1_three_actual2 = document.getElementById('ndac_mode1_channel1_three_actual2');//3段实际值2;
     const ndac_mode1_channel1_three_test2 = document.getElementById('ndac_mode1_channel1_three_test2');//3段测试值2;
@@ -7425,18 +7664,36 @@ nadc_mode1_batch_send.addEventListener('click', () => {
     const ndac_mode1_channel1_four_test2 = document.getElementById('ndac_mode1_channel1_four_test2');//4段测试值2;
     const ndac_mode1_channel1_four_k = document.getElementById('ndac_mode1_channel1_four_k');//4段k值
     const ndac_mode1_channel1_four_b = document.getElementById('ndac_mode1_channel1_four_b');//4段b值
+    //通道2
+    const ndac_mode1_channel2_one_actual1 = document.getElementById('ndac_mode1_channel2_one_actual1');//1段实际值1
+    const ndac_mode1_channel2_one_test1 = document.getElementById('ndac_mode1_channel2_one_test1');//1段测试值1
+    const ndac_mode1_channel2_one_actual2 = document.getElementById('ndac_mode1_channel2_one_actual2');//1段实际值2
+    const ndac_mode1_channel2_one_test2 = document.getElementById('ndac_mode1_channel2_one_test2');//1段测试值2
+    const ndac_mode1_channel2_one_k = document.getElementById('ndac_mode1_channel2_one_k');//1段k值
+    const ndac_mode1_channel2_one_b = document.getElementById('ndac_mode1_channel2_one_b');//1段b值
 
 
-    const channeltype = CHANNELTYPE;
+    const channeltype = CHANNELTYPE;//类型
     let channeltypeText = "";
-    const section = SECTIONNUM;
+    const section = SECTIONNUM;//几段定标
+    console.log("类型：", channeltype, section, "段定标")
     let settionText = "";
-    switch (section) {
+    switch (section) {//判断几段定标
         case 0:
+            ndac_mode1_dialog.style.display = 'block';
+            ndac_mode1_dialog_label.innerText = '执行0段定标\n定标段参数错误';
+            setTimeout(() => {
+                ndac_mode1_dialog.style.display = 'none';
+            }, 1000);
             console.log("0段定标-请检查分界点")
             return -1;
             break
         case 1:
+            ndac_mode1_dialog.style.display = 'block';
+            ndac_mode1_dialog_label.innerText = '执行1段定标，下发KB值';
+            setTimeout(() => {
+                ndac_mode1_dialog.style.display = 'none';
+            }, 1000);
             console.log("1段定标-没设分界点1")
             switch (channeltype) {
                 case 0x00:
@@ -7453,15 +7710,200 @@ nadc_mode1_batch_send.addEventListener('click', () => {
                     settionText = "1段定标";
                     if (ndac_mode1_channel1.checked) {
                         const channelNum = 1;
-                        calibrate_One_Method(channeltypeText, settionText, channelNum, ndac_mode1_channel1_one_actual1.value, ndac_mode1_channel1_one_actual2.value,
-                            ndac_mode1_channel1_one_test1.value, ndac_mode1_channel1_one_test2.value, ndac_mode1_channel1_one_k.value, ndac_mode1_channel1_one_b.value,
-                            nadc_mode1_demarc1_value.value, nadc_mode1_demarc2_value.value, nadc_mode1_demarc3_value.value);
+                        calibrate_One_Method(
+                            channeltypeText,
+                            settionText,
+                            channelNum,
+                            ndac_mode1_channel1_one_actual1.value,
+                            ndac_mode1_channel1_one_actual2.value,
+                            ndac_mode1_channel1_one_test1.value,
+                            ndac_mode1_channel1_one_test2.value,
+                            Math.round(ndac_mode1_channel1_one_k.value),
+                            Math.round(ndac_mode1_channel1_one_b.value),
+                            nadc_mode1_demarc1_value.value,
+                            nadc_mode1_demarc2_value.value,
+                            nadc_mode1_demarc3_value.value
+                        );
+                    }
+                    if (ndac_mode1_channel2.checked) {
+                        const channelNum = 2;
+                        calibrate_One_Method(
+                            channeltypeText,
+                            settionText,
+                            channelNum,
+                            ndac_mode1_channel2_one_actual1.value,
+                            ndac_mode1_channel2_one_actual2.value,
+                            ndac_mode1_channel2_one_test1.value,
+                            ndac_mode1_channel2_one_test2.value,
+                            Math.round(ndac_mode1_channel2_one_k.value),
+                            Math.round(ndac_mode1_channel2_one_b.value),
+                            nadc_mode1_demarc1_value.value,
+                            nadc_mode1_demarc2_value.value,
+                            nadc_mode1_demarc3_value.value
+                        );
                     }
                     break;
             }
             break
+        case 2:
+            ndac_mode1_dialog.style.display = 'block';
+            ndac_mode1_dialog_label.innerText = '执行2段定标，下发KB值';
+            setTimeout(() => {
+                ndac_mode1_dialog.style.display = 'none';
+            }, 1000);
+            console.log("2段定标-设分界点1")
+            switch (channeltype) {
+                case 0x00:
+                // break;
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    channeltypeText = "电压采集板"
+                    settionText = "2段定标";
+                    if (ndac_mode1_channel1.checked) {
+                        const channelNum = 1;
+                        calibrate_Two_Method(
+                            channeltypeText,//板卡类型
+                            settionText,//定标类型
+                            channelNum,//通道号
+                            ndac_mode1_channel1_one_actual1.value,
+                            ndac_mode1_channel1_one_actual2.value,
+                            ndac_mode1_channel1_one_test1.value,
+                            ndac_mode1_channel1_one_test2.value,
+                            Math.round(ndac_mode1_channel1_one_k.value),
+                            Math.round(ndac_mode1_channel1_one_b.value),
+                            parseFloat(nadc_mode1_demarc1_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_two_actual1.value,
+                            ndac_mode1_channel1_two_actual2.value,
+                            ndac_mode1_channel1_two_test1.value,
+                            ndac_mode1_channel1_two_test2.value,
+                            Math.round(ndac_mode1_channel1_two_k.value),
+                            Math.round(ndac_mode1_channel1_two_b.value),
+                            nadc_mode1_demarc2_value.value,
+                            nadc_mode1_demarc3_value.value
+                        );
+                    }
+                    break;
+            }
+            break;
+        case 3:
+            ndac_mode1_dialog.style.display = 'block';
+            ndac_mode1_dialog_label.innerText = '执行3段定标，下发KB值';
+            setTimeout(() => {
+                ndac_mode1_dialog.style.display = 'none';
+            }, 1000);
+            console.log("3段定标-设分界点1和2")
+            switch (channeltype) {
+                case 0x00:
+                // break;
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    channeltypeText = "电压采集板"
+                    settionText = "3段定标";
+                    if (ndac_mode1_channel1.checked) {
+                        const channelNum = 1;
+                        calibrate_Three_Method(
+                            channeltypeText,//板卡类型
+                            settionText,//定标类型
+                            channelNum,//通道号
+                            ndac_mode1_channel1_one_actual1.value,
+                            ndac_mode1_channel1_one_actual2.value,
+                            ndac_mode1_channel1_one_test1.value,
+                            ndac_mode1_channel1_one_test2.value,
+                            Math.round(ndac_mode1_channel1_one_k.value),
+                            Math.round(ndac_mode1_channel1_one_b.value),
+                            parseFloat(nadc_mode1_demarc1_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_two_actual1.value,
+                            ndac_mode1_channel1_two_actual2.value,
+                            ndac_mode1_channel1_two_test1.value,
+                            ndac_mode1_channel1_two_test2.value,
+                            Math.round(ndac_mode1_channel1_two_k.value),
+                            Math.round(ndac_mode1_channel1_two_b.value),
+                            parseFloat(nadc_mode1_demarc2_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_three_actual1.value,
+                            ndac_mode1_channel1_three_actual2.value,
+                            ndac_mode1_channel1_three_test1.value,
+                            ndac_mode1_channel1_three_test2.value,
+                            Math.round(ndac_mode1_channel1_three_k.value),
+                            Math.round(ndac_mode1_channel1_three_b.value),
+                            nadc_mode1_demarc3_value.value,
+                        );
+                    }
+                    break;
+            }
+            break;
+        case 4:
+            ndac_mode1_dialog.style.display = 'block';
+            ndac_mode1_dialog_label.innerText = '执行4段定标，下发KB值';
+            setTimeout(() => {
+                ndac_mode1_dialog.style.display = 'none';
+            }, 1000);
+            console.log("4段定标-设分界点1、2和3");
+            switch (channeltype) {
+                case 0x00:
+                // break;
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                    channeltypeText = "电压采集板"
+                    settionText = "4段定标";
+                    if (ndac_mode1_channel1.checked) {
+                        const channelNum = 1;
+                        calibrate_Four_Method(
+                            channeltypeText,//板卡类型
+                            settionText,//定标类型
+                            channelNum,//通道号
+                            ndac_mode1_channel1_one_actual1.value,
+                            ndac_mode1_channel1_one_actual2.value,
+                            ndac_mode1_channel1_one_test1.value,
+                            ndac_mode1_channel1_one_test2.value,
+                            Math.round(ndac_mode1_channel1_one_k.value),
+                            Math.round(ndac_mode1_channel1_one_b.value),
+                            parseFloat(nadc_mode1_demarc1_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_two_actual1.value,
+                            ndac_mode1_channel1_two_actual2.value,
+                            ndac_mode1_channel1_two_test1.value,
+                            ndac_mode1_channel1_two_test2.value,
+                            Math.round(ndac_mode1_channel1_two_k.value),
+                            Math.round(ndac_mode1_channel1_two_b.value),
+                            parseFloat(nadc_mode1_demarc2_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_three_actual1.value,
+                            ndac_mode1_channel1_three_actual2.value,
+                            ndac_mode1_channel1_three_test1.value,
+                            ndac_mode1_channel1_three_test2.value,
+                            Math.round(ndac_mode1_channel1_three_k.value),
+                            Math.round(ndac_mode1_channel1_three_b.value),
+                            parseFloat(nadc_mode1_demarc3_value.value) + VOLTAGETOFFSET,
+                            ndac_mode1_channel1_four_actual1.value,
+                            ndac_mode1_channel1_four_actual2.value,
+                            ndac_mode1_channel1_four_test1.value,
+                            ndac_mode1_channel1_four_test2.value,
+                            Math.round(ndac_mode1_channel1_four_k.value),
+                            Math.round(ndac_mode1_channel1_four_b.value),
+                        );
+                    }
+                    break;
+            }
+            break;
     }
-    console.log('定标类型：', channeltype, "定标段：", section, "定标值：", shendKBvalue)
+    console.log('定标类型：', channeltype, "定标段：", section, "板卡号：", ndac_mode1_board_num.value, "定标值：", shendKBvalue)
+    window.TheIPC.toMain3(101, Number(ndac_mode1_board_num.value), shendKBvalue)
 })
 
 
@@ -7473,36 +7915,142 @@ function calibrate_One_Method(ChannelType, Settion, ChannelNum, OneActual1, OneA
         "actualOne2": Number(OneActual2),//1段实际值2
         "testOne1": Number(OneTest1),//1段测试值1
         "testOne2": Number(OneTest2),//1段测试值2
-        "bvalueOne1": Number(OneK),//1段K值
-        "kbvalueOne1": Number(OneB),//1段B值
+        "kvalueOne1": Number(OneK),//1段K值
+        "bvalueOne1": Number(OneB),//1段B值
         "demarcValue1": Number(DemarcOne),//分界点1。
         "actualTwo1": Number(0),//2段实际值1
         "actualTwo2": Number(0),//2段实际值2
         "testTwo1": Number(0),//2段测试值1
         "testTwo2": Number(0),//2段测试值2
-        "bvalueTwo1": Number(0),//1段K值
-        "kbvalueTwo1": Number(0),//1段B值
+        "kvalueTwo1": Number(0),//1段K值
+        "bvalueTwo1": Number(0),//1段B值
         "demarcValue2": Number(DemarcTwo),//分界点2。
         "actualThree1": Number(0),//3段实际值1
         "actualThree2": Number(0),//3段实际值2
         "testThree1": Number(0),//3段测试值1
         "testThree2": Number(0),//3段测试值2
-        "bvalueThree1": Number(0),//3段K值
-        "kbvalueThree1": Number(0),//3段B值
+        "kvalueThree1": Number(0),//3段K值
+        "bvalueThree1": Number(0),//3段B值
         "demarcValue3": Number(DemarcThree),//分界点3。
         "actualfour1": Number(0),//4段实际值1
         "actualfour2": Number(0),//4
         "testfour1": Number(0),//4段测试值1
         "testfour2": Number(0),//4段测试值2
-        "bvaluefour1": Number(0),//4段K值
-        "kbvaluefour1": Number(0),//4段B值
+        "kvaluefour1": Number(0),//4段K值
+        "bvaluefour1": Number(0),//4段B值
         "channeltypeText": ChannelType,
         "settionText": Settion,
     }
     shendKBvalue.push(lssued_value);
 }
-
-
+//定标二段的方法
+function calibrate_Two_Method(ChannelType, Settion, ChannelNum, OneActual1, OneActual2, OneTest1, OneTest2, OneK, OneB, DemarcOne, TwoActual1, TwoActual2, TwoTest1, TwoTest2, TwoK, TwoB, DemarcTwo, DemarcThree) {
+    const lssued_value = {
+        "channel": Number(ChannelNum),
+        "actualOne1": Number(OneActual1),//1段实际值1
+        "actualOne2": Number(OneActual2),//1段实际值2
+        "testOne1": Number(OneTest1),//1段测试值1
+        "testOne2": Number(OneTest2),//1段测试值2
+        "kvalueOne1": Number(OneK),//1段K值
+        "bvalueOne1": Number(OneB),//1段B值
+        "demarcValue1": Number(DemarcOne),//分界点1。
+        "actualTwo1": Number(TwoActual1),//2段实际值1
+        "actualTwo2": Number(TwoActual2),//2段实际值2
+        "testTwo1": Number(TwoTest1),//2段测试值1
+        "testTwo2": Number(TwoTest2),//2段测试值2
+        "kvalueTwo1": Number(TwoK),//1段K值
+        "bvalueTwo1": Number(TwoB),//1段B值
+        "demarcValue2": Number(DemarcTwo),//分界点2。
+        "actualThree1": Number(0),//3段实际值1
+        "actualThree2": Number(0),//3段实际值2
+        "testThree1": Number(0),//3段测试值1
+        "testThree2": Number(0),//3段测试值2
+        "kvalueThree1": Number(0),//3段K值
+        "bvalueThree1": Number(0),//3段B值
+        "demarcValue3": Number(DemarcThree),//分界点3。
+        "actualfour1": Number(0),//4段实际值1
+        "actualfour2": Number(0),//4
+        "testfour1": Number(0),//4段测试值1
+        "testfour2": Number(0),//4段测试值2
+        "kvaluefour1": Number(0),//4段K值
+        "bvaluefour1": Number(0),//4段B值
+        "channeltypeText": ChannelType,
+        "settionText": Settion,
+    }
+    shendKBvalue.push(lssued_value);
+}
+//定标三段的方法
+function calibrate_Three_Method(ChannelType, Settion, ChannelNum, OneActual1, OneActual2, OneTest1, OneTest2, OneK, OneB, DemarcOne, TwoActual1, TwoActual2, TwoTest1, TwoTest2, TwoK, TwoB, DemarcTwo, ThreeActual1, ThreeActual2, ThreeTest1, ThreeTest2, ThreeK, ThreeB, DemarcThree) {
+    const lssued_value = {
+        "channel": Number(ChannelNum),
+        "actualOne1": Number(OneActual1),//1段实际值1
+        "actualOne2": Number(OneActual2),//1段实际值2
+        "testOne1": Number(OneTest1),//1段测试值1
+        "testOne2": Number(OneTest2),//1段测试值2
+        "kvalueOne1": Number(OneK),//1段K值
+        "bvalueOne1": Number(OneB),//1段B值
+        "demarcValue1": Number(DemarcOne),//分界点1。
+        "actualTwo1": Number(TwoActual1),//2段实际值1
+        "actualTwo2": Number(TwoActual2),//2段实际值2
+        "testTwo1": Number(TwoTest1),//2段测试值1
+        "testTwo2": Number(TwoTest2),//2段测试值2
+        "kvalueTwo1": Number(TwoK),//1段K值
+        "bvalueTwo1": Number(TwoB),//1段B值
+        "demarcValue2": Number(DemarcTwo),//分界点2。
+        "actualThree1": Number(ThreeActual1),//3段实际值1
+        "actualThree2": Number(ThreeActual2),//3段实际值2
+        "testThree1": Number(ThreeTest1),//3段测试值1
+        "testThree2": Number(ThreeTest2),//3段测试值2
+        "kvalueThree1": Number(ThreeK),//3段K值
+        "bvalueThree1": Number(ThreeB),//3段B值
+        "demarcValue3": Number(DemarcThree),//分界点3。
+        "actualfour1": Number(0),//4段实际值1
+        "actualfour2": Number(0),//4
+        "testfour1": Number(0),//4段测试值1
+        "testfour2": Number(0),//4段测试值2
+        "kvaluefour1": Number(0),//4段K值
+        "bvaluefour1": Number(0),//4段B值
+        "channeltypeText": ChannelType,
+        "settionText": Settion,
+    }
+    shendKBvalue.push(lssued_value);
+}
+//定标四段的方法
+function calibrate_Four_Method(ChannelType, Settion, ChannelNum, OneActual1, OneActual2, OneTest1, OneTest2, OneK, OneB, DemarcOne, TwoActual1, TwoActual2, TwoTest1, TwoTest2, TwoK, TwoB, DemarcTwo, ThreeActual1, ThreeActual2, ThreeTest1, ThreeTest2, ThreeK, ThreeB, DemarcThree, FourActual1, FourActual2, FourTest1, FourTest2, FourK, FourB) {
+    const lssued_value = {
+        "channel": Number(ChannelNum),
+        "actualOne1": Number(OneActual1),//1段实际值1
+        "actualOne2": Number(OneActual2),//1段实际值2
+        "testOne1": Number(OneTest1),//1段测试值1
+        "testOne2": Number(OneTest2),//1段测试值2
+        "kvalueOne1": Number(OneK),//1段K值
+        "bvalueOne1": Number(OneB),//1段B值
+        "demarcValue1": Number(DemarcOne),//分界点1。
+        "actualTwo1": Number(TwoActual1),//2段实际值1
+        "actualTwo2": Number(TwoActual2),//2段实际值2
+        "testTwo1": Number(TwoTest1),//2段测试值1
+        "testTwo2": Number(TwoTest2),//2段测试值2
+        "kvalueTwo1": Number(TwoK),//1段K值
+        "bvalueTwo1": Number(TwoB),//1段B值
+        "demarcValue2": Number(DemarcTwo),//分界点2。
+        "actualThree1": Number(ThreeActual1),//3段实际值1
+        "actualThree2": Number(ThreeActual2),//3段实际值2
+        "testThree1": Number(ThreeTest1),//3段测试值1
+        "testThree2": Number(ThreeTest2),//3段测试值2
+        "kvalueThree1": Number(ThreeK),//3段K值
+        "bvalueThree1": Number(ThreeB),//3段B值
+        "demarcValue3": Number(DemarcThree),//分界点3。
+        "actualfour1": Number(FourActual1),//4段实际值1
+        "actualfour2": Number(FourActual2),//4段实际值2
+        "testfour1": Number(FourTest1),//4段测试值1
+        "testfour2": Number(FourTest2),//4段测试值2
+        "kvaluefour1": Number(FourK),//4段K值
+        "bvaluefour1": Number(FourB),//4段B值
+        "channeltypeText": ChannelType,
+        "settionText": Settion,
+    }
+    shendKBvalue.push(lssued_value);
+}
 /**
 * 模块名:
 * 代码描述:底部显示信息
@@ -7618,7 +8166,7 @@ function mode1_open_restore(data) {
         clearTimeout(MODE1TIMER);
         setTimeout(() => {
             ndac_mode1_dialog.style.display = 'none';
-            window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
+            // window.TheIPC.toMain3(1, Number(ndac_mode1_board_num.value), ndac_mode1_passbacktime);
         }, 1000)
     } else if (restore_state == false) {
         const ndac_mode1_dialog = document.getElementById('ndac_mode1_dialog');

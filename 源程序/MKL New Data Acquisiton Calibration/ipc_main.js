@@ -5,7 +5,7 @@ module.exports = {
 }
 const { ndac_mode1_display_TD } = require('./js/manage/ndac_jump_interface.js')
 const { mode1_parameter, initialize_KB_value,
-    query_mode1_tran, enter_mode1_debug, query_board_version, restore_mode1_baudRate, exit_mode1_debug,get_channels_values } = require('./mode/mode1/mode1_client.js');
+    query_mode1_tran, enter_mode1_debug, query_board_version, restore_mode1_baudRate, exit_mode1_debug, get_channels_values,batch_KB_write } = require('./mode/mode1/mode1_client.js');
 var mainWindow = null;
 function setWindow(theWindow) {
     mainWindow = theWindow;
@@ -99,16 +99,19 @@ ipcMain.on('toMain2', async (event, id, d1) => {
 });
 
 
-
 ipcMain.on('toMain3', async (event, id, d1, d2) => {
     switch (id) {
         case 1:
             Operation_tips = "#1显示通道数据";
-            get_channels_values(id,d1,d2);
+            get_channels_values(id, d1, d2);
             break;
         case 100:
-            Operation_tips = "#104初始化K/B值";
+            Operation_tips = "#100初始化K/B值";
             initialize_KB_value(id, d1, d2);
+            break;
+        case 101:
+            Operation_tips = "#101批量下发K/B值";
+            batch_KB_write(id, d1, d2);
             break;
     }
     console.log(`ipc =toMain3 ${id},${Operation_tips}`);

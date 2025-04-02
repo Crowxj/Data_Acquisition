@@ -33,6 +33,8 @@ class CommandFactory {
                 return this.generateDebugState();
             case 'NDAC007'://初始化K/B
                 return this.generateInitializeKB();
+            case 'NDAC008'://批量K/B
+                return this.generatebatchKB();
             default:
                 throw new Error(`Unknown command: ${this.code}`);
         }
@@ -136,7 +138,7 @@ class CommandFactory {
         return sendBuf;
     }
     generateInitializeKB() {
-        const [param1, param2,param3,param4] = this.args;
+        const [param1, param2, param3, param4] = this.args;
         const sendBuf = new Uint8Array(69);
         sendBuf[0] = 0x3d;
         sendBuf[1] = 0x00; // 命令类型
@@ -144,12 +146,54 @@ class CommandFactory {
         sendBuf[4] = param1 & 0xFF;
         sendBuf[5] = 0xdb;
         sendBuf[6] = param2;
-        sendBuf[7] = (param3 >> 8) & 0xFF; 
+        sendBuf[7] = (param3 >> 8) & 0xFF;
         sendBuf[8] = param3 & 0xFF;
         sendBuf[9] = (param4 >> 8) & 0xFF;
         sendBuf[10] = param4 & 0xFF;
         sendBuf[11] = 0x00;
         return sendBuf
+    }
+
+    generatebatchKB() {
+        const [Fid, channel, kvalueOne1, bvalueOne1, demarcValue1, kvalueTwo1, bvalueTwo1, demarcValue2, kvalueThree1, bvalueThree1, demarcValue3, kvaluefour1, bvaluefour1] = this.args;
+        console.log("wxj", Fid, channel, kvalueOne1, bvalueOne1, demarcValue1, kvalueTwo1, bvalueTwo1, demarcValue2, kvalueThree1, bvalueThree1, demarcValue3, kvaluefour1, bvaluefour1);
+        const sendBuf = new Uint8Array(69);
+        sendBuf[0] = 0x3d;
+        sendBuf[1] = 0x00;
+        sendBuf[3] = (Fid >> 8) & 0xFF;
+        sendBuf[4] = Fid & 0xFF;
+        sendBuf[5] = 0xdb;
+        sendBuf[6] = channel;
+        sendBuf[7] = (kvalueOne1 >> 8) & 0xFF;
+        sendBuf[8] = kvalueOne1 & 0xFF;
+        sendBuf[9] = (bvalueOne1 >> 8) & 0xFF;
+        sendBuf[10] = bvalueOne1 & 0xFF;
+        sendBuf[11] = (demarcValue1 >> 24) & 0xFF;
+        sendBuf[12] = (demarcValue1 >> 16) & 0xFF;
+        sendBuf[13] = (demarcValue1 >> 8) & 0xFF;
+        sendBuf[14] = demarcValue1 & 0xFF;
+        sendBuf[15] = (kvalueTwo1 >> 8) & 0xFF;
+        sendBuf[16] = kvalueTwo1 & 0xFF;
+        sendBuf[17] = (bvalueTwo1 >> 8) & 0xFF;
+        sendBuf[18] = bvalueTwo1 & 0xFF;
+        sendBuf[19] = (demarcValue2 >> 24) & 0xFF;
+        sendBuf[20] = (demarcValue2 >> 16) & 0xFF;
+        sendBuf[21] = (demarcValue2 >> 8) & 0xFF;
+        sendBuf[22] = demarcValue2 & 0xFF;
+        sendBuf[23] = (kvalueThree1 >> 8) & 0xFF;
+        sendBuf[24] = kvalueThree1 & 0xFF;
+        sendBuf[25] = (bvalueThree1 >> 8) & 0xFF;
+        sendBuf[26] = bvalueThree1 & 0xFF;
+        sendBuf[27] = (demarcValue3 >> 24) & 0xFF;
+        sendBuf[28] = (demarcValue3 >> 16) & 0xFF;
+        sendBuf[29] = (demarcValue3 >> 8) & 0xFF;
+        sendBuf[30] = demarcValue3 & 0xFF;
+        sendBuf[31] = (kvaluefour1 >> 8) & 0xFF;
+        sendBuf[32] = kvaluefour1 & 0xFF;
+        sendBuf[33] = (bvaluefour1 >> 8) & 0xFF;
+        sendBuf[34] = bvaluefour1 & 0xFF;
+        sendBuf[35] = 0x00;
+        return sendBuf;
     }
 }
 module.exports = CommandFactory;

@@ -23,3 +23,6 @@
 
 #NDACODE = "NDAC007"
 #初始化K/B值命令
+
+#NDACODE = "NDAC008"
+#批量K/B值命令
